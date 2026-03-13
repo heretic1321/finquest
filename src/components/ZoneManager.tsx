@@ -1,5 +1,5 @@
 import { memo, useEffect } from 'react'
-import { Detailed } from '@react-three/drei'
+import { Billboard, Detailed, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { useShallow } from 'zustand/react/shallow'
 import { useControls, folder } from 'leva'
@@ -7,7 +7,7 @@ import { useControls, folder } from 'leva'
 import StoreEntryExitTriggerArea from '@client/components/StoreEntryExitTriggerArea'
 import { CharacterRef } from '@client/components/Character'
 import { StoreConfigs } from '@client/config/MapConfig'
-import { ZONE_CONFIGS } from '@client/config/ZoneConfig'
+import { ZONE_CONFIGS, getZoneByStoreKey } from '@client/config/ZoneConfig'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { MapStore } from '@client/contexts/MapContext'
 
@@ -206,6 +206,53 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
                 </Detailed>
               </group>
             )}
+
+            {/* Floating zone name billboard */}
+            {hasLods && lods.transform.position && (() => {
+              const zone = getZoneByStoreKey(storeName)
+              if (!zone) return null
+              const pos = lods.transform.position as THREE.Vector3
+              // Position above the building
+              const billboardY = (pos.y || 0) + 25
+              return (
+                <Billboard
+                  follow={true}
+                  lockX={false}
+                  lockY={false}
+                  lockZ={false}
+                  position={[pos.x || 0, billboardY, pos.z || 0]}
+                >
+                  {/* Background panel */}
+                  <mesh position={[0, 0, -0.05]}>
+                    <planeGeometry args={[zone.name.length * 0.85 + 1.5, 2.8]} />
+                    <meshBasicMaterial color={'#000000'} transparent opacity={0.7} />
+                  </mesh>
+                  {/* Zone name */}
+                  <Text
+                    fontSize={1.8}
+                    color={zone.accentColor}
+                    anchorX="center"
+                    anchorY="middle"
+                    font="https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2"
+                    fontWeight={700}
+                    position={[0, 0.3, 0]}
+                  >
+                    {zone.name}
+                  </Text>
+                  {/* Subtitle */}
+                  <Text
+                    fontSize={0.6}
+                    color={'#94a3b8'}
+                    anchorX="center"
+                    anchorY="middle"
+                    font="https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2"
+                    position={[0, -0.8, 0]}
+                  >
+                    {zone.description}
+                  </Text>
+                </Billboard>
+              )
+            })()}
 
             {/* Entry trigger */}
             {entryTriggerAreaGeometry && (
