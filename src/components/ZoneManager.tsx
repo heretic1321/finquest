@@ -7,11 +7,11 @@ import { useControls, folder } from 'leva'
 import StoreEntryExitTriggerArea from '@client/components/StoreEntryExitTriggerArea'
 import { CharacterRef } from '@client/components/Character'
 import { StoreConfigs } from '@client/config/MapConfig'
-import { ZONE_CONFIGS, getZoneByStoreKey } from '@client/config/ZoneConfig'
+import { ZONE_CONFIGS, getZoneByStoreKey, STORE_TO_ZONE } from '@client/config/ZoneConfig'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { MapStore } from '@client/contexts/MapContext'
 
-// Track which meshes we've cloned materials for, so we can update them live
+// Track cloned meshes per store for live color updates
 const trackedMeshes: Record<string, THREE.Mesh[]> = {}
 
 function recolorStoreMeshes(
@@ -29,17 +29,15 @@ function recolorStoreMeshes(
     const mat = child.material as THREE.MeshStandardMaterial
     if (!mat || !mat.color) return
 
-    // Target gold-ish materials (hue ~30-60, high saturation)
     const hsl = { h: 0, s: 0, l: 0 }
     mat.color.getHSL(hsl)
     const isGoldy = hsl.h > 0.05 && hsl.h < 0.2 && hsl.s > 0.3
     const isSilver = hsl.s < 0.1 && hsl.l > 0.6
 
     if (isGoldy || isSilver) {
-      // Only clone once
-      if (!(child.material as any).__finquest_cloned) {
+      if (!(child.material as any).__fq_cloned) {
         const newMat = mat.clone()
-        ;(newMat as any).__finquest_cloned = true
+        ;(newMat as any).__fq_cloned = true
         child.material = newMat
       }
       const m = child.material as THREE.MeshStandardMaterial
@@ -50,10 +48,10 @@ function recolorStoreMeshes(
     }
   })
 
-  trackedMeshes[storeKey] = meshes
+  // Merge with existing tracked meshes (multiple LODs)
+  trackedMeshes[storeKey] = [...(trackedMeshes[storeKey] || []), ...meshes]
 }
 
-// Live update colors without re-traversing
 function updateStoreMeshColors(
   storeKey: string,
   zoneColor: string,
@@ -61,10 +59,11 @@ function updateStoreMeshColors(
   roughness: number,
 ) {
   const meshes = trackedMeshes[storeKey]
-  if (!meshes) return
+  if (!meshes || meshes.length === 0) return
   const color = new THREE.Color(zoneColor)
   meshes.forEach((child) => {
     const m = child.material as THREE.MeshStandardMaterial
+    if (!m) return
     m.color.set(color)
     m.metalness = metalness
     m.roughness = roughness
@@ -89,88 +88,114 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
   const allStoresInfo = MapStore((state) => state.allStoresInfo)
   const buildingNames = Object.keys(StoreConfigs)
 
-  // Leva color pickers for each zone
+  // ── Zone Color Controls ──
   const zoneColors = useControls('Zone Colors', {
-    'FinQuest Bank (hub)': folder({
+    [`FinQuest Bank (${ZONE_CONFIGS.bank.storeKey})`]: folder({
       bankColor: { value: ZONE_CONFIGS.bank.themeColor, label: 'Color' },
-      bankMetalness: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
-      bankRoughness: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
+      bankMetal: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
+      bankRough: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
     }),
-    'City Hospital (tallstore)': folder({
-      hospitalColor: { value: ZONE_CONFIGS.hospital.themeColor, label: 'Color' },
-      hospitalMetalness: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
-      hospitalRoughness: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
+    [`City Hospital (${ZONE_CONFIGS.hospital.storeKey})`]: folder({
+      hospColor: { value: ZONE_CONFIGS.hospital.themeColor, label: 'Color' },
+      hospMetal: { value: 1.0, min: 0, max: 1, step: 0.05, label: 'Metalness' },
+      hospRough: { value: 0.15, min: 0, max: 1, step: 0.05, label: 'Roughness' },
     }),
-    'MF Tower (domestore)': folder({
-      mftowerColor: { value: ZONE_CONFIGS.mftower.themeColor, label: 'Color' },
-      mftowerMetalness: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
-      mftowerRoughness: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
-    }),
-    'Scam Park (ogstore)': folder({
-      scamparkColor: { value: ZONE_CONFIGS.scampark.themeColor, label: 'Color' },
-      scamparkMetalness: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
-      scamparkRoughness: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
-    }),
-    'Stock Exchange (cylinderstore)': folder({
+    [`Stock Exchange (${ZONE_CONFIGS.stockexchange.storeKey})`]: folder({
       stockColor: { value: ZONE_CONFIGS.stockexchange.themeColor, label: 'Color' },
-      stockMetalness: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
-      stockRoughness: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
+      stockMetal: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
+      stockRough: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
+    }),
+    [`Scam Park (${ZONE_CONFIGS.scampark.storeKey})`]: folder({
+      scamColor: { value: ZONE_CONFIGS.scampark.themeColor, label: 'Color' },
+      scamMetal: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
+      scamRough: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
+    }),
+    [`MF Tower (${ZONE_CONFIGS.mftower.storeKey})`]: folder({
+      mfColor: { value: ZONE_CONFIGS.mftower.themeColor, label: 'Color' },
+      mfMetal: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
+      mfRough: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
     }),
   })
 
-  // Map leva values to store keys for live updates
+  // ── Label Position Controls ──
+  const labelPos = useControls('Zone Labels', {
+    [`${ZONE_CONFIGS.bank.name} Label`]: folder({
+      bankLabelY: { value: ZONE_CONFIGS.bank.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
+    }),
+    [`${ZONE_CONFIGS.hospital.name} Label`]: folder({
+      hospLabelY: { value: ZONE_CONFIGS.hospital.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
+    }),
+    [`${ZONE_CONFIGS.stockexchange.name} Label`]: folder({
+      stockLabelY: { value: ZONE_CONFIGS.stockexchange.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
+    }),
+    [`${ZONE_CONFIGS.scampark.name} Label`]: folder({
+      scamLabelY: { value: ZONE_CONFIGS.scampark.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
+    }),
+    [`${ZONE_CONFIGS.mftower.name} Label`]: folder({
+      mfLabelY: { value: ZONE_CONFIGS.mftower.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
+    }),
+  })
+
+  // Map storeKey -> leva values
   const colorMap: Record<string, { color: string; metalness: number; roughness: number }> = {
-    hub: { color: zoneColors.bankColor, metalness: zoneColors.bankMetalness, roughness: zoneColors.bankRoughness },
-    tallstore: { color: zoneColors.hospitalColor, metalness: zoneColors.hospitalMetalness, roughness: zoneColors.hospitalRoughness },
-    domestore: { color: zoneColors.mftowerColor, metalness: zoneColors.mftowerMetalness, roughness: zoneColors.mftowerRoughness },
-    ogstore: { color: zoneColors.scamparkColor, metalness: zoneColors.scamparkMetalness, roughness: zoneColors.scamparkRoughness },
-    cylinderstore: { color: zoneColors.stockColor, metalness: zoneColors.stockMetalness, roughness: zoneColors.stockRoughness },
+    [ZONE_CONFIGS.bank.storeKey]: { color: zoneColors.bankColor, metalness: zoneColors.bankMetal, roughness: zoneColors.bankRough },
+    [ZONE_CONFIGS.hospital.storeKey]: { color: zoneColors.hospColor, metalness: zoneColors.hospMetal, roughness: zoneColors.hospRough },
+    [ZONE_CONFIGS.stockexchange.storeKey]: { color: zoneColors.stockColor, metalness: zoneColors.stockMetal, roughness: zoneColors.stockRough },
+    [ZONE_CONFIGS.scampark.storeKey]: { color: zoneColors.scamColor, metalness: zoneColors.scamMetal, roughness: zoneColors.scamRough },
+    [ZONE_CONFIGS.mftower.storeKey]: { color: zoneColors.mfColor, metalness: zoneColors.mfMetal, roughness: zoneColors.mfRough },
   }
 
-  // After allStoresInfo changes, do initial recolor
+  const labelYMap: Record<string, number> = {
+    [ZONE_CONFIGS.bank.storeKey]: labelPos.bankLabelY,
+    [ZONE_CONFIGS.hospital.storeKey]: labelPos.hospLabelY,
+    [ZONE_CONFIGS.stockexchange.storeKey]: labelPos.stockLabelY,
+    [ZONE_CONFIGS.scampark.storeKey]: labelPos.scamLabelY,
+    [ZONE_CONFIGS.mftower.storeKey]: labelPos.mfLabelY,
+  }
+
+  // Initial recolor when stores load
   useEffect(() => {
     const storeKeys = Object.keys(allStoresInfo)
     if (storeKeys.length === 0) return
 
+    // Clear tracked meshes for fresh recolor
+    Object.keys(trackedMeshes).forEach(k => { trackedMeshes[k] = [] })
+
     storeKeys.forEach((storeName) => {
       const storeInfo = allStoresInfo[storeName]
       if (!storeInfo) return
-      const { lods } = storeInfo
       const cm = colorMap[storeName]
       if (!cm) return
-      lods.objects.forEach((obj) => {
+      storeInfo.lods.objects.forEach((obj) => {
         if (obj) recolorStoreMeshes(obj, cm.color, cm.metalness, cm.roughness, storeName)
       })
     })
   }, [allStoresInfo])
 
-  // Live update when leva values change
+  // Live update on leva color change
   useEffect(() => {
     Object.entries(colorMap).forEach(([storeKey, { color, metalness, roughness }]) => {
       updateStoreMeshColors(storeKey, color, metalness, roughness)
     })
   }, [
-    zoneColors.bankColor, zoneColors.bankMetalness, zoneColors.bankRoughness,
-    zoneColors.hospitalColor, zoneColors.hospitalMetalness, zoneColors.hospitalRoughness,
-    zoneColors.mftowerColor, zoneColors.mftowerMetalness, zoneColors.mftowerRoughness,
-    zoneColors.scamparkColor, zoneColors.scamparkMetalness, zoneColors.scamparkRoughness,
-    zoneColors.stockColor, zoneColors.stockMetalness, zoneColors.stockRoughness,
+    zoneColors.bankColor, zoneColors.bankMetal, zoneColors.bankRough,
+    zoneColors.hospColor, zoneColors.hospMetal, zoneColors.hospRough,
+    zoneColors.stockColor, zoneColors.stockMetal, zoneColors.stockRough,
+    zoneColors.scamColor, zoneColors.scamMetal, zoneColors.scamRough,
+    zoneColors.mfColor, zoneColors.mfMetal, zoneColors.mfRough,
   ])
 
-  // Key listener for E to confirm entry (opens zone UI overlay)
+  // E key to open zone UI
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code !== 'KeyE') return
-
-      const enterPromptShown = HUDStore.getState().isEnterStorePromptShown
-      if (enterPromptShown) {
+      if (HUDStore.getState().isEnterStorePromptShown) {
         const storeName = HUDStore.getState().enterStorePromptStoreName
         if (storeName) {
           HUDStore.getState().setStoreRequestedToEnter(storeName)
         }
       }
     }
-
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
@@ -181,18 +206,14 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
         const storeInfo = allStoresInfo[storeName]
         if (!storeInfo) return null
 
-        const {
-          lods,
-          entryTriggerAreaGeometry,
-          entryTriggerAreaTransform,
-        } = storeInfo
-
-        // LOD objects: [high, mid, low]
+        const { lods, entryTriggerAreaGeometry, entryTriggerAreaTransform } = storeInfo
         const hasLods = lods.objects[0] || lods.objects[1] || lods.objects[2]
+        const zone = getZoneByStoreKey(storeName)
+        const yOffset = labelYMap[storeName] ?? 20
 
         return (
           <group key={storeName}>
-            {/* Render building LODs */}
+            {/* Building LODs */}
             {hasLods && lods.transform.position && (
               <group
                 position={lods.transform.position}
@@ -207,48 +228,54 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
               </group>
             )}
 
-            {/* Floating zone name billboard */}
-            {hasLods && lods.transform.position && (() => {
-              const zone = getZoneByStoreKey(storeName)
-              if (!zone) return null
+            {/* Floating zone label */}
+            {zone && hasLods && lods.transform.position && (() => {
               const pos = lods.transform.position as THREE.Vector3
-              // Position above the building
-              const billboardY = (pos.y || 0) + 25
+              const bx = pos.x || 0
+              const by = (pos.y || 0) + yOffset
+              const bz = pos.z || 0
+
               return (
                 <Billboard
-                  follow={true}
+                  follow
                   lockX={false}
                   lockY={false}
                   lockZ={false}
-                  position={[pos.x || 0, billboardY, pos.z || 0]}
+                  position={[bx, by, bz]}
                 >
-                  {/* Background panel */}
-                  <mesh position={[0, 0, -0.05]}>
-                    <planeGeometry args={[zone.name.length * 0.85 + 1.5, 2.8]} />
-                    <meshBasicMaterial color={'#000000'} transparent opacity={0.7} />
+                  {/* Glow background */}
+                  <mesh position={[0, 0, -0.1]}>
+                    <planeGeometry args={[zone.name.length * 1.0 + 2, 3.2]} />
+                    <meshBasicMaterial color={zone.themeColor} transparent opacity={0.85} />
+                  </mesh>
+                  {/* Border line top */}
+                  <mesh position={[0, 1.5, -0.05]}>
+                    <planeGeometry args={[zone.name.length * 1.0 + 2, 0.06]} />
+                    <meshBasicMaterial color={zone.accentColor} />
+                  </mesh>
+                  {/* Border line bottom */}
+                  <mesh position={[0, -1.5, -0.05]}>
+                    <planeGeometry args={[zone.name.length * 1.0 + 2, 0.06]} />
+                    <meshBasicMaterial color={zone.accentColor} />
                   </mesh>
                   {/* Zone name */}
                   <Text
-                    fontSize={1.8}
-                    color={zone.accentColor}
+                    fontSize={2.0}
+                    color="#ffffff"
                     anchorX="center"
                     anchorY="middle"
                     font="./assets/fonts/Rajdhani-Bold.ttf"
-                    position={[0, 0.3, 0]}
+                    position={[0, 0.2, 0]}
+                    outlineWidth={0.08}
+                    outlineColor="#000000"
                   >
-                    {zone.name}
+                    {zone.name.toUpperCase()}
                   </Text>
-                  {/* Subtitle */}
-                  <Text
-                    fontSize={0.6}
-                    color={'#94a3b8'}
-                    anchorX="center"
-                    anchorY="middle"
-                    font="./assets/fonts/Rajdhani-Bold.ttf"
-                    position={[0, -0.8, 0]}
-                  >
-                    {zone.description}
-                  </Text>
+                  {/* Accent underline */}
+                  <mesh position={[0, -0.6, -0.02]}>
+                    <planeGeometry args={[zone.name.length * 0.7, 0.08]} />
+                    <meshBasicMaterial color={zone.accentColor} />
+                  </mesh>
                 </Billboard>
               )
             })()}
