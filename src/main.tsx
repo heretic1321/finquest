@@ -81,7 +81,7 @@ const MainCanvas = () => {
 const Main = () => {
   return (
     <>
-      <Leva oneLineLabels collapsed hidden />
+      <Leva oneLineLabels collapsed />
       <GlobalStateContextProvider />
       <GesturesAndDeviceContextProvider />
       <AuthContextProvider />
