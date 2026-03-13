@@ -1,4 +1,5 @@
-import { memo, useEffect, useRef } from 'react'
+import { memo, useEffect } from 'react'
+import { Detailed } from '@react-three/drei'
 import { useShallow } from 'zustand/react/shallow'
 
 import StoreEntryExitTriggerArea from '@client/components/StoreEntryExitTriggerArea'
@@ -8,7 +9,6 @@ import { getZoneByStoreKey } from '@client/config/ZoneConfig'
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { MapStore } from '@client/contexts/MapContext'
-import { PlayerConfigStore } from '@client/components/Character'
 
 type ZoneManagerProps = {
   characterRef: React.MutableRefObject<CharacterRef | null>
@@ -120,14 +120,33 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
         if (!storeInfo) return null
 
         const {
+          lods,
           entryTriggerAreaGeometry,
           entryTriggerAreaTransform,
           exitTriggerAreaGeometry,
           exitTriggerAreaTransform,
         } = storeInfo
 
+        // LOD objects: [high, mid, low]
+        const hasLods = lods.objects[0] || lods.objects[1] || lods.objects[2]
+
         return (
           <group key={storeName}>
+            {/* Render building LODs */}
+            {hasLods && lods.transform.position && (
+              <group
+                position={lods.transform.position}
+                rotation={lods.transform.rotation || undefined}
+                scale={lods.transform.scale || undefined}
+              >
+                <Detailed distances={lods.distances}>
+                  {lods.objects[0] && <primitive object={lods.objects[0]} />}
+                  {lods.objects[1] && <primitive object={lods.objects[1]} />}
+                  {lods.objects[2] && <primitive object={lods.objects[2]} />}
+                </Detailed>
+              </group>
+            )}
+
             {/* Entry trigger */}
             {entryTriggerAreaGeometry && (
               <StoreEntryExitTriggerArea
