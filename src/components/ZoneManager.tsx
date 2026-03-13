@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef } from 'react'
-import { Billboard, Detailed, Text } from '@react-three/drei'
+import { Detailed, Html } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useShallow } from 'zustand/react/shallow'
@@ -14,14 +14,12 @@ import { MapStore } from '@client/contexts/MapContext'
 
 const getMapScale = () => MapStore.getState().mapScale || 2
 
-// Distance-scaling label that renders on top of everything
+// HTML-based label — guaranteed to render on top of all 3D geometry
 function ZoneLabel({
   position,
   name,
   themeColor,
   accentColor,
-  minScale,
-  maxScale,
 }: {
   position: [number, number, number]
   name: string
@@ -30,60 +28,51 @@ function ZoneLabel({
   minScale: number
   maxScale: number
 }) {
-  const groupRef = useRef<THREE.Group>(null!)
-  const { camera } = useThree()
-
-  useFrame(() => {
-    if (!groupRef.current) return
-    const dist = camera.position.distanceTo(
-      new THREE.Vector3(position[0], position[1], position[2])
-    )
-    // Scale up when far, scale down when close, clamped
-    const s = THREE.MathUtils.clamp(dist * 0.012, minScale, maxScale)
-    groupRef.current.scale.setScalar(s)
-  })
-
   return (
-    <group ref={groupRef} position={position}>
-      <Billboard follow lockX={false} lockY={false} lockZ={false}>
-        {/* Background — rendered on top via depthTest=false and high renderOrder */}
-        <mesh position={[0, 0, -0.1]} renderOrder={999}>
-          <planeGeometry args={[name.length * 1.0 + 2, 3.2]} />
-          <meshBasicMaterial color={themeColor} transparent opacity={0.85} depthTest={false} depthWrite={false} />
-        </mesh>
-        {/* Border top */}
-        <mesh position={[0, 1.5, -0.05]} renderOrder={999}>
-          <planeGeometry args={[name.length * 1.0 + 2, 0.06]} />
-          <meshBasicMaterial color={accentColor} depthTest={false} depthWrite={false} />
-        </mesh>
-        {/* Border bottom */}
-        <mesh position={[0, -1.5, -0.05]} renderOrder={999}>
-          <planeGeometry args={[name.length * 1.0 + 2, 0.06]} />
-          <meshBasicMaterial color={accentColor} depthTest={false} depthWrite={false} />
-        </mesh>
-        {/* Zone name */}
-        <Text
-          fontSize={2.0}
-          color="#ffffff"
-          anchorX="center"
-          anchorY="middle"
-          font="./assets/fonts/Rajdhani-Bold.ttf"
-          position={[0, 0.2, 0]}
-          outlineWidth={0.08}
-          outlineColor="#000000"
-          renderOrder={1000}
-          // @ts-ignore - drei Text supports material props pass-through
-          depthTest={false}
-          depthWrite={false}
+    <group position={position}>
+      <Html
+        center
+        distanceFactor={40}
+        zIndexRange={[100, 0]}
+        style={{ pointerEvents: 'none' }}
+        occlude={false}
+      >
+        <div
+          style={{
+            background: `linear-gradient(135deg, ${themeColor}ee, ${themeColor}cc)`,
+            borderTop: `3px solid ${accentColor}`,
+            borderBottom: `3px solid ${accentColor}`,
+            padding: '10px 28px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
+            backdropFilter: 'blur(4px)',
+            boxShadow: `0 4px 24px ${themeColor}88`,
+          }}
         >
-          {name.toUpperCase()}
-        </Text>
-        {/* Accent underline */}
-        <mesh position={[0, -0.6, -0.02]} renderOrder={999}>
-          <planeGeometry args={[name.length * 0.7, 0.08]} />
-          <meshBasicMaterial color={accentColor} depthTest={false} depthWrite={false} />
-        </mesh>
-      </Billboard>
+          <div
+            style={{
+              color: '#ffffff',
+              fontSize: '22px',
+              fontWeight: 800,
+              letterSpacing: '3px',
+              textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+            }}
+          >
+            {name.toUpperCase()}
+          </div>
+          <div
+            style={{
+              width: '60%',
+              height: '2px',
+              background: accentColor,
+              margin: '4px auto 0',
+              borderRadius: '1px',
+            }}
+          />
+        </div>
+      </Html>
     </group>
   )
 }
