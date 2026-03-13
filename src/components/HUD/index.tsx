@@ -3,9 +3,7 @@ import { GoMute, GoUnmute } from 'react-icons/go'
 import { BsFullscreen, BsFullscreenExit } from 'react-icons/bs'
 import { GiCrossedSwords } from 'react-icons/gi'
 
-import { launchUnityGame } from '@client/utils/unityLauncher'
 import JumpButton from '@client/components/HUD/JumpButton'
-import BankHUD from '@client/components/HUD/BankHUD'
 import LoginScreen from '@client/components/HUD/LoginScreen'
 import StartButton from '@client/components/HUD/StartButton'
 import ZoneUI from '@client/components/HUD/ZoneUI'
@@ -17,13 +15,121 @@ import { GesturesAndDeviceStore } from '@client/contexts/GesturesAndDeviceContex
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { getZoneByStoreKey } from '@client/config/ZoneConfig'
+import { useGameStore, getPlayerLevel } from '@client/stores/gameStore'
+import { launchUnityGame } from '@client/utils/unityLauncher'
 import { useShallow } from 'zustand/react/shallow'
+
+function formatRupees(amount: number): string {
+  const abs = Math.abs(Math.round(amount))
+  const formatted = abs.toLocaleString('en-IN')
+  return `${amount < 0 ? '-' : ''}₹${formatted}`
+}
+
+function PlayerHUD() {
+  const balance = useGameStore((s) => s.balance)
+  const points = useGameStore((s) => s.points)
+  const isMuted = SoundsStore((s) => s.isMuted)
+  const isTouchDevice = GesturesAndDeviceStore((s) => s.isTouchDevice)
+
+  const playerData = (() => {
+    try { return JSON.parse(localStorage.getItem('finquest_player') || '{}') }
+    catch { return {} }
+  })()
+  const playerName = playerData.name || 'Explorer'
+  const initials = playerName.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2)
+
+  const { level, title, progress } = getPlayerLevel(points)
+
+  return (
+    <div className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-2">
+      {/* Left: Player info */}
+      <div className="flex items-center gap-3 rounded-xl bg-black/50 backdrop-blur-md px-4 py-2 border border-white/5">
+        {/* Avatar */}
+        <div className="relative">
+          <div className="w-9 h-9 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center text-emerald-400 text-sm font-bold">
+            {initials}
+          </div>
+          {/* Level badge */}
+          <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-[9px] font-bold text-white rounded-full w-4 h-4 flex items-center justify-center border border-black/30">
+            {level}
+          </div>
+        </div>
+
+        {/* Name + title */}
+        <div className="leading-tight">
+          <div className="text-white text-sm font-semibold">{playerName}</div>
+          <div className="text-emerald-400/70 text-[10px] font-medium">{title}</div>
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-7 bg-white/10" />
+
+        {/* Balance */}
+        <div className="leading-tight">
+          <div className="text-[10px] text-slate-400 font-medium">Balance</div>
+          <div className="text-white text-sm font-bold tabular-nums">{formatRupees(balance)}</div>
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-7 bg-white/10" />
+
+        {/* Points + Level bar */}
+        <div className="leading-tight min-w-[70px]">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-slate-400 font-medium">XP</span>
+            <span className="text-[10px] text-amber-400 font-bold tabular-nums">{points}</span>
+          </div>
+          <div className="w-full h-1 bg-white/10 rounded-full mt-0.5 overflow-hidden">
+            <div
+              className="h-full bg-amber-400 rounded-full transition-all duration-500"
+              style={{ width: `${progress * 100}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Right: Action buttons */}
+      <div className="flex items-center gap-1.5">
+        {/* Unity game */}
+        <button
+          onClick={() => launchUnityGame()}
+          className="rounded-lg bg-black/50 backdrop-blur-md p-2 border border-white/5 hover:bg-white/10 transition"
+          title="Launch Dungeon Game"
+        >
+          <GiCrossedSwords className="h-4 w-4 fill-purple-400" />
+        </button>
+
+        {/* Mute */}
+        <button
+          onClick={() => SoundsStore.getState().toggleMuted()}
+          className="rounded-lg bg-black/50 backdrop-blur-md p-2 border border-white/5 hover:bg-white/10 transition"
+        >
+          {isMuted
+            ? <GoMute className="h-4 w-4 fill-white" />
+            : <GoUnmute className="h-4 w-4 fill-white" />
+          }
+        </button>
+
+        {/* Fullscreen (desktop only) */}
+        {!isTouchDevice && (
+          <button
+            onClick={() => GesturesAndDeviceStore.getState().toggleFullscreen?.()}
+            className="rounded-lg bg-black/50 backdrop-blur-md p-2 border border-white/5 hover:bg-white/10 transition"
+          >
+            {document.fullscreenElement
+              ? <BsFullscreenExit className="h-4 w-4 fill-white" />
+              : <BsFullscreen className="h-4 w-4 fill-white" />
+            }
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function HUD() {
   const isTouchDevice = GesturesAndDeviceStore((state) => state.isTouchDevice)
-  const hasAvatarBeenSelected = AvatarStore(
-    (state) => state.hasAvatarBeenSelected,
-  )
+  const hasAvatarBeenSelected = AvatarStore((state) => state.hasAvatarBeenSelected)
 
   const { isLoggedIn, isGuest } = AuthAPIStore(
     useShallow((state) => ({
@@ -46,10 +152,7 @@ export default function HUD() {
     })),
   )
 
-  const loading_initialSpawn = genericStore(
-    (state) => state.loading_initialSpawn,
-  )
-  const isMuted = SoundsStore((state) => state.isMuted)
+  const loading_initialSpawn = genericStore((s) => s.loading_initialSpawn)
 
   // Login screen
   const showLogin = useMemo(() => {
@@ -57,114 +160,36 @@ export default function HUD() {
     return null
   }, [isLoggedIn, isGuest])
 
-  // Start button (after login, before entering world)
+  // Start button
   const showStartBtn = useMemo(() => {
-    if (
-      !hasStartButtonBeenPressed &&
-      hasAvatarBeenSelected &&
-      (isLoggedIn || isGuest)
-    )
+    if (!hasStartButtonBeenPressed && hasAvatarBeenSelected && (isLoggedIn || isGuest))
       return <StartButton />
     return null
   }, [hasStartButtonBeenPressed, hasAvatarBeenSelected, isLoggedIn, isGuest])
 
-  // Jump button (mobile only)
+  // Jump button (mobile)
   const showJumpBtn = useMemo(() => {
-    if (
-      isTouchDevice &&
-      !showDialogScreen &&
-      hasStartButtonBeenPressed
-    )
+    if (isTouchDevice && !showDialogScreen && hasStartButtonBeenPressed)
       return <JumpButton />
     return null
   }, [isTouchDevice, showDialogScreen, hasStartButtonBeenPressed])
 
-  // Mute/unmute button
-  const muteBtn = useMemo(() => {
-    if (!hasStartButtonBeenPressed) return null
-    return (
-      <div
-        onClick={() => {
-          SoundsStore.getState().toggleMuted()
-        }}
-        className='cursor-pointer rounded-lg bg-black/40 p-2.5 backdrop-blur-sm transition hover:bg-black/60'
-      >
-        {isMuted ? (
-          <GoMute className='h-5 w-5 fill-white' />
-        ) : (
-          <GoUnmute className='h-5 w-5 fill-white' />
-        )}
-      </div>
-    )
-  }, [hasStartButtonBeenPressed, isMuted])
-
-  // Fullscreen toggle
-  const fullscreenBtn = useMemo(() => {
-    if (!hasStartButtonBeenPressed || isTouchDevice) return null
-    const toggleFs = GesturesAndDeviceStore.getState().toggleFullscreen
-    const isFs = !!document.fullscreenElement
-    return (
-      <div
-        onClick={() => toggleFs?.()}
-        className='cursor-pointer rounded-lg bg-black/40 p-2.5 backdrop-blur-sm transition hover:bg-black/60'
-      >
-        {isFs ? (
-          <BsFullscreenExit className='h-5 w-5 fill-white' />
-        ) : (
-          <BsFullscreen className='h-5 w-5 fill-white' />
-        )}
-      </div>
-    )
-  }, [hasStartButtonBeenPressed, isTouchDevice])
-
-  // Unity game launch button
-  const unityGameBtn = useMemo(() => {
-    if (!hasStartButtonBeenPressed) return null
-    return (
-      <div
-        onClick={() => launchUnityGame()}
-        className='cursor-pointer rounded-lg bg-purple-600/80 p-2.5 backdrop-blur-sm transition hover:bg-purple-500/90'
-        title='Launch Dungeon Game'
-      >
-        <GiCrossedSwords className='h-5 w-5 fill-white' />
-      </div>
-    )
-  }, [hasStartButtonBeenPressed])
-
   return (
     <>
-      {/* Login */}
       {showLogin}
 
-      {/* Start button */}
       {showStartBtn && (
-        <div className='absolute inset-0 z-50'>
-          {showStartBtn}
-        </div>
+        <div className="absolute inset-0 z-50">{showStartBtn}</div>
       )}
 
-      {/* Loading screen */}
       {hasStartButtonBeenPressed && loading_initialSpawn && (
-        <CustomLoader
-          containerStyles={{}}
-          innerStyles={{}}
-        />
+        <CustomLoader containerStyles={{}} innerStyles={{}} />
       )}
 
       {/* In-game HUD */}
       {hasStartButtonBeenPressed && !loading_initialSpawn && (
         <>
-          {/* Top-right controls */}
-          <div className='absolute right-4 top-4 z-40 flex gap-2'>
-            {unityGameBtn}
-            {muteBtn}
-            {fullscreenBtn}
-          </div>
-
-          {/* Bank balance HUD (top-left) */}
-          <BankHUD />
-
-          {/* Jump button (mobile) */}
+          <PlayerHUD />
           {showJumpBtn}
         </>
       )}
@@ -174,23 +199,20 @@ export default function HUD() {
         const zone = getZoneByStoreKey(enterStorePromptStoreName)
         if (!zone) return null
         return (
-          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 text-center animate-bounce-slow">
-            <div className="bg-black/80 backdrop-blur-md rounded-2xl px-10 py-6 border border-emerald-500/40 shadow-2xl shadow-emerald-500/10">
-              <p className="text-white text-xl font-bold mb-1">
-                {zone.name}
-              </p>
-              <p className="text-slate-400 text-sm mb-4">
-                {zone.description}
-              </p>
+          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 text-center">
+            <div className="bg-black/70 backdrop-blur-md rounded-2xl px-10 py-5 border border-emerald-500/30 shadow-2xl shadow-emerald-500/10">
+              <p className="text-white text-lg font-bold mb-1">{zone.name}</p>
+              <p className="text-slate-400 text-sm mb-3">{zone.description}</p>
               <div className="flex items-center justify-center gap-2 text-emerald-400">
                 <kbd className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-3 py-1 text-sm font-mono font-bold">E</kbd>
-                <span className="text-base font-medium">to enter</span>
+                <span className="text-sm font-medium">to enter</span>
               </div>
             </div>
           </div>
         )
       })()}
 
+      {/* Zone full-page UI */}
       <ZoneUI />
     </>
   )

@@ -53,6 +53,9 @@ interface GameState {
   // Zone progress
   completedZones: ZoneId[]
 
+  // Points & level
+  points: number           // XP earned from quests/games
+
   // Investments & financial products
   sipAmount: number        // monthly SIP amount (0 if not started)
   sipTotal: number         // total invested in SIP so far
@@ -79,6 +82,7 @@ interface GameState {
   addToEmergencyFund: (amount: number) => boolean
   receiveSalary: () => void
   deductMonthlyExpenses: () => void
+  addPoints: (amount: number) => void
 }
 
 // ---- Helper: generate transaction id ----
@@ -101,6 +105,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   activeDialogue: null,
   nearbyNPC: null,
   completedZones: [],
+  points: 0,
   sipAmount: 0,
   sipTotal: 0,
   sipMonthsActive: 0,
@@ -299,9 +304,27 @@ export const useGameStore = create<GameState>((set, get) => ({
       }))
     }
   },
+
+  addPoints: (amount) => {
+    set((s) => ({ points: s.points + amount }))
+  },
 }))
 
 // ---- Helper exports ----
+
+export function getPlayerLevel(points: number): { level: number; title: string; nextLevelAt: number; progress: number } {
+  const thresholds = [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500]
+  const titles = ['Rookie', 'Beginner', 'Learner', 'Saver', 'Investor', 'Advisor', 'Expert', 'Master', 'Guru', 'Legend']
+  let level = 1
+  for (let i = 1; i < thresholds.length; i++) {
+    if (points >= thresholds[i]) level = i + 1
+    else break
+  }
+  const currentThreshold = thresholds[Math.min(level - 1, thresholds.length - 1)]
+  const nextThreshold = thresholds[Math.min(level, thresholds.length - 1)] || currentThreshold + 1000
+  const progress = Math.min(1, (points - currentThreshold) / (nextThreshold - currentThreshold))
+  return { level, title: titles[Math.min(level - 1, titles.length - 1)], nextLevelAt: nextThreshold, progress }
+}
 
 export function getTotalMonthlyExpenses(): number {
   return TOTAL_MONTHLY_EXPENSES
