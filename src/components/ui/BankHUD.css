@@ -1,0 +1,98 @@
+/* src/components/ui/BankHUD.css */
+
+.bank-hud {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+
+  background: rgba(10, 10, 10, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px 20px;
+
+  min-width: 200px;
+  color: #fff;
+  font-family: 'Inter', system-ui, sans-serif;
+
+  pointer-events: auto;
+}
+
+/* Parent overlay container should have pointer-events: none
+   so clicks pass through to the 3D canvas.
+   The HUD itself has pointer-events: auto. */
+
+.bank-hud__label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+}
+
+.bank-hud__amount {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+/* Flash animations */
+.bank-hud__amount[data-flash="income"] {
+  animation: flash-income 0.6s ease-out;
+}
+
+.bank-hud__amount[data-flash="expense"] {
+  animation: flash-expense 0.6s ease-out;
+}
+
+@keyframes flash-income {
+  0%   { color: #4caf50; text-shadow: 0 0 12px rgba(76, 175, 80, 0.6); }
+  100% { color: #fff; text-shadow: none; }
+}
+
+@keyframes flash-expense {
+  0%   { color: #f44336; text-shadow: 0 0 12px rgba(244, 67, 54, 0.6); }
+  100% { color: #fff; text-shadow: none; }
+}
+
+/* Financial health bar */
+.bank-hud__health {
+  margin-top: 12px;
+}
+
+.bank-hud__health-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.bank-hud__health-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease, background-color 0.5s ease;
+}
+
+/* Health bar color based on value — set via inline style or dynamic class */
+
+.bank-hud__health-value {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
+.bank-hud__month {
+  margin-top: 12px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}

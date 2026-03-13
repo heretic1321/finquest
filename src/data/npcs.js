@@ -1,0 +1,38 @@
+export const NPC_DATA = [
+  {
+    id: 'hr-vikram',
+    name: 'HR Vikram',
+    position: [28, 2, -22],
+    color: '#4FC3F7',
+    zone: 'techcorp',
+    greeting: "Welcome to TechCorp! Ready to start your career?",
+    characterModel: '/models/characters/feb.glb',
+  },
+  {
+    id: 'scam-alert',
+    name: 'Friendly Stranger',
+    position: [-28, 2, -15],
+    color: '#EF5350',
+    zone: 'scampark',
+    greeting: "Hey! Got a minute? I have something interesting for you...",
+    characterModel: '/models/characters/may.glb',
+  },
+  {
+    id: 'mf-advisor',
+    name: 'MF Advisor Priya',
+    position: [23, 4, 23],
+    color: '#66BB6A',
+    zone: 'mftower',
+    greeting: "Hello! Ready to learn about the power of compounding?",
+    characterModel: '/models/characters/Female.glb',
+  },
+  {
+    id: 'didi',
+    name: 'Didi',
+    position: [5, 2, 5],
+    color: '#AB47BC',
+    zone: 'spawn',
+    greeting: "Welcome to FinQuest Island! I'm Didi, your guide. Walk around and explore -- talk to people at each zone to learn about money!",
+    characterModel: '/models/characters/feb.glb',
+  },
+]
