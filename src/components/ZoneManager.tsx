@@ -7,7 +7,7 @@ import { useControls, folder } from 'leva'
 import StoreEntryExitTriggerArea from '@client/components/StoreEntryExitTriggerArea'
 import { CharacterRef } from '@client/components/Character'
 import { StoreConfigs } from '@client/config/MapConfig'
-import { ZONE_CONFIGS, getZoneByStoreKey, STORE_TO_ZONE } from '@client/config/ZoneConfig'
+import { ZONE_CONFIGS, getZoneByStoreKey, STORE_TO_ZONE, IGNORED_STORES } from '@client/config/ZoneConfig'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { MapStore } from '@client/contexts/MapContext'
 
@@ -92,67 +92,46 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
 
   // ── Zone Color Controls ──
   const zoneColors = useControls('Zone Colors', {
-    [`FinQuest Bank (${ZONE_CONFIGS.bank.storeKey})`]: folder({
+    'FinQuest Bank': folder({
       bankColor: { value: ZONE_CONFIGS.bank.themeColor, label: 'Color' },
-      bankMetal: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
+      bankMetal: { value: 0.0, min: 0, max: 1, step: 0.05, label: 'Metalness' },
       bankRough: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
     }),
-    [`City Hospital (${ZONE_CONFIGS.hospital.storeKey})`]: folder({
+    'City Hospital': folder({
       hospColor: { value: ZONE_CONFIGS.hospital.themeColor, label: 'Color' },
       hospMetal: { value: 1.0, min: 0, max: 1, step: 0.05, label: 'Metalness' },
       hospRough: { value: 0.15, min: 0, max: 1, step: 0.05, label: 'Roughness' },
     }),
-    [`Stock Exchange (${ZONE_CONFIGS.stockexchange.storeKey})`]: folder({
+    'Stock Exchange': folder({
       stockColor: { value: ZONE_CONFIGS.stockexchange.themeColor, label: 'Color' },
-      stockMetal: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
-      stockRough: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
-    }),
-    [`Scam Park (${ZONE_CONFIGS.scampark.storeKey})`]: folder({
-      scamColor: { value: ZONE_CONFIGS.scampark.themeColor, label: 'Color' },
-      scamMetal: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
-      scamRough: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
-    }),
-    [`MF Tower (${ZONE_CONFIGS.mftower.storeKey})`]: folder({
-      mfColor: { value: ZONE_CONFIGS.mftower.themeColor, label: 'Color' },
-      mfMetal: { value: 0.3, min: 0, max: 1, step: 0.05, label: 'Metalness' },
-      mfRough: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Roughness' },
+      stockMetal: { value: 0.6, min: 0, max: 1, step: 0.05, label: 'Metalness' },
+      stockRough: { value: 0.15, min: 0, max: 1, step: 0.05, label: 'Roughness' },
     }),
   })
 
-  // ── Label Position Controls ──
+  // ── Label Position Controls (XYZ) ──
   const labelPos = useControls('Zone Labels', {
-    [`${ZONE_CONFIGS.bank.name} Label`]: folder({
-      bankLabelY: { value: ZONE_CONFIGS.bank.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
+    'Bank Label': folder({
+      bankLabelOffset: { value: [0, ZONE_CONFIGS.bank.labelYOffset, 0], label: 'Offset XYZ', step: 1 },
     }),
-    [`${ZONE_CONFIGS.hospital.name} Label`]: folder({
-      hospLabelY: { value: ZONE_CONFIGS.hospital.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
+    'Hospital Label': folder({
+      hospLabelOffset: { value: [0, ZONE_CONFIGS.hospital.labelYOffset, 0], label: 'Offset XYZ', step: 1 },
     }),
-    [`${ZONE_CONFIGS.stockexchange.name} Label`]: folder({
-      stockLabelY: { value: ZONE_CONFIGS.stockexchange.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
-    }),
-    [`${ZONE_CONFIGS.scampark.name} Label`]: folder({
-      scamLabelY: { value: ZONE_CONFIGS.scampark.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
-    }),
-    [`${ZONE_CONFIGS.mftower.name} Label`]: folder({
-      mfLabelY: { value: ZONE_CONFIGS.mftower.labelYOffset, min: 0, max: 60, step: 1, label: 'Y Offset' },
+    'Stock Exchange Label': folder({
+      stockLabelOffset: { value: [0, ZONE_CONFIGS.stockexchange.labelYOffset, 0], label: 'Offset XYZ', step: 1 },
     }),
   })
 
-  // Map storeKey -> leva values
   const colorMap: Record<string, { color: string; metalness: number; roughness: number }> = {
     [ZONE_CONFIGS.bank.storeKey]: { color: zoneColors.bankColor, metalness: zoneColors.bankMetal, roughness: zoneColors.bankRough },
     [ZONE_CONFIGS.hospital.storeKey]: { color: zoneColors.hospColor, metalness: zoneColors.hospMetal, roughness: zoneColors.hospRough },
     [ZONE_CONFIGS.stockexchange.storeKey]: { color: zoneColors.stockColor, metalness: zoneColors.stockMetal, roughness: zoneColors.stockRough },
-    [ZONE_CONFIGS.scampark.storeKey]: { color: zoneColors.scamColor, metalness: zoneColors.scamMetal, roughness: zoneColors.scamRough },
-    [ZONE_CONFIGS.mftower.storeKey]: { color: zoneColors.mfColor, metalness: zoneColors.mfMetal, roughness: zoneColors.mfRough },
   }
 
-  const labelYMap: Record<string, number> = {
-    [ZONE_CONFIGS.bank.storeKey]: labelPos.bankLabelY,
-    [ZONE_CONFIGS.hospital.storeKey]: labelPos.hospLabelY,
-    [ZONE_CONFIGS.stockexchange.storeKey]: labelPos.stockLabelY,
-    [ZONE_CONFIGS.scampark.storeKey]: labelPos.scamLabelY,
-    [ZONE_CONFIGS.mftower.storeKey]: labelPos.mfLabelY,
+  const labelOffsetMap: Record<string, [number, number, number]> = {
+    [ZONE_CONFIGS.bank.storeKey]: labelPos.bankLabelOffset as [number, number, number],
+    [ZONE_CONFIGS.hospital.storeKey]: labelPos.hospLabelOffset as [number, number, number],
+    [ZONE_CONFIGS.stockexchange.storeKey]: labelPos.stockLabelOffset as [number, number, number],
   }
 
   // Initial recolor when stores load
@@ -183,8 +162,6 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
     zoneColors.bankColor, zoneColors.bankMetal, zoneColors.bankRough,
     zoneColors.hospColor, zoneColors.hospMetal, zoneColors.hospRough,
     zoneColors.stockColor, zoneColors.stockMetal, zoneColors.stockRough,
-    zoneColors.scamColor, zoneColors.scamMetal, zoneColors.scamRough,
-    zoneColors.mfColor, zoneColors.mfMetal, zoneColors.mfRough,
   ])
 
   // E key to open zone UI
@@ -205,13 +182,16 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
   return (
     <>
       {buildingNames.map((storeName) => {
+        // Skip removed zones
+        if (IGNORED_STORES.has(storeName)) return null
+
         const storeInfo = allStoresInfo[storeName]
         if (!storeInfo) return null
 
         const { lods, entryTriggerAreaGeometry, entryTriggerAreaTransform } = storeInfo
         const hasLods = lods.objects[0] || lods.objects[1] || lods.objects[2]
         const zone = getZoneByStoreKey(storeName)
-        const yOffset = labelYMap[storeName] ?? 20
+        const labelOffset = labelOffsetMap[storeName] ?? [0, 20, 0]
 
         const ms = getMapScale()
 
@@ -239,9 +219,9 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
             {/* Floating zone label */}
             {zone && hasLods && lods.transform.position && (() => {
               const pos = lods.transform.position as THREE.Vector3
-              const bx = (pos.x || 0) * ms
-              const by = (pos.y || 0) * ms + yOffset
-              const bz = (pos.z || 0) * ms
+              const bx = (pos.x || 0) * ms + labelOffset[0]
+              const by = (pos.y || 0) * ms + labelOffset[1]
+              const bz = (pos.z || 0) * ms + labelOffset[2]
 
               return (
                 <Billboard

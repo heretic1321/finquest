@@ -1,16 +1,16 @@
-export type ZoneId = 'bank' | 'hospital' | 'stockexchange' | 'scampark' | 'mftower'
+export type ZoneId = 'bank' | 'hospital' | 'stockexchange'
 
 export type ZoneConfig = {
   id: ZoneId
   name: string
   description: string
-  storeKey: string           // Maps to everlite store key
+  storeKey: string
   npcName: string
   npcGreeting: string
   questCompleted: boolean
   themeColor: string
   accentColor: string
-  labelYOffset: number       // Height offset for floating label above building
+  labelYOffset: number
 }
 
 export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
@@ -22,8 +22,8 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     npcName: 'Didi',
     npcGreeting: "Welcome to FinQuest Bank! I'm Didi, your financial guide. Let me show you around.",
     questCompleted: false,
-    themeColor: '#1e3a5f',
-    accentColor: '#4a90d9',
+    themeColor: '#93a4ba',
+    accentColor: '#c8d6e5',
     labelYOffset: 20,
   },
   hospital: {
@@ -46,42 +46,19 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     npcName: 'Broker Raj',
     npcGreeting: "Welcome to Dalal Street! I'm Raj. Want to try your hand at the market?",
     questCompleted: false,
-    themeColor: '#1c3d2e',
-    accentColor: '#34d399',
+    themeColor: '#969696',
+    accentColor: '#d4d4d4',
     labelYOffset: 25,
-  },
-  scampark: {
-    id: 'scampark',
-    name: 'Scam Park',
-    description: 'Beware! Not everyone here has good intentions...',
-    storeKey: 'ogstore',
-    npcName: 'Friendly Stranger',
-    npcGreeting: "Hey! Got a minute? I have an amazing investment opportunity for you...",
-    questCompleted: false,
-    themeColor: '#4a1c1c',
-    accentColor: '#ef4444',
-    labelYOffset: 20,
-  },
-  mftower: {
-    id: 'mftower',
-    name: 'MF Tower',
-    description: 'Learn about mutual funds and the power of compounding',
-    storeKey: 'hub',
-    npcName: 'MF Advisor Priya',
-    npcGreeting: "Hello! I'm Priya. Ready to learn how your money can work for you?",
-    questCompleted: false,
-    themeColor: '#2d2b55',
-    accentColor: '#818cf8',
-    labelYOffset: 20,
   },
 }
 
-// Reverse lookup: everlite store key -> zone id
+// Stores to SKIP (not render as zones)
+export const IGNORED_STORES = new Set(['ogstore', 'hub'])
+
 export const STORE_TO_ZONE: Record<string, ZoneId> = Object.fromEntries(
   Object.values(ZONE_CONFIGS).map(z => [z.storeKey, z.id])
 ) as Record<string, ZoneId>
 
-// Get zone config by everlite store key
 export function getZoneByStoreKey(storeKey: string): ZoneConfig | undefined {
   const zoneId = STORE_TO_ZONE[storeKey]
   return zoneId ? ZONE_CONFIGS[zoneId] : undefined
