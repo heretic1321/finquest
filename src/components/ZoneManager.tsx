@@ -1,5 +1,6 @@
-import { memo, useEffect } from 'react'
+import { memo, useEffect, useMemo } from 'react'
 import { Detailed } from '@react-three/drei'
+import * as THREE from 'three'
 import { useShallow } from 'zustand/react/shallow'
 
 import StoreEntryExitTriggerArea from '@client/components/StoreEntryExitTriggerArea'
@@ -9,6 +10,31 @@ import { getZoneByStoreKey } from '@client/config/ZoneConfig'
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { MapStore } from '@client/contexts/MapContext'
+
+// Replace gold/jewelry materials with zone-appropriate colors
+function recolorStoreMeshes(obj: THREE.Object3D, zoneColor: string) {
+  const color = new THREE.Color(zoneColor)
+  obj.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return
+    const mat = child.material as THREE.MeshStandardMaterial
+    if (!mat || !mat.color) return
+
+    // Target gold-ish materials (hue ~30-60, high saturation)
+    const hsl = { h: 0, s: 0, l: 0 }
+    mat.color.getHSL(hsl)
+    const isGoldy = hsl.h > 0.05 && hsl.h < 0.2 && hsl.s > 0.3
+    const isSilver = hsl.s < 0.1 && hsl.l > 0.6
+
+    if (isGoldy || isSilver) {
+      // Clone material so we don't affect shared instances
+      const newMat = mat.clone()
+      newMat.color.set(color)
+      newMat.metalness = 0.3
+      newMat.roughness = 0.6
+      child.material = newMat
+    }
+  })
+}
 
 type ZoneManagerProps = {
   characterRef: React.MutableRefObject<CharacterRef | null>
@@ -129,6 +155,14 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
 
         // LOD objects: [high, mid, low]
         const hasLods = lods.objects[0] || lods.objects[1] || lods.objects[2]
+
+        // Recolor store meshes based on zone theme
+        const zone = getZoneByStoreKey(storeName)
+        if (zone && hasLods) {
+          lods.objects.forEach((obj) => {
+            if (obj) recolorStoreMeshes(obj, zone.themeColor)
+          })
+        }
 
         return (
           <group key={storeName}>

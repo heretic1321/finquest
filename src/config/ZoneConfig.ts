@@ -8,6 +8,8 @@ export type ZoneConfig = {
   npcName: string            // NPC at this zone
   npcGreeting: string        // First line of dialogue
   questCompleted: boolean    // Track state
+  themeColor: string         // Primary color for building material override
+  accentColor: string        // Secondary/accent color
 }
 
 export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
@@ -19,6 +21,8 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     npcName: 'Didi',
     npcGreeting: "Welcome to FinQuest Bank! I'm Didi, your financial guide. Let me show you around.",
     questCompleted: false,
+    themeColor: '#1e3a5f',   // Dark navy blue (bank)
+    accentColor: '#4a90d9',
   },
   techcorp: {
     id: 'techcorp',
@@ -28,6 +32,8 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     npcName: 'HR Vikram',
     npcGreeting: "Welcome to TechCorp! I'm Vikram from HR. Ready to understand your offer letter?",
     questCompleted: false,
+    themeColor: '#1a2744',   // Deep slate blue (corporate)
+    accentColor: '#3b82f6',
   },
   mftower: {
     id: 'mftower',
@@ -37,6 +43,8 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     npcName: 'MF Advisor Priya',
     npcGreeting: "Hello! I'm Priya. Ready to learn how your money can work for you?",
     questCompleted: false,
+    themeColor: '#2d2b55',   // Dark indigo (investment)
+    accentColor: '#818cf8',
   },
   scampark: {
     id: 'scampark',
@@ -46,6 +54,8 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     npcName: 'Friendly Stranger',
     npcGreeting: "Hey! Got a minute? I have an amazing investment opportunity for you...",
     questCompleted: false,
+    themeColor: '#4a1c1c',   // Dark maroon (danger)
+    accentColor: '#ef4444',
   },
   stockexchange: {
     id: 'stockexchange',
@@ -55,6 +65,8 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     npcName: 'Broker Raj',
     npcGreeting: "Welcome to Dalal Street! I'm Raj. Want to try your hand at the market?",
     questCompleted: false,
+    themeColor: '#1c3d2e',   // Dark teal (stock market)
+    accentColor: '#34d399',
   },
 }
 
