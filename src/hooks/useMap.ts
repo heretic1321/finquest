@@ -514,6 +514,10 @@ const useMap = () => {
     let referenceGeometries: THREE.BufferGeometry[] | null = null
     let referenceMaterials: THREE.Material[] | null = null
 
+    if (node.children.length === 0) {
+      return // Empty instance group, skip
+    }
+
     if (node.children[0] instanceof THREE.Mesh) {
       // each individual blender mesh contains only one material, hence blender exported it as a single mesh
       referenceGeometries = [node.children[0].geometry]
@@ -1416,7 +1420,7 @@ const useMap = () => {
         if (child.name.toLowerCase().includes('low')) {
           map.lods.objects[2] = child
           map.lods.distances[2] =
-            StoreConfigs[_storeName].exterior.lod.low.distance
+            StoreConfigs[_storeName]?.exterior?.lod?.low?.distance || 120
 
           child.position.copy(zeroVector)
           child.rotation.copy(zeroEuler)
@@ -1424,7 +1428,7 @@ const useMap = () => {
         } else if (child.name.toLowerCase().includes('mid')) {
           map.lods.objects[1] = child
           map.lods.distances[1] =
-            StoreConfigs[_storeName].exterior.lod.mid.distance
+            StoreConfigs[_storeName]?.exterior?.lod?.mid?.distance || 80
 
           child.position.copy(zeroVector)
           child.rotation.copy(zeroEuler)
@@ -1432,7 +1436,7 @@ const useMap = () => {
         } else if (child.name.toLowerCase().includes('high')) {
           map.lods.objects[0] = child
           map.lods.distances[0] =
-            StoreConfigs[_storeName].exterior.lod.high.distance
+            StoreConfigs[_storeName]?.exterior?.lod?.high?.distance || 40
 
           child.position.copy(zeroVector)
           child.rotation.copy(zeroEuler)
@@ -1502,14 +1506,19 @@ const useMap = () => {
         customColliderMesh = child
     })
 
-    if (
-      map.lods.objects[0] === null ||
-      map.lods.objects[1] === null ||
-      map.lods.objects[2] === null
-    ) {
-      console.error('Invalid store, no low/mid/high found')
+    // Fill missing LODs: use whatever LOD exists for the missing ones
+    const anyLod = map.lods.objects[0] || map.lods.objects[1] || map.lods.objects[2]
+    if (!anyLod) {
+      console.error('Invalid store, no low/mid/high found for', _storeName)
       return
     }
+    if (map.lods.objects[0] === null) map.lods.objects[0] = anyLod
+    if (map.lods.objects[1] === null) map.lods.objects[1] = anyLod
+    if (map.lods.objects[2] === null) map.lods.objects[2] = anyLod
+    // Fill missing distances
+    if (!map.lods.distances[0]) map.lods.distances[0] = StoreConfigs[_storeName]?.exterior?.lod?.high?.distance || 40
+    if (!map.lods.distances[1]) map.lods.distances[1] = StoreConfigs[_storeName]?.exterior?.lod?.mid?.distance || 80
+    if (!map.lods.distances[2]) map.lods.distances[2] = StoreConfigs[_storeName]?.exterior?.lod?.low?.distance || 120
 
     // assign any custom glass materials to the lods
     map.lods.objects.map((node) => {
