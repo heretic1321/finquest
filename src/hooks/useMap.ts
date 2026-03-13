@@ -1386,10 +1386,9 @@ const useMap = () => {
         distances: [0, 0, 0],
         objects: [null, null, null],
         transform: {
-          // Use the store GROUP's transform (parent), scaled by mapScale
-          position: store.position.clone().multiplyScalar(_mapScale),
-          rotation: store.rotation.clone(),
-          scale: store.scale.clone().multiplyScalar(_mapScale),
+          position: null,
+          rotation: null,
+          scale: null,
         },
       },
       entryTriggerAreaGeometry: null,
@@ -1407,6 +1406,21 @@ const useMap = () => {
     }
     store.children.forEach((child) => {
       if (child instanceof THREE.Mesh || child instanceof THREE.Group) {
+        if (
+          child.name.toLowerCase().includes('low') ||
+          child.name.toLowerCase().includes('mid') ||
+          child.name.toLowerCase().includes('high')
+        ) {
+          if (map.lods.transform.position === null) {
+            // Save original transform, scaled by mapScale
+            const pos = child.position.clone().multiplyScalar(_mapScale)
+            map.lods.transform.position = pos
+            map.lods.transform.rotation = child.rotation.clone()
+            const scl = child.scale.clone().multiplyScalar(_mapScale)
+            map.lods.transform.scale = scl
+          }
+        }
+
         if (child.name.toLowerCase().includes('low')) {
           map.lods.objects[2] = child
           map.lods.distances[2] =
@@ -1435,26 +1449,32 @@ const useMap = () => {
       }
     })
 
-    // Compute trigger area transforms in world space (store parent + child local, scaled)
     store.children.forEach((child) => {
       if (child instanceof THREE.Mesh) {
-        const worldPos = child.position.clone().add(store.position).multiplyScalar(_mapScale)
-        const worldScale = child.scale.clone().multiply(store.scale).multiplyScalar(_mapScale)
-
         if (
           child.name.toLowerCase().includes('entrytriggerarea')
         ) {
           map.entryTriggerAreaGeometry = child.geometry
-          map.entryTriggerAreaTransform.position = worldPos.toArray() as [number, number, number]
-          map.entryTriggerAreaTransform.rotation = child.rotation.clone().toArray() as [number, number, number]
-          map.entryTriggerAreaTransform.scale = worldScale.toArray() as [number, number, number]
+          map.entryTriggerAreaTransform.position = child.position
+            .clone().toArray()
+            .map((num) => num * _mapScale) as [number, number, number]
+          map.entryTriggerAreaTransform.rotation = child.rotation
+            .clone().toArray() as [number, number, number]
+          map.entryTriggerAreaTransform.scale = child.scale
+            .clone().toArray()
+            .map((num) => num * _mapScale) as [number, number, number]
         } else if (
           child.name.toLowerCase().includes('exittriggerarea')
         ) {
           map.exitTriggerAreaGeometry = child.geometry
-          map.exitTriggerAreaTransform.position = worldPos.toArray() as [number, number, number]
-          map.exitTriggerAreaTransform.rotation = child.rotation.clone().toArray() as [number, number, number]
-          map.exitTriggerAreaTransform.scale = worldScale.toArray() as [number, number, number]
+          map.exitTriggerAreaTransform.position = child.position
+            .clone().toArray()
+            .map((num) => num * _mapScale) as [number, number, number]
+          map.exitTriggerAreaTransform.rotation = child.rotation
+            .clone().toArray() as [number, number, number]
+          map.exitTriggerAreaTransform.scale = child.scale
+            .clone().toArray()
+            .map((num) => num * _mapScale) as [number, number, number]
         }
       }
     })
