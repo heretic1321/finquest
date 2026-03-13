@@ -10,7 +10,6 @@ import {
 } from 'react'
 import { RoundedBox } from '@react-three/drei'
 import { GroupProps, useFrame, useThree } from '@react-three/fiber'
-import { useXRInputSourceState, XROrigin } from '@react-three/xr'
 import * as THREE from 'three'
 import { OrbitControls as OrbitControlsType } from 'three-stdlib'
 
@@ -25,7 +24,6 @@ import { Player } from '@server/rooms/schema/MyRoomState'
 import { AnimationStates } from '@server/utils/types'
 
 import NameTag from '@client/components/Character/NameTag'
-import VRTeleport from '@client/components/VR/VRTeleport'
 import { AuthAPIStore } from '@client/contexts/AuthContext'
 import {
   AvatarStore,
@@ -38,7 +36,6 @@ import { HUDStore } from '@client/contexts/HUDContext'
 import { InventoryConsoleHUDStore } from '@client/contexts/InventoryConsoleHUDContext'
 import { MapStore } from '@client/contexts/MapContext'
 import { NetworkingStore } from '@client/contexts/NetworkingContext'
-import { vrStore } from '@client/contexts/VRStateContext'
 import { CameraMode } from '@client/hooks/useCameraControls'
 import useCharacterControls, {
   Movement,
@@ -113,7 +110,6 @@ type TCharacter = {
   playerObject?: Player
   playerUserId?: string
   paramsForAvatar?: string
-  isVRMode: boolean
   selfPlayer?: Player | null
 } & GroupProps
 
@@ -182,7 +178,6 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
     physicsStep: physicsStepProp,
     isOtherPlayer = false,
     paramsForAvatar = '',
-    isVRMode = false,
     selfPlayer,
     playerObject,
     ...groupProps
@@ -307,12 +302,6 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
   const playerSpeed = useRef<number>(0)
 
   const isReady = genericStore((state) => state.isCharacterRefReady)
-  const { useVRLocomotion, useVRTeleportation } = vrStore(
-    useShallow((state) => ({
-      useVRLocomotion: state.useVRLocomotion,
-      useVRTeleportation: state.useVRTeleportation,
-    })),
-  )
   const avatarRef = useRef<THREE.Group | null>(null)
 
   useEffect(() => {
@@ -393,32 +382,6 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
   // and keep track of what the previous quadrant was and what the current quadrant is
   const tempJoystickQuadrant = useRef<number | null>(null)
   const previousJoystickQuadrant = useRef<number | null>(null)
-
-  const controllerRight = useXRInputSourceState('controller', 'right')
-  const controllerLeft = useXRInputSourceState('controller', 'left')
-
-  const rightThumbStickState =
-    controllerRight?.gamepad['xr-standard-thumbstick']
-  const leftThumbStickState = controllerLeft?.gamepad['xr-standard-thumbstick']
-
-  const rotationSpeedInVR = 0.1
-
-  const [vrPlayerPosition, setVRPlayerPosition] = useState<THREE.Vector3>(
-    new THREE.Vector3(-2.6, 10, 64.72),
-  )
-  const [useVRControls, setUseVRControls] = useState<boolean>(true)
-
-  //All these are used when VR session is enabled.
-  const worldDirection = useRef(new THREE.Vector3()).current
-  const rightVector = useRef(new THREE.Vector3()).current
-  const vrPlayerSpeed = isVRMode ? vrStore.getState().playerSpeed : 3
-
-  function onTeleport() {
-    setUseVRControls(false)
-    setTimeout(() => {
-      setUseVRControls(true)
-    }, 500)
-  }
 
   // The player can be thought of as a capsule. The collision detection for the player
   // is then done assuming this capsule shape. This object is store the capsule's information
@@ -746,7 +709,7 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
   // Hide/Unhide the player's avatar based on the camera mode changes
   useEffect(() => {
     if (!avatarRef.current || props.isOtherPlayer === true) return
-    if (!isVRMode && cameraMode === CameraMode.FIRST_PERSON)
+    if (cameraMode === CameraMode.FIRST_PERSON)
       avatarRef.current.visible = false
     else avatarRef.current.visible = true
   }, [cameraMode])
@@ -754,18 +717,11 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
   const teleportPlayer = (position: [number, number, number]) => {
     if (avatarRef.current) {
       avatarRef.current.position.set(position[0], position[1], position[2])
-      if (isVRMode) {
-        setVRPlayerPosition(
-          new THREE.Vector3(position[0], position[1], position[2]),
-        )
-      }
     }
   }
 
   // Constants for fixed time step
-  const FIXED_TIME_STEP = isVRMode
-    ? 1 / 60
-    : GesturesAndDeviceStore.getState().isTouchDevice
+  const FIXED_TIME_STEP = GesturesAndDeviceStore.getState().isTouchDevice
     ? 1 / 60
     : 1 / 160
   const MAX_SUBSTEPS = 10 // Prevent spiraling in case of large delta times
@@ -865,53 +821,7 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
       }
     }
 
-    if (isVRMode && useVRLocomotion && useVRControls) {
-      if (!player || !rightThumbStickState) return
-
-      camera.getWorldDirection(worldDirection)
-      worldDirection.normalize()
-      worldDirection.y = 0
-
-      const moveX = rightThumbStickState.xAxis ?? 0
-      const moveY = rightThumbStickState.yAxis ?? 0
-
-      rightVector.crossVectors(worldDirection, camera.up).normalize()
-
-      const greatestAxis = Math.max(Math.abs(moveX), Math.abs(moveY))
-      const adjustedSpeed =
-        PlayerConfigStore.getState().maxSpeed *
-        greatestAxis *
-        (greatestAxis < 0.3 ? 3 : 6)
-      playerSpeed.current = adjustedSpeed
-
-      const rot = (leftThumbStickState?.xAxis ?? 0) * rotationSpeedInVR * -1
-      const desiredRotationAngle = player.rotation.y + rot
-      tempVector.set(0, 0, -1).applyAxisAngle(upVector, cameraAzAngle)
-      tempVector.normalize()
-      if (Math.abs(player.rotation.y - desiredRotationAngle) > Math.PI) {
-        if (player.rotation.y > desiredRotationAngle) {
-          player.rotation.y += 2 * Math.PI
-        } else {
-          player.rotation.y -= 2 * Math.PI
-        }
-      }
-
-      player.position.addScaledVector(
-        worldDirection,
-        -moveY * delta * vrPlayerSpeed,
-      )
-      player.position.addScaledVector(
-        rightVector,
-        moveX * delta * vrPlayerSpeed,
-      )
-
-      //xrOriginRef.current.position.copy(player.position)
-      setVRPlayerPosition(player.position)
-
-      damp(player.rotation, 'y', desiredRotationAngle, 0.1, delta)
-
-      CameraControlsStore.getState().isCameraMovingByUserMove.current = true
-    } else if (
+    if (
       // Handle movement and rotation of the player if the joystick is being used
       GesturesAndDeviceStore.getState().isTouchDevice === true &&
       joystick.angle &&
@@ -1351,23 +1261,13 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
 
   return (
     <>
-      {isVRMode && (
-        <>
-          {useVRTeleportation && (
-            <VRTeleport avatarRef={avatarRef.current} onTeleport={onTeleport} />
-          )}
-        </>
-      )}
       <group
         ref={avatarRef}
         name='characterGroup'
-        position={isVRMode ? vrPlayerPosition : position}
+        position={position}
         rotation={rotation}
         {...groupProps}
       >
-        {isVRMode && (
-          <XROrigin position={[0, 0.5, 0]} rotation={[0, Math.PI, 0]} />
-        )}
         {!props.isOtherPlayer && (
           <>
             <mesh
@@ -1407,7 +1307,7 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
             </RoundedBox>
           </>
         )}
-        {!isVRMode && avatarData && avatarData.avatarPath && (
+        {avatarData && avatarData.avatarPath && (
           <>
             {props.isOtherPlayer &&
               !isPresentationMode &&
@@ -1438,7 +1338,7 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
         {/* Displays name tags over other players' head */}
 
         {/* Helper for occluding all name tags after a certain distance from camera*/}
-        {!isVRMode && !props.isOtherPlayer ? (
+        {!props.isOtherPlayer ? (
           <mesh
             position={[0, 1, 0]}
             name='nameTagOccludeSphere'

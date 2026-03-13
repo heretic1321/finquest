@@ -46,14 +46,14 @@ export const AvatarStore = create<AvatarZustandState>((set, get) => ({
 
   currentDanceAnimationIndex: null,
 
-  avatarData: {avatarPath: localStorage.getItem('avatarPath') ?? ''},
+  avatarData: {avatarPath: localStorage.getItem('avatarPath') || './assets/avatars/feb.glb'},
   setAvatarData: (_avatarData: AvatarData | PartialAvatarData) => set((state) => ({avatarData: {
     ...state.avatarData,
     ..._avatarData,
   }})),
 
   hasRandomAvatarBeenSelected: false,
-  hasAvatarBeenSelected: false,
+  hasAvatarBeenSelected: true, // Always true for FinQuest — no avatar picker
   setHasAvatarBeenSelected: (selected: boolean) => set({ hasAvatarBeenSelected: selected }),
 
   animationServerState: {},
