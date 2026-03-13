@@ -2,7 +2,7 @@ export const NPC_DATA = [
   {
     id: 'hr-vikram',
     name: 'HR Vikram',
-    position: [28, 2, -22],
+    position: [5, 3, -5],
     color: '#4FC3F7',
     zone: 'techcorp',
     greeting: "Welcome to TechCorp! Ready to start your career?",
@@ -11,7 +11,7 @@ export const NPC_DATA = [
   {
     id: 'scam-alert',
     name: 'Friendly Stranger',
-    position: [-28, 2, -15],
+    position: [-5, 3, -10],
     color: '#EF5350',
     zone: 'scampark',
     greeting: "Hey! Got a minute? I have something interesting for you...",
@@ -20,7 +20,7 @@ export const NPC_DATA = [
   {
     id: 'mf-advisor',
     name: 'MF Advisor Priya',
-    position: [23, 4, 23],
+    position: [10, 3, 5],
     color: '#66BB6A',
     zone: 'mftower',
     greeting: "Hello! Ready to learn about the power of compounding?",
@@ -29,7 +29,7 @@ export const NPC_DATA = [
   {
     id: 'didi',
     name: 'Didi',
-    position: [5, 2, 5],
+    position: [0, 3, 8],
     color: '#AB47BC',
     zone: 'spawn',
     greeting: "Welcome to FinQuest Island! I'm Didi, your guide. Walk around and explore -- talk to people at each zone to learn about money!",

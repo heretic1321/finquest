@@ -1,4 +1,5 @@
 import { useRef, useEffect, useMemo } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import * as THREE from 'three'
 import { SkeletonUtils } from 'three-stdlib'
@@ -15,7 +16,7 @@ export default function CharacterModel({
   modelUrl = '/models/characters/Female.glb',
   scale = 0.72,
   position = [0, -0.65, 0],
-  rotation = [0, Math.PI, 0],
+  rotation = [0, 0, 0],
 }) {
   const group = useRef()
   const hipsRef = useRef()
@@ -114,6 +115,15 @@ export default function CharacterModel({
       mixer.removeEventListener('finished', onFinished)
     }
   }, [curAnimation, actions, mixer, resetAnimation])
+
+  // Cancel root motion: reset Hips x/z every frame so animation stays in-place
+  // while ecctrl handles actual movement via physics. Keep y for jump animations.
+  useFrame(() => {
+    if (hipsRef.current) {
+      hipsRef.current.position.x = 0
+      hipsRef.current.position.z = 0
+    }
+  })
 
   return (
     <group ref={group} dispose={null} userData={{ camExcludeCollision: true }}>

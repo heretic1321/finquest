@@ -13,7 +13,7 @@ export default function Player() {
     const rb = ecctrlRef.current?.group;
     if (rb) {
       const position = rb.translation();
-      if (position.y < -5) {
+      if (position.y < -20) {
         rb.setTranslation({ x: 0, y: 5, z: 0 }, true);
         rb.setLinvel({ x: 0, y: 0, z: 0 }, true);
       }
@@ -33,7 +33,7 @@ export default function Player() {
       maxVelLimit={5}
       sprintMult={2}
       jumpVel={4}
-      position={[0, 3, 5]}
+      position={[0, 5, 0]}
       animated={true}
       mode={controlMode === 'pointToMove' ? 'PointToMove' : null}
     >
@@ -42,7 +42,7 @@ export default function Player() {
           modelUrl="/models/characters/Female.glb"
           scale={0.72}
           position={[0, -0.65, 0]}
-          rotation={[0, Math.PI, 0]}
+          rotation={[0, 0, 0]}
         />
       </Suspense>
     </Ecctrl>

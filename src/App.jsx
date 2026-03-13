@@ -5,13 +5,11 @@ import { Physics } from '@react-three/rapier';
 import { keyboardMap } from './data/keyboardMap';
 
 // 3D World components
-import Island from './components/world/Island';
-import Ocean from './components/world/Ocean';
 import Atmosphere from './components/world/Atmosphere';
 import Lighting from './components/world/Lighting';
+import GameWorld from './components/world/GameWorld';
+import Water from './components/world/Water';
 import Player from './components/world/Player';
-import ZoneBuildings from './components/world/ZoneBuildings';
-import WorldAssets from './components/world/WorldAssets';
 import NPCList from './components/npcs/NPCList';
 
 // DOM UI components
@@ -45,11 +43,9 @@ function App() {
           <Physics timeStep="vary">
             <Atmosphere />
             <Lighting />
-            <Island />
-            <Ocean />
+            <GameWorld />
+            <Water />
             <Player />
-            <ZoneBuildings />
-            <WorldAssets />
             <NPCList />
           </Physics>
         </Suspense>

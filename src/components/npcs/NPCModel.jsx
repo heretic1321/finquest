@@ -1,4 +1,5 @@
 import { useRef, useEffect, useMemo } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import * as THREE from 'three'
 import { SkeletonUtils } from 'three-stdlib'
@@ -14,6 +15,7 @@ export default function NPCModel({
   rotation = [0, 0, 0],
 }) {
   const group = useRef()
+  const hipsRef = useRef()
 
   // Load the character model
   const { scene: originalScene } = useGLTF(modelUrl)
@@ -25,6 +27,9 @@ export default function NPCModel({
       if (child.isMesh) {
         child.castShadow = true
         child.receiveShadow = true
+      }
+      if (child.name === 'Hips') {
+        hipsRef.current = child
       }
     })
     return clone
@@ -56,6 +61,14 @@ export default function NPCModel({
       if (idle) idle.fadeOut(0.3)
     }
   }, [actions])
+
+  // Cancel root motion: reset Hips x/z every frame so animation stays in-place.
+  useFrame(() => {
+    if (hipsRef.current) {
+      hipsRef.current.position.x = 0
+      hipsRef.current.position.z = 0
+    }
+  })
 
   return (
     <group ref={group} dispose={null}>
