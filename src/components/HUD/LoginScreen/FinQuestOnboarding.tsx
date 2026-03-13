@@ -95,6 +95,21 @@ const FinQuestOnboarding: React.FC = () => {
         >
           Start My Journey
         </button>
+
+        {/* Dev skip */}
+        <button
+          className='mt-2 w-full rounded-lg border border-white/5 py-2.5 text-sm text-slate-500 transition hover:border-white/10 hover:text-slate-300'
+          onClick={() => {
+            localStorage.setItem('finquest_player', JSON.stringify({
+              name: 'Dev',
+              age: 21,
+              type: 'student',
+            }))
+            continueAsGuest('Dev')
+          }}
+        >
+          Skip (Dev Mode)
+        </button>
       </div>
     </>
   )
