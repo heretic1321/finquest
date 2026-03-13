@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef } from 'react'
-import { Detailed, Html } from '@react-three/drei'
+import { Billboard, Detailed, Text } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useShallow } from 'zustand/react/shallow'
@@ -14,7 +14,7 @@ import { MapStore } from '@client/contexts/MapContext'
 
 const getMapScale = () => MapStore.getState().mapScale || 2
 
-// HTML label that scales BIGGER when far, SMALLER when close
+// Billboard label with distance-based scaling
 function ZoneLabel({
   position,
   name,
@@ -32,65 +32,57 @@ function ZoneLabel({
   maxScale: number
   scaleFactor: number
 }) {
-  const divRef = useRef<HTMLDivElement>(null)
+  const groupRef = useRef<THREE.Group>(null!)
   const { camera } = useThree()
-  const posVec = useRef(new THREE.Vector3(...position)).current
+  const posVec = useRef(new THREE.Vector3()).current
 
   useFrame(() => {
-    if (!divRef.current) return
+    if (!groupRef.current) return
     posVec.set(position[0], position[1], position[2])
     const dist = camera.position.distanceTo(posVec)
-    // Bigger when far, smaller when close
     const s = THREE.MathUtils.clamp(dist * scaleFactor, minScale, maxScale)
-    divRef.current.style.transform = `translate(-50%, -50%) scale(${s})`
+    groupRef.current.scale.setScalar(s)
   })
 
+  const w = name.length * 1.0 + 2
+
   return (
-    <group position={position}>
-      <Html
-        center
-        zIndexRange={[100, 0]}
-        style={{ pointerEvents: 'none' }}
-        occlude={false}
-      >
-        <div
-          ref={divRef}
-          style={{
-            background: `linear-gradient(135deg, ${themeColor}ee, ${themeColor}cc)`,
-            borderTop: `3px solid ${accentColor}`,
-            borderBottom: `3px solid ${accentColor}`,
-            padding: '10px 28px',
-            borderRadius: '8px',
-            textAlign: 'center',
-            whiteSpace: 'nowrap',
-            backdropFilter: 'blur(4px)',
-            boxShadow: `0 4px 24px ${themeColor}88`,
-            transformOrigin: 'center center',
-          }}
+    <group ref={groupRef} position={position}>
+      <Billboard follow lockX={false} lockY={false} lockZ={false}>
+        {/* Background */}
+        <mesh position={[0, 0, -0.1]}>
+          <planeGeometry args={[w, 3.2]} />
+          <meshBasicMaterial color={themeColor} transparent opacity={0.85} />
+        </mesh>
+        {/* Border top */}
+        <mesh position={[0, 1.5, -0.05]}>
+          <planeGeometry args={[w, 0.06]} />
+          <meshBasicMaterial color={accentColor} />
+        </mesh>
+        {/* Border bottom */}
+        <mesh position={[0, -1.5, -0.05]}>
+          <planeGeometry args={[w, 0.06]} />
+          <meshBasicMaterial color={accentColor} />
+        </mesh>
+        {/* Zone name */}
+        <Text
+          fontSize={2.0}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+          font="./assets/fonts/Rajdhani-Bold.ttf"
+          position={[0, 0.2, 0]}
+          outlineWidth={0.08}
+          outlineColor="#000000"
         >
-          <div
-            style={{
-              color: '#ffffff',
-              fontSize: '22px',
-              fontWeight: 800,
-              letterSpacing: '3px',
-              textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-            }}
-          >
-            {name.toUpperCase()}
-          </div>
-          <div
-            style={{
-              width: '60%',
-              height: '2px',
-              background: accentColor,
-              margin: '4px auto 0',
-              borderRadius: '1px',
-            }}
-          />
-        </div>
-      </Html>
+          {name.toUpperCase()}
+        </Text>
+        {/* Underline */}
+        <mesh position={[0, -0.6, -0.02]}>
+          <planeGeometry args={[name.length * 0.7, 0.08]} />
+          <meshBasicMaterial color={accentColor} />
+        </mesh>
+      </Billboard>
     </group>
   )
 }
