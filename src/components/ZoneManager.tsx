@@ -14,12 +14,15 @@ import { MapStore } from '@client/contexts/MapContext'
 
 const getMapScale = () => MapStore.getState().mapScale || 2
 
-// HTML-based label — guaranteed to render on top of all 3D geometry
+// HTML label that scales BIGGER when far, SMALLER when close
 function ZoneLabel({
   position,
   name,
   themeColor,
   accentColor,
+  minScale,
+  maxScale,
+  scaleFactor,
 }: {
   position: [number, number, number]
   name: string
@@ -27,17 +30,31 @@ function ZoneLabel({
   accentColor: string
   minScale: number
   maxScale: number
+  scaleFactor: number
 }) {
+  const divRef = useRef<HTMLDivElement>(null)
+  const { camera } = useThree()
+  const posVec = useRef(new THREE.Vector3(...position)).current
+
+  useFrame(() => {
+    if (!divRef.current) return
+    posVec.set(position[0], position[1], position[2])
+    const dist = camera.position.distanceTo(posVec)
+    // Bigger when far, smaller when close
+    const s = THREE.MathUtils.clamp(dist * scaleFactor, minScale, maxScale)
+    divRef.current.style.transform = `translate(-50%, -50%) scale(${s})`
+  })
+
   return (
     <group position={position}>
       <Html
         center
-        distanceFactor={40}
         zIndexRange={[100, 0]}
         style={{ pointerEvents: 'none' }}
         occlude={false}
       >
         <div
+          ref={divRef}
           style={{
             background: `linear-gradient(135deg, ${themeColor}ee, ${themeColor}cc)`,
             borderTop: `3px solid ${accentColor}`,
@@ -48,6 +65,7 @@ function ZoneLabel({
             whiteSpace: 'nowrap',
             backdropFilter: 'blur(4px)',
             boxShadow: `0 4px 24px ${themeColor}88`,
+            transformOrigin: 'center center',
           }}
         >
           <div
@@ -185,8 +203,9 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
       stockLabelOffset: { value: ZONE_CONFIGS.stockexchange.labelOffset, label: 'Offset XYZ', step: 1 },
     }),
     'Scale': folder({
-      labelMinScale: { value: 0.8, min: 0.1, max: 3, step: 0.1, label: 'Min Scale' },
-      labelMaxScale: { value: 3.0, min: 1, max: 10, step: 0.1, label: 'Max Scale' },
+      labelMinScale: { value: 0.5, min: 0.1, max: 5, step: 0.1, label: 'Min Scale (close)' },
+      labelMaxScale: { value: 4.0, min: 1, max: 15, step: 0.1, label: 'Max Scale (far)' },
+      labelScaleFactor: { value: 0.015, min: 0.001, max: 0.1, step: 0.001, label: 'Distance Factor' },
     }),
   })
 
@@ -299,6 +318,7 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
                   accentColor={zone.accentColor}
                   minScale={labelPos.labelMinScale}
                   maxScale={labelPos.labelMaxScale}
+                  scaleFactor={labelPos.labelScaleFactor}
                 />
               )
             })()}
