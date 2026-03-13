@@ -1,71 +1,100 @@
 # FinQuest — Hackathon Resources Master Document
 
-Everything needed to build the 3D island financial education RPG in 24 hours.
+Everything needed to build the 3D island financial education game in 24 hours.
+
+> **See also:**
+> - [`HACKATHON_SCOPE.md`](./HACKATHON_SCOPE.md) — Realistic 24hr scope, P0 task breakdown, demo script, cut list
+> - [`USER_STORY.md`](./USER_STORY.md) — Full game vision, virtual money system, zone designs, quest list, pitch doc for judges
 
 ---
 
 ## Table of Contents
 
+- [Hackathon Scope Summary](#hackathon-scope-summary)
 - [Tech Stack](#tech-stack)
 - [Asset Packs (Downloaded)](#asset-packs-downloaded)
 - [Reference Repos (Cloned)](#reference-repos-cloned)
 - [Key Code Patterns](#key-code-patterns)
 - [Articles & Tutorials](#articles--tutorials)
 - [Tools](#tools)
-- [External APIs](#external-apis)
+- [Deploy](#deploy)
+
+---
+
+## Hackathon Scope Summary
+
+From [`HACKATHON_SCOPE.md`](./HACKATHON_SCOPE.md):
+
+### What We BUILD (P0 — Must Ship)
+
+| # | Task | Hours | What |
+|---|------|-------|------|
+| 1 | 3D World Foundation | 3-4 | Island terrain, ocean, sky, player WASD, camera follow, NPCs with proximity |
+| 2 | UI Layer + Dialogue + Zustand Store | 3-4 | Bank HUD (₹ balance, health, month), dialogue box with choices, overlay system |
+| 3 | TechCorp Zone: First Salary | 2-3 | CTC vs in-hand quiz, offer letter breakdown, ₹45K credited, auto-deductions |
+| 4 | Budget Allocation Mini-Game | 3-4 | PS5/Goa/SIP/Insurance cards, overspend = credit card debt, 50/30/20 rule |
+| 5 | Scam Park: UPI Encounter | 2-3 | Fake UPI collect request, ₹5K vanishes or saved, KYC scam, too-good offer |
+| 6 | SIP Calculator | 2 | 3 sliders, live compounding, "5 years late" comparison, start SIP button |
+| 7 | End-Game Report | 1.5 | Net worth, breakdown, 20-year projection, verdict |
+
+### The "Oh Shit" Moment
+UPI scam simulation where real virtual money vanishes from your bank HUD. Every Indian judge has either been scammed or knows someone who has.
+
+### What We SKIP
+- No backend / no server
+- No AI / LLM / RAG NPCs (talk about it in pitch, don't build it)
+- No database (all state in Zustand, client-side)
+- No multiplayer / leaderboard
+- No mobile responsive
+- No sound/music
+- No loading screen polish
+
+### Critical Path (2 devs)
+```
+Dev A (3D + Quests):  [Task 1: 4hrs][Task 3: 2.5hrs][Task 4: 3.5hrs][Task 5: 2.5hrs]
+Dev B (UI + Tools):   [Task 2: 4hrs][Task 6: 2hrs  ][Task 7: 1.5hrs][Polish: 2hrs  ]
+                      ├─────────────┼──────────────┼──────────────┼──────────────┤
+                      0             4              8              12            16 hrs
+```
 
 ---
 
 ## Tech Stack
 
-### Frontend (3D Game)
+**This is a pure client-side game. No backend. No database. No external APIs needed for the MVP.**
 
 | Layer | Package | Why |
 |---|---|---|
 | Build | **Vite 6** | Sub-1s cold start, R3F team uses it. Next.js SSR breaks Three.js |
 | Framework | **React 19 + React Three Fiber 9** | 90x adoption over alternatives, richest ecosystem |
-| Helpers | **@react-three/drei 10** | Sky, Environment, Float, Text, useGLTF, useAnimations, KeyboardControls |
-| Physics | **@react-three/rapier 2** | WASM+SIMD, sensors, trimesh terrain, raycasting. Cannon is dead, Jolt pre-alpha |
-| Character Controller | **ecctrl** (pmndrs) | Drop-in 3rd person: camera, animations, joystick, gamepad in ~10 lines |
-| Post-Processing | **@react-three/postprocessing** | Bloom, vignette, depth-of-field, color grading |
-| Water Shader | **three-custom-shader-material** | Extend MeshStandardMaterial with custom GLSL |
-| State | **Zustand** | Lightweight, no boilerplate, works great with R3F |
+| Helpers | **@react-three/drei 10** | Sky, Environment, Float, Text, useGLTF, useAnimations, KeyboardControls, Html |
+| Physics | **@react-three/rapier 2** | WASM+SIMD, sensors for NPC triggers, trimesh for terrain collision |
+| Character Controller | **ecctrl** (pmndrs) | Drop-in 3rd person: camera, animations, input in ~10 lines of JSX |
+| State | **Zustand** | Game state: balance, health, month, transactions, quests, dialogue |
 | Pkg Manager | **pnpm** | 2x faster than npm, reliable with R3F ecosystem |
 
-### Backend (AI + Data)
-
+### Optional (if time permits)
 | Layer | Package | Why |
 |---|---|---|
-| Runtime | **Bun** | 8ms cold start, native TypeScript, AI SDKs work |
-| Framework | **Hono** | Express-like syntax, 3x faster, deploys anywhere |
-| Database | **Supabase** | Postgres + pgvector + Auth + Realtime, one free service |
-| RAG Vector Store | **Supabase pgvector** | Same DB as relational data, one SQL command to enable |
-| Embeddings | **OpenAI text-embedding-3-small** | $0.02/1M tokens, best quality/cost |
+| Water Shader | **three-custom-shader-material** + **vite-plugin-glsl** | Stylized water with foam (see stylized-water reference) |
+| Post-Processing | **@react-three/postprocessing** | Bloom, vignette for polish |
+| Debug | **leva** | Tweak values in real-time during dev |
 
-### AI (NPC Dialogue + Voice)
-
-| Layer | Package | Why |
-|---|---|---|
-| LLM (primary) | **Groq** (Llama 3 70B) | 0.22s TTFT, 300+ tok/s — NPCs feel real-time |
-| LLM (fallback) | **OpenAI GPT-4o-mini** | Better quality for complex financial concepts |
-| STT | **Web Speech API** | Free, zero setup, built into Chrome |
-| TTS | **Groq Orpheus TTS** | Fast, expressive, keeps entire pipeline on Groq |
-
-### Deploy
-
-| Layer | Choice |
-|---|---|
-| Frontend | **Vercel** (one git push) |
-| Backend | **Vercel Edge Functions** or **Railway** ($5 free) |
-| DB | **Supabase** (already hosted) |
+### Install Command
+```bash
+pnpm create vite finquest --template react
+cd finquest
+pnpm add three @react-three/fiber @react-three/drei @react-three/rapier ecctrl zustand
+pnpm dev
+```
 
 ---
 
 ## Asset Packs (Downloaded)
 
-All stored in `/assets/` directory. All CC0 licensed (public domain).
+All stored in `../assets/` directory (outside repo). All CC0 licensed (public domain).
 
-### Kenney — `/assets/kenney/`
+### Kenney — `../assets/kenney/`
 
 | Pack | Folder | Count | Contents | URL |
 |---|---|---|---|---|
@@ -76,7 +105,7 @@ All stored in `/assets/` directory. All CC0 licensed (public domain).
 | UI Pack | `ui-pack/` | 1,315 files | Buttons, sliders, panels, icons (PNG + spritesheet) | https://kenney.nl/assets/ui-pack |
 | UI Pack RPG | `ui-pack-rpg-expansion/` | 94 files | Inventory slots, stat bars, portraits | https://kenney.nl/assets/ui-pack-rpg-expansion |
 
-### Quaternius — `/assets/quaternius/`
+### Quaternius — `../assets/quaternius/`
 
 | Pack | Folder | Count | Contents | URL |
 |---|---|---|---|---|
@@ -84,14 +113,14 @@ All stored in `/assets/` directory. All CC0 licensed (public domain).
 | Fantasy Props MegaKit | `fantasy-props/` | 517 files | Chests, books, potions, market stalls, furniture | https://quaternius.itch.io/fantasy-props-megakit |
 | Animated Fish | `animated-fish/` | 29 files | 7 species with swimming animations | https://quaternius.itch.io/lowpoly-animated-fish |
 
-### KayKit — `/assets/kaykit/`
+### KayKit — `../assets/kaykit/`
 
 | Pack | Folder | Count | Contents | URL |
 |---|---|---|---|---|
 | Forest Nature Pack | `forest/` | 641 files | Trees, rocks, bushes, grass, terrain (FBX/glTF/OBJ) | https://kaylousberg.itch.io/kaykit-forest |
 | Adventurers | `adventurers/` | 250 files | 4 rigged+animated characters, 75 animations, 25+ weapons (FBX/glTF) | https://kaylousberg.itch.io/kaykit-adventurers |
 
-### Additional Asset Sources (not downloaded, bookmark)
+### Additional Asset Sources (bookmark)
 
 | Source | URL | Notes |
 |---|---|---|
@@ -100,100 +129,71 @@ All stored in `/assets/` directory. All CC0 licensed (public domain).
 | Poly.pizza Island Models | https://poly.pizza/search/island | Island-themed search |
 | Mixamo | https://www.mixamo.com/ | Free character animations, export FBX → convert to GLTF |
 | OpenGameArt CC0 3D | https://opengameart.org/content/cc0-assets-3d-low-poly | Aggregated CC0 collection |
-| Sketchfab Pirate Island | https://sketchfab.com/3d-models/stylized-pirate-island-pack-low-poly-3d-assets-77d8d91e3fb14ef289850bc59d8683d6 | Modular pirate island assets |
 
 ---
 
 ## Reference Repos (Cloned)
 
-All stored in `/references/` directory.
+All stored in `../references/` directory (outside repo).
 
 ### 1. ecctrl — Character Controller
-- **Path:** `references/ecctrl/`
+- **Path:** `../references/ecctrl/`
 - **Repo:** https://github.com/pmndrs/ecctrl
 - **License:** MIT
-- **Summary:** `references/controllers-summary.md`
-- **What it gives us:** Drop-in 3rd person floating capsule controller. 50+ props for camera, movement, animations, slopes, platforms. Built-in joystick + gamepad support.
+- **Summary:** `../references/controllers-summary.md`
+- **What it gives us:** Drop-in 3rd person floating capsule controller. 50+ props for camera, movement, animations, slopes, platforms. Built-in joystick + gamepad.
 - **Key file:** `src/Ecctrl.tsx` (~1700 lines)
-- **Integration:**
-  ```jsx
-  <Physics><KeyboardControls map={keyboardMap}>
-    <Ecctrl animated><EcctrlAnimation characterURL={url} animationSet={animSet}>
-      <CharacterModel />
-    </EcctrlAnimation></Ecctrl>
-  </KeyboardControls></Physics>
-  ```
-- **Modes:** Default (3rd person), `"FixedCamera"` (Coastal World style), `"CameraBasedMovement"` (1st person), `"PointToMove"` (click-to-walk)
+- **Modes:** Default (3rd person), `"FixedCamera"` (Coastal World style auto-rotate behind player)
 
-### 2. react-three-npc — NPC Pathfinding
-- **Path:** `references/react-three-npc/`
-- **Repo:** https://github.com/ssethsara/react-three-npc
-- **License:** MIT
-- **Summary:** `references/controllers-summary.md`
-- **What it gives us:** Navmesh-based NPC patrol + player-following via yuka.js. BallCollider sensors for player detection. Waypoint cycling.
-- **Requires:** Pre-generated navmesh (.glb) from https://navmesh.isaacmason.com/
-- **Integration:** `<Manager><NavMeshAgent name="Enemy" agentId="npc1" navPoints={[...]}><NPCModel /></NavMeshAgent></Manager>`
-
-### 3. fintech-world — Financial Education Game
-- **Path:** `references/fintech-world/`
+### 2. fintech-world — Financial Education Game Reference
+- **Path:** `../references/fintech-world/`
 - **Repo:** https://github.com/michaelkolesidis/fintech-world
-- **License:** AGPL-3.0 (copyleft — derivative must be open-sourced)
-- **Summary:** `references/controllers-summary.md`
-- **What it gives us:** Reference for NPC dialogue pattern (proximity → chat button → click-to-advance text array), phone UI overlay for payments, Zustand game state structure, GLSL sea water shader.
-- **Key patterns:**
+- **License:** AGPL-3.0 (copyleft)
+- **Summary:** `../references/controllers-summary.md`
+- **Relevant patterns:**
   - NPC proximity: `playerPosition.distanceTo(npcPosition) < 5` every frame
-  - Dialogue: Array of strings, advance on click, auto-close after last line
-  - Phone UI: React overlay simulating QR scan → payment flow
-- **Financial topics:** Digital wallets, QR payments, browser-based payments, cashless transactions
+  - Dialogue: Array of strings, click to advance, auto-close after last line
+  - Phone UI overlay: React overlay simulating payment flow
+  - Zustand game store structure
+  - GLSL sea water shader
 
-### 4. wawa-coastal-aesthetics — Coastal Visual Style
-- **Path:** `references/wawa-coastal-aesthetics/`
+### 3. wawa-coastal-aesthetics — Coastal Visual Style
+- **Path:** `../references/wawa-coastal-aesthetics/`
 - **Repo:** https://github.com/wass08/wawa-coastal-aesthetics
-- **Summary:** `references/wawa-summary.md`
-- **What it gives us:** Fog setup (`near=20, far=50`), `Environment preset="sunset"`, directional light at 0.42 intensity, GLB loading with animations via `useGLTF` + `useAnimations`.
-- **Key pattern:** Fog color matches background color for seamless depth fade
+- **Summary:** `../references/wawa-summary.md`
+- **Relevant patterns:** Fog (`near=20, far=50` matching background), `Environment preset="sunset"`, directional light at 0.42, GLB loading + animations
 
-### 5. r3f-vite-starter — Clean Project Template
-- **Path:** `references/r3f-vite-starter/`
+### 4. r3f-vite-starter — Clean Template
+- **Path:** `../references/r3f-vite-starter/`
 - **Repo:** https://github.com/wass08/r3f-vite-starter
 - **License:** CC0 (public domain)
-- **Summary:** `references/wawa-summary.md`
-- **What it gives us:** Latest deps (React 19, R3F 9, drei 10, Three.js 0.173, Vite 6). Clean starting point.
+- **Latest deps:** React 19, R3F 9, drei 10, Three.js 0.173, Vite 6
 
-### 6. stylized-water — Cartoon Water Shader
-- **Path:** `references/stylized-water/`
+### 5. stylized-water — Cartoon Water Shader
+- **Path:** `../references/stylized-water/`
 - **Repo:** https://github.com/thaslle/stylized-water
 - **Demo:** https://stylized-water.vercel.app/
 - **License:** MIT
-- **Summary:** `references/effects-summary.md`
-- **What it gives us:**
-  - Custom GLSL water shader via `three-custom-shader-material` (extends MeshStandardMaterial)
-  - Vertex: Simple sine-based whole-plane bobbing
-  - Fragment: 2D simplex noise for foam speckles + wave contour lines + distance gradient
-  - Terrain foam lines: White stripe synced to water level on land/rock geometry
-  - Requires: `three-custom-shader-material`, `vite-plugin-glsl`
-- **Key uniforms:** `uTime`, `uColorFar`, `uWaveSpeed`, `uWaveAmplitude`, `uTextureSize`
+- **Summary:** `../references/effects-summary.md`
+- **Key tech:** `three-custom-shader-material` extends MeshStandardMaterial, 2D simplex noise for foam + wave lines, terrain foam stripe synced to water level
 
-### 7. r3f-sims-online — Multiplayer Click-to-Move
-- **Path:** `references/r3f-sims-online/`
-- **Repo:** https://github.com/wass08/r3f-sims-online
-- **Summary:** `references/effects-summary.md`
-- **What it gives us:** Socket.IO + Jotai pattern for multiplayer, `SkeletonUtils.clone()` for multiple character instances, smooth movement interpolation (lerp toward target), animation crossfade (idle/run).
-
-### 8. ecctrl-sample — Full Character Controller Demo
-- **Path:** `references/ecctrl-sample/`
+### 6. ecctrl-sample — Character Controller + Post-Processing Demo
+- **Path:** `../references/ecctrl-sample/`
 - **Repo:** https://github.com/icurtis1/character-controller-sample-project
 - **Demo:** https://character-sample-project.netlify.app/
 - **License:** MIT
-- **Summary:** `references/effects-summary.md`
-- **What it gives us:**
-  - Custom character controller (NOT ecctrl npm — built from scratch)
-  - **Mobile virtual joystick** with deadzone, smoothing, multi-touch
-  - **Full post-processing pipeline:** Bloom, ChromaticAberration, Vignette, DoF, BrightnessContrast, HueSaturation, SMAA — all togglable via Leva
-  - Animation state machine (IDLE/RUN/FALL) with crossfade
-  - Toon shader for physics objects
-  - Multi-ray ground detection (5 rays)
-  - Zod schemas for character state validation
+- **Summary:** `../references/effects-summary.md`
+- **Relevant patterns:** Mobile virtual joystick, post-processing pipeline (Bloom, Vignette, DoF, SMAA), animation state machine (IDLE/RUN/FALL), toon shader
+
+### 7. react-three-npc — NPC Pathfinding (roadmap, not P0)
+- **Path:** `../references/react-three-npc/`
+- **Repo:** https://github.com/ssethsara/react-three-npc
+- **Notes:** Navmesh-based NPC patrol via yuka.js. Not needed for P0 (our NPCs are stationary), but useful if adding walking NPCs later.
+
+### 8. r3f-sims-online — Multiplayer Reference (roadmap, not P0)
+- **Path:** `../references/r3f-sims-online/`
+- **Repo:** https://github.com/wass08/r3f-sims-online
+- **Notes:** Socket.IO multiplayer pattern, `SkeletonUtils.clone()` for multiple characters. Not needed for P0.
 
 ---
 
@@ -209,13 +209,11 @@ import Ecctrl, { EcctrlAnimation } from "ecctrl";
     { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
     { name: 'leftward', keys: ['ArrowLeft', 'KeyA'] },
     { name: 'rightward', keys: ['ArrowRight', 'KeyD'] },
-    { name: 'jump', keys: ['Space'] },
     { name: 'run', keys: ['ShiftLeft'] },
   ]}>
-    <Ecctrl animated camInitDis={-5} mode="FixedCamera">
+    <Ecctrl animated camInitDis={-5}>
       <EcctrlAnimation characterURL="/models/character.glb" animationSet={{
         idle: "Idle", walk: "Walk", run: "Run",
-        jump: "Jump_Start", jumpIdle: "Jump_Idle", jumpLand: "Jump_Land", fall: "Climbing",
       }}>
         <CharacterModel />
       </EcctrlAnimation>
@@ -243,13 +241,35 @@ import Ecctrl, { EcctrlAnimation } from "ecctrl";
 <directionalLight castShadow position={[3, 1, 3]} intensity={0.42} shadow-normalBias={0.06} />
 ```
 
-### GLB Model Loading
-```jsx
-import { useGLTF, useAnimations } from "@react-three/drei";
-const { scene, animations } = useGLTF("/models/island.glb");
-const { actions } = useAnimations(animations, scene);
-useEffect(() => { actions["Idle"]?.play(); }, []);
-// Preload: useGLTF.preload("/models/island.glb");
+### Zustand Game Store (from HACKATHON_SCOPE.md)
+```js
+const useGameStore = create((set, get) => ({
+  balance: 0,
+  financialHealth: 50,
+  month: 1,
+  transactions: [],
+  completedZones: [],
+  activeDialogue: null,
+  investments: { sip: 0, insurance: false },
+  nearbyNPC: null,
+
+  addMoney: (amount, label) => set(s => ({
+    balance: s.balance + amount,
+    transactions: [...s.transactions, { type: 'credit', amount, label }]
+  })),
+  spendMoney: (amount, label) => set(s => ({
+    balance: s.balance - amount,
+    transactions: [...s.transactions, { type: 'debit', amount, label }]
+  })),
+  setDialogue: (dialogue) => set({ activeDialogue: dialogue }),
+  clearDialogue: () => set({ activeDialogue: null }),
+  advanceMonth: () => set(s => ({ month: s.month + 1 })),
+  completeZone: (zone) => set(s => ({ completedZones: [...s.completedZones, zone] })),
+  setNearbyNPC: (npc) => set({ nearbyNPC: npc }),
+  updateHealth: (delta) => set(s => ({
+    financialHealth: Math.max(0, Math.min(100, s.financialHealth + delta))
+  })),
+}));
 ```
 
 ### Terrain with Trimesh Collider
@@ -259,19 +279,26 @@ useEffect(() => { actions["Idle"]?.play(); }, []);
 </RigidBody>
 ```
 
+### GLB Model Loading
+```jsx
+import { useGLTF, useAnimations } from "@react-three/drei";
+const { scene, animations } = useGLTF("/models/island.glb");
+const { actions } = useAnimations(animations, scene);
+useEffect(() => { actions["Idle"]?.play(); }, []);
+useGLTF.preload("/models/island.glb");
+```
+
 ---
 
 ## Articles & Tutorials
 
 | Resource | URL | Key Takeaway |
 |---|---|---|
-| Merci-Michel Coastal World Case Study | https://mercimichel.medium.com/coastal-world-8f23b945823b | Full technical architecture: heightmap terrain, splat maps, physics in web worker, octree collisions, chunk-based loading, dynamic quality |
-| Wawa Sensei Coastal Aesthetics Tutorial | https://wawasensei.dev/tuto/coastal-world-aesthetics-react-three-fiber | How to recreate Coastal World look in R3F: fog, environment preset, gradient texturing |
+| Merci-Michel Coastal World Case Study | https://mercimichel.medium.com/coastal-world-8f23b945823b | Architecture: heightmap terrain, splat maps, physics in web worker, chunk loading, dynamic quality |
+| Wawa Sensei Coastal Aesthetics Tutorial | https://wawasensei.dev/tuto/coastal-world-aesthetics-react-three-fiber | How to recreate Coastal World look in R3F: fog, environment, gradient texturing |
 | Wawa Sensei Third Person Controller | https://wawasensei.dev/tuto/third-person-controller-react-three-fiber-tutorial | Character movement in R3F |
-| Codrops Stylized Water Tutorial | https://tympanus.net/codrops/2025/03/04/creating-stylized-water-effects-with-react-three-fiber/ | Custom water shader with foam, wave lines, transparency |
-| Three.js Journey — Physics with R3F | https://threejs-journey.com/lessons/physics-with-r3f | Rapier physics integration patterns |
-| American Banker — Coastal World | https://www.americanbanker.com/news/coastal-community-bank-launches-virtual-world | Business context: banking gamification |
-| Navmesh Editor | https://navmesh.isaacmason.com/ | Online navmesh generation tool |
+| Codrops Stylized Water Tutorial | https://tympanus.net/codrops/2025/03/04/creating-stylized-water-effects-with-react-three-fiber/ | Custom water shader: foam, wave lines, transparency |
+| Three.js Journey — Physics with R3F | https://threejs-journey.com/lessons/physics-with-r3f | Rapier physics integration |
 
 ---
 
@@ -281,30 +308,46 @@ useEffect(() => { actions["Idle"]?.play(); }, []);
 |---|---|---|
 | **gltfjsx** | https://gltf.pmnd.rs/ | Convert GLB → React Three Fiber JSX component |
 | **PolyPack** | https://polypack.mint.gg/ | Compress GLB files by up to 97% (DRACO) |
-| **Navmesh Editor** | https://navmesh.isaacmason.com/ | Generate navigation meshes for NPC pathfinding |
 | **Leva** | https://github.com/pmndrs/leva | Debug UI for tweaking values in real-time |
-| **R3F-Perf** | https://github.com/utsuboco/r3f-perf | Performance monitor for R3F scenes |
 | **Mixamo** | https://www.mixamo.com/ | Free character rigging + animations |
 
 ---
 
-## External APIs
+## Deploy
 
-| Service | Purpose | Free Tier | URL |
-|---|---|---|---|
-| **Groq** | LLM inference (Llama 3 70B) + Orpheus TTS | Generous free tier | https://console.groq.com/ |
-| **OpenAI** | Embeddings (text-embedding-3-small) + GPT-4o-mini fallback | $5 credit | https://platform.openai.com/ |
-| **Supabase** | Postgres + pgvector + Auth + Realtime | 500MB DB, 1GB storage | https://supabase.com/ |
-| **Vercel** | Frontend deployment | Hobby plan (free) | https://vercel.com/ |
-| **Railway** | Backend deployment | $5 credit | https://railway.app/ |
-| **Web Speech API** | Browser-native STT | Free (built-in) | MDN docs |
+For the hackathon demo, **localhost is fine**. If deploying:
+
+| Platform | URL | Notes |
+|---|---|---|
+| **Vercel** | https://vercel.com/ | One `git push`, free hobby plan. Best for static Vite apps |
+| **Netlify** | https://netlify.com/ | Alternative to Vercel, also free |
+
+**Do NOT rely on WiFi at the venue.** Have a local build ready: `pnpm build && pnpm preview`
 
 ---
 
 ## Detailed Summaries
 
 For deep technical details on each reference repo, see:
-- `references/wawa-summary.md` — Coastal aesthetics + R3F starter
-- `references/controllers-summary.md` — ecctrl API, NPC pathfinding, fintech-world game loop
-- `references/effects-summary.md` — Water shader GLSL, multiplayer patterns, post-processing pipeline
-- `references/coastal-world-analysis.md` — Coastal World deep dive (459 lines): architecture, terrain splatting, water system, NPC AI, asset pipeline, performance optimization, game design patterns
+- `../references/wawa-summary.md` — Coastal aesthetics + R3F starter
+- `../references/controllers-summary.md` — ecctrl API (50+ props), NPC pathfinding, fintech-world game loop
+- `../references/effects-summary.md` — Water shader GLSL, post-processing pipeline, mobile controls
+- `../references/coastal-world-analysis.md` — Coastal World deep dive (459 lines): architecture, terrain splatting, water system, NPC AI, asset pipeline, game design
+
+---
+
+## Roadmap Features (Post-Hackathon / Pitch Only)
+
+These are documented in [`USER_STORY.md`](./USER_STORY.md) for judges but **not built in the 24hr demo**:
+
+| Feature | Section in USER_STORY.md |
+|---|---|
+| Hospital zone + insurance simulation | Zone Details |
+| Tax Haveli: Section 80C, ITR filing | Zone Details |
+| Dalal Street: Stock market trading | Zone Details |
+| Credit Chowk: CIBIL + EMI trap | Zone Details |
+| AI-powered NPC conversations (LLM + RAG) | Technical Notes |
+| 12-month time simulation with random events | Virtual Money System |
+| Latte factor tracker | Progression & Reward |
+| Island Mall + avatar cosmetics | Progression & Reward |
+| Personalization based on age/income/goals | Onboarding & Personalization |
