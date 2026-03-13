@@ -10,6 +10,7 @@ import UnityControls from '@client/components/dev/UnityControls'
 import UnderfloorRespawnTrigger from '@client/components/UnderfloorRespawnTrigger'
 import ZoneManager from '@client/components/ZoneManager'
 import ColliderDebug from '@client/components/ColliderDebug'
+import OldManNPC from '@client/components/OldManNPC'
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { useGameStore } from '@client/stores/gameStore'
@@ -233,6 +234,7 @@ const CharacterDependentComponents = () => {
       <UnderfloorRespawnTrigger characterRef={characterRef} />
       <ZoneManager characterRef={characterRef} />
       <ColliderDebug />
+      <OldManNPC characterRef={characterRef} />
     </>
   )
 }

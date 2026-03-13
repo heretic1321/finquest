@@ -7,6 +7,8 @@ import JumpButton from '@client/components/HUD/JumpButton'
 import LoginScreen from '@client/components/HUD/LoginScreen'
 import StartButton from '@client/components/HUD/StartButton'
 import ZoneUI from '@client/components/HUD/ZoneUI'
+import OldManUI from '@client/components/HUD/OldManUI'
+import { useOldManStore } from '@client/components/OldManNPC'
 import { CustomLoader } from '@client/components/HUD/Loader'
 import { SoundsStore } from '@client/components/Sounds'
 import { AuthAPIStore } from '@client/contexts/AuthContext'
@@ -43,43 +45,43 @@ function PlayerHUD() {
   return (
     <div className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-2">
       {/* Left: Player info */}
-      <div className="flex items-center gap-3 rounded-xl bg-black/50 backdrop-blur-md px-4 py-2 border border-white/5">
+      <div className="flex items-center gap-4 rounded-2xl bg-black/60 backdrop-blur-md px-5 py-3 border border-white/[0.08] shadow-lg">
         {/* Avatar */}
         <div className="relative">
-          <div className="w-9 h-9 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center text-emerald-400 text-sm font-bold">
+          <div className="w-11 h-11 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center text-emerald-400 text-base font-bold">
             {initials}
           </div>
           {/* Level badge */}
-          <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-[9px] font-bold text-white rounded-full w-4 h-4 flex items-center justify-center border border-black/30">
+          <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-[10px] font-bold text-white rounded-full w-5 h-5 flex items-center justify-center border-2 border-black/40">
             {level}
           </div>
         </div>
 
         {/* Name + title */}
         <div className="leading-tight">
-          <div className="text-white text-sm font-semibold">{playerName}</div>
-          <div className="text-emerald-400/70 text-[10px] font-medium">{title}</div>
+          <div className="text-white text-base font-semibold">{playerName}</div>
+          <div className="text-emerald-400/80 text-xs font-medium">{title}</div>
         </div>
 
         {/* Divider */}
-        <div className="w-px h-7 bg-white/10" />
+        <div className="w-px h-9 bg-white/10" />
 
         {/* Balance */}
         <div className="leading-tight">
-          <div className="text-[10px] text-slate-400 font-medium">Balance</div>
-          <div className="text-white text-sm font-bold tabular-nums">{formatRupees(balance)}</div>
+          <div className="text-xs text-slate-400 font-medium">Balance</div>
+          <div className="text-white text-lg font-bold tabular-nums">{formatRupees(balance)}</div>
         </div>
 
         {/* Divider */}
-        <div className="w-px h-7 bg-white/10" />
+        <div className="w-px h-9 bg-white/10" />
 
         {/* Points + Level bar */}
-        <div className="leading-tight min-w-[70px]">
+        <div className="leading-tight min-w-[90px]">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 font-medium">XP</span>
-            <span className="text-[10px] text-amber-400 font-bold tabular-nums">{points}</span>
+            <span className="text-xs text-slate-400 font-medium">XP</span>
+            <span className="text-xs text-amber-400 font-bold tabular-nums">{points}</span>
           </div>
-          <div className="w-full h-1 bg-white/10 rounded-full mt-0.5 overflow-hidden">
+          <div className="w-full h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden">
             <div
               className="h-full bg-amber-400 rounded-full transition-all duration-500"
               style={{ width: `${progress * 100}%` }}
@@ -153,6 +155,8 @@ export default function HUD() {
   )
 
   const loading_initialSpawn = genericStore((s) => s.loading_initialSpawn)
+  const oldManNearby = useOldManStore((s) => s.isNearby)
+  const oldManUIOpen = useOldManStore((s) => s.isUIOpen)
 
   // Login screen
   const showLogin = useMemo(() => {
@@ -212,8 +216,23 @@ export default function HUD() {
         )
       })()}
 
+      {/* Old man proximity prompt */}
+      {hasStartButtonBeenPressed && !loading_initialSpawn && oldManNearby && !oldManUIOpen && !isEnterStorePromptShown && (
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 text-center">
+          <div className="bg-black/70 backdrop-blur-md rounded-2xl px-10 py-5 border border-amber-500/30 shadow-2xl shadow-amber-500/10">
+            <p className="text-white text-lg font-bold mb-1">🧘 The Wise Elder</p>
+            <p className="text-slate-400 text-sm mb-3">He seems to have something to say...</p>
+            <div className="flex items-center justify-center gap-2 text-amber-400">
+              <kbd className="bg-amber-500/20 border border-amber-500/40 rounded-lg px-3 py-1 text-sm font-mono font-bold">E</kbd>
+              <span className="text-sm font-medium">to talk</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Zone full-page UI */}
       <ZoneUI />
+      <OldManUI />
     </>
   )
 }
