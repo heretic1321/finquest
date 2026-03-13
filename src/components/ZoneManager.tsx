@@ -11,6 +11,8 @@ import { ZONE_CONFIGS, getZoneByStoreKey, STORE_TO_ZONE } from '@client/config/Z
 import { HUDStore } from '@client/contexts/HUDContext'
 import { MapStore } from '@client/contexts/MapContext'
 
+const getMapScale = () => MapStore.getState().mapScale || 2
+
 // Track cloned meshes per store for live color updates
 const trackedMeshes: Record<string, THREE.Mesh[]> = {}
 
@@ -211,29 +213,35 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
         const zone = getZoneByStoreKey(storeName)
         const yOffset = labelYMap[storeName] ?? 20
 
+        const ms = getMapScale()
+
         return (
           <group key={storeName}>
             {/* Building LODs */}
-            {hasLods && lods.transform.position && (
-              <group
-                position={lods.transform.position}
-                rotation={lods.transform.rotation || undefined}
-                scale={lods.transform.scale || undefined}
-              >
-                <Detailed distances={lods.distances}>
-                  {lods.objects[0] && <primitive object={lods.objects[0]} />}
-                  {lods.objects[1] && <primitive object={lods.objects[1]} />}
-                  {lods.objects[2] && <primitive object={lods.objects[2]} />}
-                </Detailed>
-              </group>
-            )}
+            {hasLods && lods.transform.position && (() => {
+              const p = lods.transform.position as THREE.Vector3
+              const s = lods.transform.scale as THREE.Vector3
+              return (
+                <group
+                  position={[p.x * ms, p.y * ms, p.z * ms]}
+                  rotation={lods.transform.rotation || undefined}
+                  scale={s ? [s.x * ms, s.y * ms, s.z * ms] : [ms, ms, ms]}
+                >
+                  <Detailed distances={lods.distances}>
+                    {lods.objects[0] && <primitive object={lods.objects[0]} />}
+                    {lods.objects[1] && <primitive object={lods.objects[1]} />}
+                    {lods.objects[2] && <primitive object={lods.objects[2]} />}
+                  </Detailed>
+                </group>
+              )
+            })()}
 
             {/* Floating zone label */}
             {zone && hasLods && lods.transform.position && (() => {
               const pos = lods.transform.position as THREE.Vector3
-              const bx = pos.x || 0
-              const by = (pos.y || 0) + yOffset
-              const bz = pos.z || 0
+              const bx = (pos.x || 0) * ms
+              const by = (pos.y || 0) * ms + yOffset
+              const bz = (pos.z || 0) * ms
 
               return (
                 <Billboard

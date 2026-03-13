@@ -1412,12 +1412,9 @@ const useMap = () => {
           child.name.toLowerCase().includes('high')
         ) {
           if (map.lods.transform.position === null) {
-            // Save original transform, scaled by mapScale
-            const pos = child.position.clone().multiplyScalar(_mapScale)
-            map.lods.transform.position = pos
+            map.lods.transform.position = child.position.clone()
             map.lods.transform.rotation = child.rotation.clone()
-            const scl = child.scale.clone().multiplyScalar(_mapScale)
-            map.lods.transform.scale = scl
+            map.lods.transform.scale = child.scale.clone()
           }
         }
 
