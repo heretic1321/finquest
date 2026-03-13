@@ -66,7 +66,7 @@ export const PlayerConfigStore = create<PlayerConfigZustandState>(() => ({
   jumpDistance: 15,
   deathHeight: -5.1,
   // OG
-  playerSpawnPosition: [-2.6, 10, 64.72],
+  playerSpawnPosition: [0, 15, 120],  // Open area outside buildings, drops onto ground
   // near OAT
   // playerSpawnPosition: [
   //   -108.90103100141795, 5.8609145596367407, -53.83296920507591,
@@ -527,9 +527,6 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
     }),
     {
       collapsed: true,
-      render: () => {
-        return isDebugMode || false
-      },
     },
   )
 
