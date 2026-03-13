@@ -233,8 +233,7 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
                     color={zone.accentColor}
                     anchorX="center"
                     anchorY="middle"
-                    font="https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2"
-                    fontWeight={700}
+                    font="./assets/fonts/Rajdhani-Bold.ttf"
                     position={[0, 0.3, 0]}
                   >
                     {zone.name}
@@ -245,7 +244,7 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
                     color={'#94a3b8'}
                     anchorX="center"
                     anchorY="middle"
-                    font="https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2"
+                    font="./assets/fonts/Rajdhani-Bold.ttf"
                     position={[0, -0.8, 0]}
                   >
                     {zone.description}
