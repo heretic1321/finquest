@@ -10,7 +10,7 @@ export type ZoneConfig = {
   questCompleted: boolean
   themeColor: string
   accentColor: string
-  labelYOffset: number
+  labelOffset: [number, number, number]
 }
 
 export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
@@ -24,7 +24,7 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     questCompleted: false,
     themeColor: '#93a4ba',
     accentColor: '#c8d6e5',
-    labelYOffset: 20,
+    labelOffset: [-25, 20, 0] as [number, number, number],
   },
   hospital: {
     id: 'hospital',
@@ -36,7 +36,7 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     questCompleted: false,
     themeColor: '#c4c4c4',
     accentColor: '#ffffff',
-    labelYOffset: 30,
+    labelOffset: [-35, 20, 0] as [number, number, number],
   },
   stockexchange: {
     id: 'stockexchange',
@@ -48,7 +48,7 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     questCompleted: false,
     themeColor: '#969696',
     accentColor: '#d4d4d4',
-    labelYOffset: 25,
+    labelOffset: [35, 20, 0] as [number, number, number],
   },
 }
 

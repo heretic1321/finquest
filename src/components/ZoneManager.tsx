@@ -112,13 +112,13 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
   // ── Label Position Controls (XYZ) ──
   const labelPos = useControls('Zone Labels', {
     'Bank Label': folder({
-      bankLabelOffset: { value: [0, ZONE_CONFIGS.bank.labelYOffset, 0], label: 'Offset XYZ', step: 1 },
+      bankLabelOffset: { value: ZONE_CONFIGS.bank.labelOffset, label: 'Offset XYZ', step: 1 },
     }),
     'Hospital Label': folder({
-      hospLabelOffset: { value: [0, ZONE_CONFIGS.hospital.labelYOffset, 0], label: 'Offset XYZ', step: 1 },
+      hospLabelOffset: { value: ZONE_CONFIGS.hospital.labelOffset, label: 'Offset XYZ', step: 1 },
     }),
     'Stock Exchange Label': folder({
-      stockLabelOffset: { value: [0, ZONE_CONFIGS.stockexchange.labelYOffset, 0], label: 'Offset XYZ', step: 1 },
+      stockLabelOffset: { value: ZONE_CONFIGS.stockexchange.labelOffset, label: 'Offset XYZ', step: 1 },
     }),
   })
 
