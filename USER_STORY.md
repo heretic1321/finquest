@@ -1,5 +1,37 @@
 # FinQuest - User Story & Game Design Document
 
+> **This document serves two purposes:**
+> 1. **Vision doc** — the full game concept with all zones, quests, and systems
+> 2. **Pitch doc** — for judges to understand the depth of the idea
+>
+> Not everything here is built in the hackathon demo. See the MVP/Roadmap guide below.
+
+---
+
+## MVP vs Roadmap — What's Playable Now
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| 3D island world + player movement | **MVP — Built** | Walkable island with zone buildings, NPCs |
+| Virtual Bank Account HUD | **MVP — Built** | Persistent balance, live updates on every action |
+| TechCorp: CTC vs In-Hand salary | **MVP — Built** | Full quest with offer letter, quiz, salary credit |
+| Budget Allocation mini-game | **MVP — Built** | PS5/Goa/SIP/Insurance cards, bank drains live |
+| Scam Park: UPI collect request | **MVP — Built** | Fake notification, real ₹ consequence |
+| SIP Calculator with compounding | **MVP — Built** | Sliders, live numbers, "5 years late" comparison |
+| End-Game Report Card | **MVP — Built** | Net worth, breakdown, 20-year projection |
+| Hospital: Meera's insurance story | Roadmap | Emotional story + insurance with/without comparison |
+| Tax Haveli: Section 80C, ITR | Roadmap | Old vs new regime calculator, guided ITR filing |
+| Dalal Street: Stock market zone | Roadmap | Mock trading, NIFTY history, portfolio building |
+| Credit Chowk: CIBIL & EMI | Roadmap | Credit score simulator, EMI trap mini-game |
+| Onboarding personalization | Roadmap | Age/income/goals form that adapts NPC dialogue |
+| Random life events | Roadmap | Medical emergency, market crash, festival pressure |
+| Latte Factor tracker | Roadmap | Silent small-expense logging, 20-year opportunity cost |
+| Island Mall & Temptation shops | Roadmap | Avatar cosmetics vs investing trade-off |
+| AI-powered NPC conversations | Roadmap | LLM-driven personalized financial advice |
+| 12-month time simulation | Roadmap | Full year with monthly salary, auto-debits, compounding |
+
+---
+
 ## Table of Contents
 
 1. [The Problem: Financial Literacy Gaps in India](#1-the-problem)
@@ -586,7 +618,7 @@ When a player first arrives on the island, they wash ashore (shipwreck intro —
 
 ---
 
-### Act 1: Arrival & Onboarding (Island Center)
+### Act 1: Arrival & Onboarding (Island Center) `MVP`
 
 **[SCENE: Arjun's avatar washes up on a beautiful island beach. Gentle waves, a few palm trees, and a small hut nearby.]**
 
@@ -604,7 +636,7 @@ Didi gives Arjun his **Financial Health Score: 50/100** (neutral starting point)
 
 ---
 
-### Act 2: The First Job (TechCorp Office) 💼
+### Act 2: The First Job (TechCorp Office) 💼 `MVP`
 
 **[SCENE: Arjun walks toward a sleek glass building with a sign: "TechCorp India Pvt. Ltd." There's a receptionist NPC at the entrance.]**
 
@@ -668,7 +700,7 @@ The FinQuest Bank HUD updates in real-time. Arjun watches his balance go from �
 
 ---
 
-### Act 3: The Budget Dilemma (TechCorp Canteen) 🍕
+### Act 3: The Budget Dilemma (TechCorp Canteen) 🍕 `MVP`
 
 **[SCENE: Inside TechCorp's fun canteen. Arjun's colleagues are hanging out. A UI panel pops up:]**
 
@@ -754,7 +786,7 @@ If the player chooses wisely (e.g., ₹5,000 SIP + ₹5,000 emergency fund + ₹
 
 ---
 
-### Act 4: The Hospital Wake-Up Call (MedCare Hospital) 🏥
+### Act 4: The Hospital Wake-Up Call (MedCare Hospital) 🏥 `ROADMAP`
 
 **[SCENE: Arjun walks toward a building that looks like a typical Indian hospital — a "MedCare Multi-Speciality Hospital" sign, an ambulance parked outside, and a few worried-looking NPCs sitting on benches near the entrance.]**
 
@@ -825,7 +857,7 @@ If the player buys insurance now, ₹1,000 auto-debits every game-month. If they
 
 ---
 
-### Act 5: The Danger Zone (Scam Park) 🌳
+### Act 5: The Danger Zone (Scam Park) 🌳 `MVP`
 
 **[SCENE: A beautiful park in the middle of the island. Families walking around, kids playing, food stalls — looks completely harmless. But hidden among the friendly NPCs are scammers.]**
 
@@ -923,7 +955,7 @@ If the player buys insurance now, ₹1,000 auto-debits every game-month. If they
 
 ---
 
-### Act 6: Understanding the Market (Dalal Street Exchange) 📈
+### Act 6: Understanding the Market (Dalal Street Exchange) 📈 `ROADMAP`
 
 **[SCENE: A grand building modeled after the NSE/BSE. A large electronic ticker runs across the front displaying stock names and prices — RELIANCE, TCS, INFOSYS, HDFC. The entrance has a bronze bull statue (inspired by the real Dalal Street bull).]**
 
@@ -977,7 +1009,7 @@ From this point on, the player can allocate part of their monthly discretionary 
 
 ---
 
-### Act 7: The Power of Compounding (Mutual Fund Tower) 🏦
+### Act 7: The Power of Compounding (Mutual Fund Tower) 🏦 `MVP — SIP Calculator only`
 
 **[SCENE: A tall, modern building with glass walls — "Mutual Fund Sahi Hai Tower" (a nod to the famous AMFI tagline). Inside, the ground floor looks like a friendly bank branch with helpful NPCs.]**
 
@@ -1101,7 +1133,7 @@ Quick comparison:
 
 ---
 
-### Act 8: Tax Doesn't Have to Be Taxing (Tax Haveli) 🏛️
+### Act 8: Tax Doesn't Have to Be Taxing (Tax Haveli) 🏛️ `ROADMAP`
 
 **[SCENE: A building styled like a government office — think a mix of an old Indian sarkari building with modern digital kiosks inside. Sign reads "Tax Haveli — Kara Bhavan." A friendly CA (Chartered Accountant) NPC waits inside.]**
 
@@ -1168,7 +1200,7 @@ A simplified, guided walkthrough of ITR filing:
 
 ---
 
-### Act 9: Building Your Credit (Credit Chowk) 🏪
+### Act 9: Building Your Credit (Credit Chowk) 🏪 `ROADMAP`
 
 **[SCENE: A bustling Indian marketplace — shops, vendors, a small bank branch. This zone teaches credit, loans, and the CIBIL score.]**
 
@@ -1208,7 +1240,7 @@ Game shows: if player takes all three, ₹19,000/month goes to EMIs from a ₹45
 
 ---
 
-### Act 10: The Financial Health Check (Island Center — Finale)
+### Act 10: The Financial Health Check (Island Center — Finale) `MVP`
 
 **[SCENE: After completing all zones, Arjun returns to the Island Center. Didi is waiting with a final assessment.]**
 
