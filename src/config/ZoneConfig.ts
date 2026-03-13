@@ -1,4 +1,4 @@
-export type ZoneId = 'bank' | 'techcorp' | 'mftower' | 'scampark' | 'stockexchange'
+export type ZoneId = 'bank' | 'hospital' | 'mftower' | 'scampark' | 'stockexchange'
 
 export type ZoneConfig = {
   id: ZoneId
@@ -24,13 +24,13 @@ export const ZONE_CONFIGS: Record<ZoneId, ZoneConfig> = {
     themeColor: '#1e3a5f',   // Dark navy blue (bank)
     accentColor: '#4a90d9',
   },
-  techcorp: {
-    id: 'techcorp',
-    name: 'TechCorp HQ',
-    description: 'Your new workplace - understand your salary structure',
+  hospital: {
+    id: 'hospital',
+    name: 'City Hospital',
+    description: 'What happens when you skip health insurance?',
     storeKey: 'tallstore',
-    npcName: 'HR Vikram',
-    npcGreeting: "Welcome to TechCorp! I'm Vikram from HR. Ready to understand your offer letter?",
+    npcName: 'Dr. Sharma',
+    npcGreeting: "I see patients every day who could've avoided financial ruin with a simple insurance policy...",
     questCompleted: false,
     themeColor: '#1a2744',   // Deep slate blue (corporate)
     accentColor: '#3b82f6',

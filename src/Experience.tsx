@@ -9,7 +9,6 @@ import Character, { CharacterRef } from '@client/components/Character'
 import UnityControls from '@client/components/dev/UnityControls'
 import UnderfloorRespawnTrigger from '@client/components/UnderfloorRespawnTrigger'
 import ZoneManager from '@client/components/ZoneManager'
-import InteriorManager from '@client/components/interiors/InteriorManager'
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { useGameStore } from '@client/stores/gameStore'
@@ -232,7 +231,6 @@ const CharacterDependentComponents = () => {
       {unityLikeControlsEnabled ? <UnityControls /> : null}
       <UnderfloorRespawnTrigger characterRef={characterRef} />
       <ZoneManager characterRef={characterRef} />
-      <InteriorManager />
     </>
   )
 }

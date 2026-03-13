@@ -6,6 +6,7 @@ import JumpButton from '@client/components/HUD/JumpButton'
 import BankHUD from '@client/components/HUD/BankHUD'
 import LoginScreen from '@client/components/HUD/LoginScreen'
 import StartButton from '@client/components/HUD/StartButton'
+import ZoneUI from '@client/components/HUD/ZoneUI'
 import { CustomLoader } from '@client/components/HUD/Loader'
 import { SoundsStore } from '@client/components/Sounds'
 import { AuthAPIStore } from '@client/contexts/AuthContext'
@@ -34,16 +35,12 @@ export default function HUD() {
     showDialogScreen,
     isEnterStorePromptShown,
     enterStorePromptStoreName,
-    isExitStorePromptShown,
-    exitStorePromptStoreName,
   } = HUDStore(
     useShallow((state) => ({
       hasStartButtonBeenPressed: state.hasStartButtonBeenPressed,
       showDialogScreen: state.showDialogScreen,
       isEnterStorePromptShown: state.isEnterStorePromptShown,
       enterStorePromptStoreName: state.enterStorePromptStoreName,
-      isExitStorePromptShown: state.isExitStorePromptShown,
-      exitStorePromptStoreName: state.exitStorePromptStoreName,
     })),
   )
 
@@ -156,29 +153,28 @@ export default function HUD() {
       )}
 
       {/* Zone entry prompt */}
-      {hasStartButtonBeenPressed && isEnterStorePromptShown && (
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 text-center">
-          <div className="bg-black/70 backdrop-blur-sm rounded-xl px-8 py-4 border border-emerald-500/30">
-            <p className="text-emerald-400 text-lg font-semibold">
-              Press E to enter {getZoneByStoreKey(enterStorePromptStoreName)?.name || enterStorePromptStoreName}
-            </p>
-            <p className="text-slate-400 text-sm mt-1">
-              {getZoneByStoreKey(enterStorePromptStoreName)?.description || ''}
-            </p>
+      {hasStartButtonBeenPressed && !loading_initialSpawn && isEnterStorePromptShown && (() => {
+        const zone = getZoneByStoreKey(enterStorePromptStoreName)
+        if (!zone) return null
+        return (
+          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 text-center animate-bounce-slow">
+            <div className="bg-black/80 backdrop-blur-md rounded-2xl px-10 py-6 border border-emerald-500/40 shadow-2xl shadow-emerald-500/10">
+              <p className="text-white text-xl font-bold mb-1">
+                {zone.name}
+              </p>
+              <p className="text-slate-400 text-sm mb-4">
+                {zone.description}
+              </p>
+              <div className="flex items-center justify-center gap-2 text-emerald-400">
+                <kbd className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-3 py-1 text-sm font-mono font-bold">E</kbd>
+                <span className="text-base font-medium">to enter</span>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
-      {/* Zone exit prompt */}
-      {hasStartButtonBeenPressed && isExitStorePromptShown && (
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 text-center">
-          <div className="bg-black/70 backdrop-blur-sm rounded-xl px-8 py-4 border border-red-500/30">
-            <p className="text-red-400 text-lg font-semibold">
-              Press E to exit {getZoneByStoreKey(exitStorePromptStoreName)?.name || exitStorePromptStoreName}
-            </p>
-          </div>
-        </div>
-      )}
+      <ZoneUI />
     </>
   )
 }
