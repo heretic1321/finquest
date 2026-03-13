@@ -60,7 +60,7 @@ export const staticResourcePaths = {
     buttonColliders: './assets/inventoryConsole/buttonColliders.glb',
   },
   // newEnvironment: './assets/map_store5_chains_added.glb',  
-  newEnvironment: './assets/world2.glb',
+  newEnvironment: './assets/world.glb',
   waterNormalsTexture: './assets/images/waternormals.jpg',
   groupInfo: './assets/groupReferences/groupInfo.glb',
   groupInfoOGStore: './assets/groupReferences/groupInfoOGStore.glb',
