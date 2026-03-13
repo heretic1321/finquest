@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 import { GoMute, GoUnmute } from 'react-icons/go'
 import { BsFullscreen, BsFullscreenExit } from 'react-icons/bs'
+import { GiCrossedSwords } from 'react-icons/gi'
 
+import { launchUnityGame } from '@client/utils/unityLauncher'
 import JumpButton from '@client/components/HUD/JumpButton'
 import BankHUD from '@client/components/HUD/BankHUD'
 import LoginScreen from '@client/components/HUD/LoginScreen'
@@ -115,6 +117,20 @@ export default function HUD() {
     )
   }, [hasStartButtonBeenPressed, isTouchDevice])
 
+  // Unity game launch button
+  const unityGameBtn = useMemo(() => {
+    if (!hasStartButtonBeenPressed) return null
+    return (
+      <div
+        onClick={() => launchUnityGame()}
+        className='cursor-pointer rounded-lg bg-purple-600/80 p-2.5 backdrop-blur-sm transition hover:bg-purple-500/90'
+        title='Launch Dungeon Game'
+      >
+        <GiCrossedSwords className='h-5 w-5 fill-white' />
+      </div>
+    )
+  }, [hasStartButtonBeenPressed])
+
   return (
     <>
       {/* Login */}
@@ -140,6 +156,7 @@ export default function HUD() {
         <>
           {/* Top-right controls */}
           <div className='absolute right-4 top-4 z-40 flex gap-2'>
+            {unityGameBtn}
             {muteBtn}
             {fullscreenBtn}
           </div>
