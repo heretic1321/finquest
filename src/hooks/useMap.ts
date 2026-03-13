@@ -1381,6 +1381,13 @@ const useMap = () => {
     const _storeName = store.name.toLowerCase()
     const _mapScale = MapStore.getState().mapScale
 
+    // Skip ignored stores entirely (no LODs, no colliders, no triggers)
+    const IGNORED = ['ogstore', 'hub']
+    if (IGNORED.includes(_storeName)) {
+      console.log(`[useMap] Skipping ignored store: ${_storeName}`)
+      return
+    }
+
     const map: StoreInfo = {
       lods: {
         distances: [0, 0, 0],
