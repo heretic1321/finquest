@@ -1,0 +1,156 @@
+{"frames": [
+
+{
+	"filename": "frame_000_delay-0.04s.png",
+	"frame": {"x":0,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_001_delay-0.04s.png",
+	"frame": {"x":201,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_002_delay-0.05s.png",
+	"frame": {"x":402,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_003_delay-0.04s.png",
+	"frame": {"x":603,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_004_delay-0.04s.png",
+	"frame": {"x":804,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_005_delay-0.04s.png",
+	"frame": {"x":1005,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_006_delay-0.04s.png",
+	"frame": {"x":1206,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_007_delay-0.04s.png",
+	"frame": {"x":1407,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_008_delay-0.05s.png",
+	"frame": {"x":1608,"y":0,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_009_delay-0.04s.png",
+	"frame": {"x":0,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_010_delay-0.04s.png",
+	"frame": {"x":201,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_011_delay-0.04s.png",
+	"frame": {"x":402,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_012_delay-0.04s.png",
+	"frame": {"x":603,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_013_delay-0.04s.png",
+	"frame": {"x":804,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_014_delay-0.05s.png",
+	"frame": {"x":1005,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_015_delay-0.04s.png",
+	"frame": {"x":1206,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_016_delay-0.04s.png",
+	"frame": {"x":1407,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+},
+{
+	"filename": "frame_017_delay-0.04s.png",
+	"frame": {"x":1608,"y":122,"w":201,"h":122},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":122},
+	"sourceSize": {"w":201,"h":122}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "meteorGroundImpactSprite.png",
+	"format": "RGBA8888",
+	"size": {"w":1809,"h":244},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:c78b1e5670f5e2daccb6526e7108bae2:8e633f1589049f2de261070202da4587:4098c75ef01c31ed083512ae19f52f47$"
+}
+}

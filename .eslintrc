@@ -1,0 +1,42 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "simple-import-sort",
+    "no-relative-import-paths"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "rules": {
+    // increase the severity of rules so they are auto-fixable
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          // Packages `react` related packages come first.
+          ["^react$", "^@react-three/\\w", "three"],
+          ["^\\w"],
+          ["^@server/\\w"],
+          ["^@client/\\w"],
+          ["^../\\w", "^./\\w"],
+          // Style imports.
+          ["^.+\\.?(css)$"]
+        ]
+      }
+    ],
+    "simple-import-sort/exports": "error",
+    "no-relative-import-paths/no-relative-import-paths": [
+      "error",
+      { "allowSameFolder": true }
+    ],
+    "@typescript-eslint/ban-ts-comment": "off"
+  }
+}

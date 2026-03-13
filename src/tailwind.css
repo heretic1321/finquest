@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* custom class to make the chatbox take available
+height of the screen in different browsers */
+.chatbox-min-height {
+  min-height: 100%;
+}
+
+@supports (min-height: -moz-stretch) {
+  .chatbox-min-height {
+    min-height: -moz-stretch;
+  }
+}
+
+@supports (min-height: -webkit-stretch) {
+  .chatbox-min-height {
+    min-height: -webkit-stretch;
+  }
+}
+
+@supports (min-height: stretch) {
+  .chatbox-min-height {
+    min-height: stretch;
+  }
+}
+
+@font-face {
+  font-family: "RajdhaniBold";
+  src: url('./assets/fonts/Rajdhani-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "RajdhaniRegular";
+  src: url('./assets/fonts/Rajdhani-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "RajdhaniMedium";
+  src: url('./assets/fonts/Rajdhani-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "RajdhaniSemiBold";
+  src: url('./assets/fonts/Rajdhani-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "RajdhaniLight";
+  src: url('./assets/fonts/Rajdhani-Light.ttf') format('truetype');
+}
