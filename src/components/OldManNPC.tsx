@@ -35,7 +35,7 @@ export default function OldManNPC({ characterRef }: OldManNPCProps) {
 
   // Leva controls for positioning
   const { npcPos, npcRot, npcScale } = useControls('Old Man NPC', {
-    npcPos: { value: [4, 5.8, -209], label: 'Position', step: 0.5 },
+    npcPos: { value: [4, 5.8, -150], label: 'Position', step: 0.5 },
     npcRot: { value: [0, 0, 0], label: 'Rotation', step: 0.1 },
     npcScale: { value: 4, min: 0.5, max: 10, step: 0.1, label: 'Scale' },
   })
