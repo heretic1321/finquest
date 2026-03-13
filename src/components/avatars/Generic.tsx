@@ -1,6 +1,7 @@
 import {
   forwardRef,
   ForwardRefRenderFunction,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -40,7 +41,8 @@ const Generic: ForwardRefRenderFunction<AvatarModelRef, AvatarModelProps> = (
   },
   ref,
 ) => {
-  const group = useRef<THREE.Group | null>(null)
+  // This group wraps the avatar primitive — useAnimations binds the mixer to this
+  const wrapperGroup = useRef<THREE.Group>(null!)
   const hips = useRef<THREE.Object3D | null>(null)
 
   // Load animations
@@ -54,30 +56,26 @@ const Generic: ForwardRefRenderFunction<AvatarModelRef, AvatarModelProps> = (
   RunAnimation[0].name = 'run'
   JumpAnimation[0].name = 'jump'
 
-  const { actions } = useAnimations(
-    [IdleAnimation[0], WalkAnimation[0], RunAnimation[0], JumpAnimation[0]],
-    group,
-  )
+  const allClips = useMemo(() => [
+    IdleAnimation[0], WalkAnimation[0], RunAnimation[0], JumpAnimation[0],
+  ], [IdleAnimation, WalkAnimation, RunAnimation, JumpAnimation])
+
+  // useAnimations creates an AnimationMixer on wrapperGroup
+  const { actions } = useAnimations(allClips, wrapperGroup)
 
   const [animationActions, setAnimationActions] = useState<Record<
     string,
     THREE.AnimationAction | null
   > | null>(null)
 
-  // Load avatar model via useGLTF (no custom loader needed)
+  // Load avatar model
   const avatarPath = avatarData?.avatarPath && avatarData.avatarPath !== ''
     ? avatarData.avatarPath
     : DEFAULT_AVATAR
-
-  // Only load local paths (skip remote ReadyPlayerMe URLs)
   const safePath = avatarPath.startsWith('http') ? DEFAULT_AVATAR : avatarPath
   const { scene: originalScene } = useGLTF(safePath)
 
-  useImperativeHandle(ref, () => ({
-    animationActions: animationActions,
-  }))
-
-  const scene = useMemo(() => {
+  const clonedScene = useMemo(() => {
     if (!originalScene) return null
     const clone = SkeletonUtils.clone(originalScene)
     clone.traverse((child) => {
@@ -86,41 +84,43 @@ const Generic: ForwardRefRenderFunction<AvatarModelRef, AvatarModelProps> = (
     return clone
   }, [originalScene])
 
+  useImperativeHandle(ref, () => ({
+    animationActions: animationActions,
+  }))
+
+  // Once actions are populated, expose them and play idle
+  useEffect(() => {
+    if (areAnimActionsSet) return
+    if (actions['idle']) {
+      setAnimationActions(actions)
+      setAreAnimActionsSet(true)
+      actions['idle']?.play()
+      if (!isOtherPlayer)
+        genericStore.setState({ loading_avatarModelAndAnims: false })
+    }
+  }, [actions, areAnimActionsSet])
+
   useFrame(() => {
     if (!genericStore.getState().isTabFocused) return
     // Reset hips x/z each frame to cancel root motion drift
     if (hips.current) {
-      hips.current.position.fromArray([0, hips.current.position.y, 0])
-    }
-    // Set animation actions once ready
-    if (!areAnimActionsSet) {
-      if (actions['idle'] !== null && actions['idle'] !== undefined) {
-        setAnimationActions(actions)
-        setAreAnimActionsSet(true)
-        actions['idle']?.play()
-        if (!isOtherPlayer)
-          genericStore.setState({ loading_avatarModelAndAnims: false })
-      }
+      hips.current.position.x = 0
+      hips.current.position.z = 0
     }
   })
 
+  if (!clonedScene) return null
+
   return (
-    scene && (
+    <group ref={wrapperGroup}>
       <primitive
-        object={scene}
-        ref={(node: THREE.Object3D) => {
-          if (node) {
-            group.current = node as THREE.Group
-          } else {
-            group.current = null
-          }
-        }}
+        object={clonedScene}
         scale={AVATAR_CONFIG.scale}
         position={AVATAR_CONFIG.position}
         rotation={AVATAR_CONFIG.rotation}
         {...props}
       />
-    )
+    </group>
   )
 }
 
