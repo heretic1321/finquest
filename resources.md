@@ -195,6 +195,23 @@ All stored in `../references/` directory (outside repo).
 - **Repo:** https://github.com/wass08/r3f-sims-online
 - **Notes:** Socket.IO multiplayer pattern, `SkeletonUtils.clone()` for multiple characters. Not needed for P0.
 
+### 9. everlite-store — Our Own Three.js Game (HIGH PRIORITY REFERENCE)
+- **Path:** `../references/everlite-store/`
+- **Repo:** https://github.com/IndieVerseStudio/everlite-store
+- **Summary:** `../references/everlite-summary.md`
+- **Our own project.** Monorepo (client + server), R3F + Vite + Tailwind + Zustand.
+- **Key reusable systems:**
+  - **NPC Chat System** (`client/src/components/tutorial/NPCChatSystem.tsx`) — Full branching dialogue tree with question nodes, key-press triggers, checkpoint integration. Directly applicable for financial NPCs.
+  - **HUD / UI Overlay** (`client/src/components/HUD/`) — All UI is HTML outside Canvas, controlled by Zustand booleans. Loading screen, start screen, mobile joystick, modals.
+  - **Camera System** (`client/src/hooks/useCameraControls.ts`, `CameraFollowCharacter.tsx`, `useSpringArm.ts`) — Third-person OrbitControls following player with spring arm wall avoidance.
+  - **Input Handling** (`client/src/hooks/useCharacterControls.ts`) — WASD + nipplejs mobile joystick with sprint/jump.
+  - **Post-Processing** (`client/src/components/Effects.tsx`) — SMAA + SelectiveBloom + DepthOfField pipeline.
+  - **Sound Manager** (`client/src/components/Sounds.tsx`) — Howler.js + Zustand, tab focus handling, mute toggle.
+  - **Portal Shader** (`client/src/components/Portal/PortalShader.tsx`) — Animated Perlin noise shader, could be repurposed for zone entry effects.
+  - **Instanced Grass** (`client/src/components/Grass/GrassMaterial.tsx`) — Custom grass shader for island vegetation.
+  - **Zustand Store Pattern** — 15+ standalone stores with `useShallow` optimization, `getState()` for access outside React.
+- **Key difference:** Uses BVH collision (no physics engine), not Rapier. Character controller and trigger systems will need adaptation.
+
 ---
 
 ## Key Code Patterns
@@ -333,6 +350,7 @@ For deep technical details on each reference repo, see:
 - `../references/controllers-summary.md` — ecctrl API (50+ props), NPC pathfinding, fintech-world game loop
 - `../references/effects-summary.md` — Water shader GLSL, post-processing pipeline, mobile controls
 - `../references/coastal-world-analysis.md` — Coastal World deep dive (459 lines): architecture, terrain splatting, water system, NPC AI, asset pipeline, game design
+- `../references/everlite-summary.md` — Everlite Store (our own project): NPC chat system, HUD, camera, input, post-processing, shaders, Zustand patterns
 
 ---
 
