@@ -3,6 +3,7 @@ import { GoMute, GoUnmute } from 'react-icons/go'
 import { BsFullscreen, BsFullscreenExit } from 'react-icons/bs'
 
 import JumpButton from '@client/components/HUD/JumpButton'
+import BankHUD from '@client/components/HUD/BankHUD'
 import LoginScreen from '@client/components/HUD/LoginScreen'
 import StartButton from '@client/components/HUD/StartButton'
 import { CustomLoader } from '@client/components/HUD/Loader'
@@ -12,6 +13,7 @@ import { AvatarStore } from '@client/contexts/AvatarAppearanceContext'
 import { GesturesAndDeviceStore } from '@client/contexts/GesturesAndDeviceContext'
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
+import { getZoneByStoreKey } from '@client/config/ZoneConfig'
 import { useShallow } from 'zustand/react/shallow'
 
 export default function HUD() {
@@ -30,10 +32,18 @@ export default function HUD() {
   const {
     hasStartButtonBeenPressed,
     showDialogScreen,
+    isEnterStorePromptShown,
+    enterStorePromptStoreName,
+    isExitStorePromptShown,
+    exitStorePromptStoreName,
   } = HUDStore(
     useShallow((state) => ({
       hasStartButtonBeenPressed: state.hasStartButtonBeenPressed,
       showDialogScreen: state.showDialogScreen,
+      isEnterStorePromptShown: state.isEnterStorePromptShown,
+      enterStorePromptStoreName: state.enterStorePromptStoreName,
+      isExitStorePromptShown: state.isExitStorePromptShown,
+      exitStorePromptStoreName: state.exitStorePromptStoreName,
     })),
   )
 
@@ -137,9 +147,37 @@ export default function HUD() {
             {fullscreenBtn}
           </div>
 
+          {/* Bank balance HUD (top-left) */}
+          <BankHUD />
+
           {/* Jump button (mobile) */}
           {showJumpBtn}
         </>
+      )}
+
+      {/* Zone entry prompt */}
+      {hasStartButtonBeenPressed && isEnterStorePromptShown && (
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 text-center">
+          <div className="bg-black/70 backdrop-blur-sm rounded-xl px-8 py-4 border border-emerald-500/30">
+            <p className="text-emerald-400 text-lg font-semibold">
+              Press E to enter {getZoneByStoreKey(enterStorePromptStoreName)?.name || enterStorePromptStoreName}
+            </p>
+            <p className="text-slate-400 text-sm mt-1">
+              {getZoneByStoreKey(enterStorePromptStoreName)?.description || ''}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Zone exit prompt */}
+      {hasStartButtonBeenPressed && isExitStorePromptShown && (
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 text-center">
+          <div className="bg-black/70 backdrop-blur-sm rounded-xl px-8 py-4 border border-red-500/30">
+            <p className="text-red-400 text-lg font-semibold">
+              Press E to exit {getZoneByStoreKey(exitStorePromptStoreName)?.name || exitStorePromptStoreName}
+            </p>
+          </div>
+        </div>
       )}
     </>
   )

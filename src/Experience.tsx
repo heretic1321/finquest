@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 
 // import { button, useControls } from 'leva'
 import { create } from 'zustand'
@@ -10,6 +10,7 @@ import UnityControls from '@client/components/dev/UnityControls'
 import UnderfloorRespawnTrigger from '@client/components/UnderfloorRespawnTrigger'
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
+import { useGameStore } from '@client/stores/gameStore'
 
 import CameraFollowCharacter from './CameraFollowCharacter'
 // import DanceFloor from './components/DanceFloor'
@@ -140,6 +141,20 @@ function Experience() {
   const hasStartButtonBeenPressed = HUDStore(
     (state) => state.hasStartButtonBeenPressed,
   )
+
+  // Credit first salary when the game starts (month 1)
+  const month = useGameStore((state) => state.month)
+  const receiveSalary = useGameStore((state) => state.receiveSalary)
+  useEffect(() => {
+    if (hasStartButtonBeenPressed && month === 1) {
+      // Only credit if balance is 0 (first time)
+      const { balance } = useGameStore.getState()
+      if (balance === 0) {
+        receiveSalary()
+      }
+    }
+  }, [hasStartButtonBeenPressed, month, receiveSalary])
+
   if (!hasStartButtonBeenPressed) return null
 
   // Render the scene
