@@ -24,3 +24,13 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Large binary assets (use LFS or serve separately)
+public/unity/Build/v1.wasm
+public/unity/Build/v1.data
+public/assets/world.glb
+public/assets/world2.glb
+public/assets/avatars/oldman.fbx
+public/assets/avatars/oldman-idle.fbx
+public/assets/avatars/oldguy.glb
+public/unity/
