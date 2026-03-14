@@ -26,7 +26,7 @@ export function CustomLoader({
 
   React.useEffect(() => {
     let t: NodeJS.Timeout
-    if (active !== shown) t = setTimeout(() => setShown(active), 300)
+    if (active !== shown) t = setTimeout(() => setShown(active), 1000)
     return () => clearTimeout(t)
   }, [shown, active])
 
@@ -49,9 +49,10 @@ export function CustomLoader({
     <div
       style={{
         opacity: active ? 1 : 0,
+        transition: 'opacity 0.8s ease-out',
         ...containerStyles,
       }}
-      className='absolute inset-0 z-[1000] flex flex-col items-center justify-center bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#0a1628]'
+      className='absolute inset-0 z-[1000] flex flex-col items-center justify-center bg-[#0a0f1a]'
     >
       <h1 className='text-5xl font-bold tracking-tight md:text-7xl'>
         <span className='text-emerald-400'>Fin</span>

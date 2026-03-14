@@ -1127,7 +1127,9 @@ const Character: ForwardRefRenderFunction<CharacterRef, TCharacter> = (
       // this is when turn off the loading screen
       if (!hasStabilized.current) {
         stabilizationCheckFrameCount.current++
-        if (stabilizationCheckFrameCount.current > 10) {
+        // Wait at least 120 frames (~2 seconds at 60fps) for BVH collider to
+        // generate, shaders to compile, and player to settle on ground
+        if (stabilizationCheckFrameCount.current > 120) {
           hasStabilized.current = true
           genericStore.setState({ loading_initialSpawn: false })
         }
