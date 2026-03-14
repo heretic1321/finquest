@@ -9,7 +9,6 @@ import {
   QuizResult,
   evaluateAnswer,
 } from './bankStoryEngine'
-import './bankFlow.css'
 
 type Stage =
   | 'welcome'
@@ -69,7 +68,6 @@ export default function BankFlow() {
   const topSpeakerImage = isManagerSpeaking
     ? '/assets/ui/bank/bank_manager.png'
     : GLOBAL_COMPANION.imagePath
-  const topPortraitClass = isManagerSpeaking ? 'bank-manager-portrait' : 'bank-companion-portrait'
 
   // Compute what the top speaker says for typewriter
   const speakerLine = useMemo(() => {
@@ -152,40 +150,44 @@ export default function BankFlow() {
   }
 
   return (
-    <div className='bank-screen'>
-      {/* ── Header ── */}
-      <div className='bank-header'>
+    <div className='bg-[#0a0a0a] min-h-[80vh] p-4 space-y-4'>
+      {/* -- Header -- */}
+      <div className='flex items-center justify-between border-b-2 border-neutral-700 pb-4'>
         <div>
-          <p className='text-xs uppercase tracking-[0.2em] text-emerald-700'>FinQuest Bank</p>
-          <h3 className='mt-1 text-2xl font-semibold text-stone-800'>Banking Education Module</h3>
+          <p className='uppercase tracking-[0.2em] text-xs text-[#00ff88] font-mono'>FinQuest Bank</p>
+          <h3 className='mt-1 text-2xl font-black uppercase tracking-tight text-white'>Banking Education Module</h3>
         </div>
-        <div className='bank-header-meta'>
-          <div className='bank-progress' title='Topic progress'>
+        <div className='flex items-center gap-4'>
+          <div className='flex gap-1.5' title='Topic progress'>
             {BANK_TOPICS.map((t) => (
               <div
                 key={t.id}
-                className={`progress-pip ${completedTopics.has(t.id) ? 'done' : ''}`}
+                className={`w-3 h-3 border-2 ${completedTopics.has(t.id) ? 'bg-[#00ff88] border-[#00ff88]' : 'bg-transparent border-neutral-600'}`}
                 title={t.title}
               />
             ))}
           </div>
-          <div className='bank-coin-counter'>
-            <FaCoins className='text-amber-600' />
-            <span className='text-lg font-bold text-amber-800'>{totalCoins}</span>
-            <span className='text-xs text-amber-700'>coins</span>
+          <div className='flex items-center gap-2 border-2 border-[#ffcc00] bg-black px-3 py-1.5'>
+            <FaCoins className='text-[#ffcc00]' />
+            <span className='text-lg font-bold text-[#ffcc00] font-mono'>{totalCoins}</span>
+            <span className='text-xs text-neutral-500 uppercase tracking-wider font-mono'>coins</span>
           </div>
         </div>
       </div>
 
-      {/* ── Manager / Companion dialogue row ── */}
-      <div className='bank-convo-row'>
-        <img src={topSpeakerImage} alt={topSpeakerName} className={topPortraitClass} />
+      {/* -- Manager / Companion dialogue row -- */}
+      <div className='flex gap-4 items-start'>
+        <img
+          src={topSpeakerImage}
+          alt={topSpeakerName}
+          className='w-20 h-20 object-cover border-2 border-[#00ff88] rounded-none flex-shrink-0'
+        />
 
-        <div className='bank-dialogue-box'>
-          <p className='bank-speaker-tag'>{topSpeakerName}</p>
-          <p className='bank-dialogue-text'>
+        <div className='bg-black border-2 border-neutral-700 p-4 flex-1'>
+          <span className='bg-[#00ff88] text-black font-mono font-bold text-xs uppercase px-2 py-1 inline-block'>{topSpeakerName}</span>
+          <p className='font-mono text-sm text-neutral-300 mt-3 leading-relaxed'>
             {typedText}
-            <span className='bank-type-cursor' />
+            <span className='inline-block w-0.5 h-4 bg-[#00ff88] ml-0.5 animate-pulse' />
           </p>
 
           {/* Stage-specific content inside dialogue box */}
@@ -193,9 +195,9 @@ export default function BankFlow() {
             <button
               type='button'
               onClick={() => setStage('topic-select')}
-              className='bank-continue-btn'
+              className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
             >
-              Let's explore →
+              Let's explore
             </button>
           )}
 
@@ -203,9 +205,9 @@ export default function BankFlow() {
             <button
               type='button'
               onClick={() => setStage('quiz')}
-              className='bank-continue-btn'
+              className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
             >
-              Take the quiz →
+              Take the quiz
             </button>
           )}
 
@@ -213,28 +215,28 @@ export default function BankFlow() {
             <button
               type='button'
               onClick={() => setStage('simulation')}
-              className='bank-continue-btn'
+              className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
             >
-              See real example →
+              See real example
             </button>
           )}
 
           {stage === 'simulation' && currentTopic && (
             <>
-              <div className='sim-box'>
-                <p className='text-sm text-emerald-800 leading-relaxed'>
+              <div className='mt-4 border-2 border-neutral-700 bg-[#111] p-3'>
+                <p className='text-sm text-neutral-300 font-mono leading-relaxed'>
                   {currentTopic.simulation.result}
                 </p>
                 {currentTopic.simulation.formula && (
-                  <span className='sim-formula'>{currentTopic.simulation.formula}</span>
+                  <span className='inline-block mt-2 font-mono text-xs text-[#00ff88] bg-black border border-neutral-800 px-2 py-1'>{currentTopic.simulation.formula}</span>
                 )}
               </div>
               <button
                 type='button'
                 onClick={() => setStage('topic-complete')}
-                className='bank-continue-btn'
+                className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
-                Continue →
+                Continue
               </button>
             </>
           )}
@@ -242,58 +244,64 @@ export default function BankFlow() {
           {stage === 'topic-complete' && (
             <>
               {quizResult?.isCorrect && (
-                <div className='reward-popup'>
-                  <div className='text-3xl'>🪙</div>
-                  <div className='reward-coins-display'>+{currentTopic?.rewardCoins} coins!</div>
+                <div className='mt-4 flex items-center gap-3 border-2 border-[#ffcc00] bg-black p-3'>
+                  <div className='text-3xl'>&#x1FA99;</div>
+                  <div className='font-mono font-bold text-[#ffcc00]'>+{currentTopic?.rewardCoins} coins!</div>
                 </div>
               )}
               <button
                 type='button'
                 onClick={handleTopicComplete}
-                className='bank-continue-btn'
+                className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
-                {completedTopics.size + 1 >= TOTAL_BANK_TOPICS ? 'See summary →' : 'Choose another topic →'}
+                {completedTopics.size + 1 >= TOTAL_BANK_TOPICS ? 'See summary' : 'Choose another topic'}
               </button>
             </>
           )}
 
           {stage === 'all-done' && (
-            <div className='all-done-wrap'>
-              <div className='text-5xl'>🏆</div>
-              <div className='all-done-total'>{totalCoins} coins earned!</div>
-              <p className='text-sm text-stone-500'>You have mastered all banking concepts.</p>
+            <div className='mt-4 border-2 border-[#ffcc00] bg-black p-4 text-center space-y-2'>
+              <div className='text-5xl'>&#x1F3C6;</div>
+              <div className='font-mono font-bold text-[#ffcc00] text-xl'>{totalCoins} coins earned!</div>
+              <p className='text-sm text-neutral-500 font-mono'>You have mastered all banking concepts.</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Player dialogue row ── */}
-      <div className='bank-player-row'>
-        <div className='bank-player-dialogue'>
-          <p className='bank-player-tag'>{playerName}</p>
+      {/* -- Player dialogue row -- */}
+      <div className='flex gap-4 items-start flex-row-reverse'>
+        <img
+          src={playerAvatar}
+          alt={playerName}
+          className='w-16 h-16 object-cover border-2 border-neutral-700 rounded-none flex-shrink-0'
+        />
+
+        <div className='bg-[#111] border-2 border-neutral-700 p-4 flex-1'>
+          <span className='bg-neutral-700 text-white font-mono font-bold text-xs uppercase px-2 py-1 inline-block'>{playerName}</span>
 
           {stage === 'welcome' && (
-            <p className='text-sm text-stone-600 italic'>
+            <p className='text-sm text-neutral-400 italic mt-3 font-mono'>
               Hello! I'd like to learn more about banking and finance.
             </p>
           )}
 
           {stage === 'topic-select' && (
-            <div>
-              <p className='mb-3 text-sm text-stone-600'>Pick a topic to learn:</p>
-              <div className='bank-topic-grid'>
+            <div className='mt-3'>
+              <p className='mb-3 text-sm text-neutral-400 font-mono'>Pick a topic to learn:</p>
+              <div className='grid grid-cols-2 gap-3'>
                 {BANK_TOPICS.map((topic) => (
                   <button
                     key={topic.id}
                     type='button'
                     disabled={completedTopics.has(topic.id)}
                     onClick={() => handleTopicSelect(topic.id)}
-                    className={`topic-card ${completedTopics.has(topic.id) ? 'completed' : ''}`}
+                    className={`bg-black border-2 p-4 text-left uppercase tracking-wider cursor-pointer transition-all ${completedTopics.has(topic.id) ? 'border-[#00ff88] opacity-50 cursor-not-allowed' : 'border-neutral-700 text-white hover:border-[#00ff88] hover:shadow-[3px_3px_0_#00ff88]'}`}
                   >
-                    <span className='topic-icon'>{topic.icon}</span>
-                    <span className='topic-card-label'>{topic.title}</span>
+                    <span className='text-2xl block mb-2'>{topic.icon}</span>
+                    <span className='font-mono text-xs font-bold'>{topic.title}</span>
                     {completedTopics.has(topic.id) && (
-                      <span className='topic-done-badge'>✓ Done</span>
+                      <span className='block mt-1 text-[#00ff88] font-mono text-xs'>DONE</span>
                     )}
                   </button>
                 ))}
@@ -302,20 +310,26 @@ export default function BankFlow() {
           )}
 
           {stage === 'module-intro' && (
-            <p className='text-sm text-stone-600 italic'>
+            <p className='text-sm text-neutral-400 italic mt-3 font-mono'>
               That's really helpful! I want to know more.
             </p>
           )}
 
           {stage === 'quiz' && currentTopic && (
-            <div className='bank-options-wrap'>
+            <div className='mt-3 space-y-2'>
               {currentTopic.question.options.map((option) => {
                 const isSelected = selectedAnswer === option.id
                 const isCorrectOption = option.id === currentTopic.question.correctId
-                let extraClass = ''
+                let borderColor = 'border-neutral-700'
+                let bgColor = 'bg-black'
                 if (selectedAnswer) {
-                  if (isCorrectOption) extraClass = 'correct'
-                  else if (isSelected) extraClass = 'wrong'
+                  if (isCorrectOption) {
+                    borderColor = 'border-[#00ff88]'
+                    bgColor = 'bg-[#00ff88]/10'
+                  } else if (isSelected) {
+                    borderColor = 'border-[#ff3366]'
+                    bgColor = 'bg-[#ff3366]/10'
+                  }
                 }
                 return (
                   <button
@@ -323,7 +337,7 @@ export default function BankFlow() {
                     type='button'
                     disabled={!!selectedAnswer}
                     onClick={() => handleAnswerSelect(option.id)}
-                    className={`bank-option-btn ${extraClass}`}
+                    className={`w-full text-left border-2 ${borderColor} ${bgColor} p-3 font-mono text-sm text-white cursor-pointer hover:border-[#00ff88] transition-all`}
                   >
                     {option.label}
                   </button>
@@ -333,25 +347,19 @@ export default function BankFlow() {
           )}
 
           {(stage === 'quiz-feedback' || stage === 'simulation' || stage === 'topic-complete') && (
-            <p className='text-sm text-stone-600 italic'>
+            <p className='text-sm text-neutral-400 italic mt-3 font-mono'>
               {quizResult?.isCorrect
-                ? 'I got it! That makes total sense now. 🎉'
-                : "I see — I didn't know that. I'll remember it now."}
+                ? 'I got it! That makes total sense now.'
+                : "I see -- I didn't know that. I'll remember it now."}
             </p>
           )}
 
           {stage === 'all-done' && (
-            <p className='text-sm text-emerald-700 italic font-medium'>
-              I feel financially educated! Thank you so much! 🌟
+            <p className='text-sm text-[#00ff88] italic font-mono font-medium mt-3'>
+              I feel financially educated! Thank you so much!
             </p>
           )}
         </div>
-
-        <img
-          src={playerAvatar}
-          alt={playerName}
-          className='bank-user-portrait'
-        />
       </div>
     </div>
   )

@@ -49,24 +49,24 @@ export default function UIFlowsOverlay() {
     activeFlowId === 'laxmi-intro'
 
   return (
-    <section className={`absolute inset-0 z-[120] overflow-y-auto bg-[#05070fcc] backdrop-blur-md ${isImmersiveInsurance ? 'px-2 py-2' : 'px-4 py-6'}`}>
-      <div className={`mx-auto w-full rounded-2xl border border-white/15 bg-gradient-to-b from-[#111a2b] to-[#0e1624] text-white shadow-2xl ${isImmersiveInsurance ? 'max-w-[98vw] p-3' : 'max-w-6xl p-6'}`}>
+    <section className={`absolute inset-0 z-[120] overflow-y-auto bg-[#0a0a0a]/95 ${isImmersiveInsurance ? 'px-2 py-2' : 'px-4 py-6'}`}>
+      <div className={`mx-auto w-full rounded-none border-2 border-[#00ff88] bg-[#0a0a0a] text-white ${isImmersiveInsurance ? 'max-w-[98vw] p-3' : 'max-w-6xl p-6 shadow-[6px_6px_0_#00ff88]'}`}>
         {!isImmersiveInsurance && (
           <>
             <div className='mb-6 flex items-start justify-between gap-4'>
               <div>
-                <h2 className='text-2xl font-semibold'>UI Flows Sandbox</h2>
-                <p className='mt-1 text-sm text-slate-300'>
+                <h2 className='font-black uppercase tracking-tight text-xl text-white'>UI Flows Sandbox</h2>
+                <p className='mt-1 font-mono text-xs text-neutral-500 uppercase tracking-wider'>
                   Separate UI pipeline for screen flows outside the 3D world interactions.
                 </p>
-                <p className='mt-2 text-xs text-slate-400'>
+                <p className='mt-2 font-mono text-xs text-[#00ff88]'>
                   Entry: {entrySource || 'manual'}
-                  {entryStoreKey ? ` · Trigger: ${entryStoreKey}` : ''}
+                  {entryStoreKey ? ` // Trigger: ${entryStoreKey}` : ''}
                 </p>
               </div>
 
               <button
-                className='rounded-lg border border-rose-400/30 bg-rose-500/15 px-3 py-2 text-sm font-medium text-rose-200 transition hover:bg-rose-500/25'
+                className='bg-[#ff3366] text-white font-bold uppercase tracking-wider text-sm border-2 border-[#ff3366] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
                 onClick={closeUIFlow}
               >
                 Exit to World
@@ -74,9 +74,9 @@ export default function UIFlowsOverlay() {
             </div>
 
             {activeFlow && (
-              <div className='mb-4 rounded-xl border border-indigo-400/20 bg-indigo-500/10 px-4 py-3'>
-                <p className='text-xs uppercase tracking-wide text-indigo-200'>Active flow</p>
-                <p className='mt-1 font-medium text-indigo-100'>{activeFlow.title}</p>
+              <div className='mb-4 bg-black border-2 border-[#00ff88] p-3 rounded-none'>
+                <p className='font-mono text-xs uppercase tracking-[0.2em] text-[#00ff88]'>Active flow</p>
+                <p className='mt-1 font-bold text-white'>{activeFlow.title}</p>
               </div>
             )}
           </>
@@ -85,7 +85,7 @@ export default function UIFlowsOverlay() {
         {isImmersiveInsurance && (
           <div className='mb-2 flex justify-end'>
             <button
-              className='rounded-lg border border-rose-400/30 bg-rose-500/15 px-3 py-2 text-sm font-medium text-rose-200 transition hover:bg-rose-500/25'
+              className='bg-[#ff3366] text-white font-bold uppercase tracking-wider text-sm border-2 border-[#ff3366] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               onClick={closeUIFlow}
             >
               Exit to World

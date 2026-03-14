@@ -10,7 +10,6 @@ import {
   UNCLE_CHUNK_DIALOGUES,
   makeVisualHash,
 } from './blockchainStoryEngine'
-import './blockchainFlow.css'
 
 type Stage = 'intro' | 'quiz' | 'quiz-feedback' | 'minigame-intro' | 'minigame' | 'complete'
 
@@ -80,7 +79,6 @@ export default function BlockchainFlow() {
   const topSpeakerImage = isLaxmiSpeaking
     ? GLOBAL_COMPANION.imagePath
     : '/assets/ui/blockchain/uncle_chunk.png'
-  const topPortraitClass = isLaxmiSpeaking ? 'blockchain-companion-portrait' : 'blockchain-npc-portrait'
 
   // Compute what the top speaker says for typewriter
   const speakerLine = useMemo(() => {
@@ -169,37 +167,41 @@ export default function BlockchainFlow() {
   }
 
   return (
-    <div className='blockchain-screen'>
-      {/* ── Header ── */}
-      <div className='blockchain-header'>
+    <div className='bg-[#0a0a0a] min-h-[80vh] p-4 space-y-4'>
+      {/* -- Header -- */}
+      <div className='flex items-center justify-between border-b-2 border-neutral-700 pb-4'>
         <div>
-          <p className='text-xs uppercase tracking-[0.2em] text-cyan-400'>Blockchain Domain</p>
-          <h3 className='mt-1 text-2xl font-semibold text-white'>
+          <p className='uppercase tracking-[0.2em] text-xs text-[#00ff88] font-mono'>Blockchain Domain</p>
+          <h3 className='mt-1 text-2xl font-black uppercase tracking-tight text-white'>
             Learn Blockchain with Uncle Chunk
           </h3>
         </div>
-        <div className='blockchain-coin-counter'>
-          <FaCoins className='text-yellow-400' />
-          <span className='text-lg font-bold text-yellow-100'>{totalCoins}</span>
-          <span className='text-xs text-yellow-300'>coins</span>
+        <div className='flex items-center gap-2 border-2 border-[#ffcc00] bg-black px-3 py-1.5'>
+          <FaCoins className='text-[#ffcc00]' />
+          <span className='text-lg font-bold text-[#ffcc00] font-mono'>{totalCoins}</span>
+          <span className='text-xs text-neutral-500 uppercase tracking-wider font-mono'>coins</span>
         </div>
       </div>
 
-      {/* ── NPC / Companion dialogue row (hidden during mini-game) ── */}
+      {/* -- NPC / Companion dialogue row (hidden during mini-game) -- */}
       {stage !== 'minigame' && (
-        <div className='blockchain-npc-row'>
-          <img src={topSpeakerImage} alt={topSpeakerName} className={topPortraitClass} />
+        <div className='flex gap-4 items-start'>
+          <img
+            src={topSpeakerImage}
+            alt={topSpeakerName}
+            className='w-20 h-20 object-cover border-2 border-[#00ff88] rounded-none flex-shrink-0'
+          />
 
-          <div className='blockchain-dialogue-box'>
-            <p className='blockchain-speaker-tag'>{topSpeakerName}</p>
-            <p className='blockchain-dialogue-text'>
+          <div className='bg-black border-2 border-neutral-700 p-4 flex-1'>
+            <span className='bg-[#ffcc00] text-black font-mono font-bold text-xs uppercase px-2 py-1 inline-block'>{topSpeakerName}</span>
+            <p className='font-mono text-sm text-neutral-300 mt-3 leading-relaxed'>
               {typedText}
-              <span className='blockchain-type-cursor' />
+              <span className='inline-block w-0.5 h-4 bg-[#00ff88] ml-0.5 animate-pulse' />
             </p>
 
             {stage === 'intro' && (
-              <button type='button' onClick={goNextDialogue} className='blockchain-continue-btn'>
-                Continue →
+              <button type='button' onClick={goNextDialogue} className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'>
+                Continue
               </button>
             )}
 
@@ -207,9 +209,9 @@ export default function BlockchainFlow() {
               <button
                 type='button'
                 onClick={() => setStage('minigame-intro')}
-                className='blockchain-continue-btn'
+                className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
-                Show me the mini-game →
+                Show me the mini-game
               </button>
             )}
 
@@ -217,18 +219,18 @@ export default function BlockchainFlow() {
               <button
                 type='button'
                 onClick={() => setStage('minigame')}
-                className='blockchain-continue-btn'
+                className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
-                Build the Blockchain! →
+                Build the Blockchain!
               </button>
             )}
 
             {stage === 'complete' && (
-              <div className='blockchain-reward-popup'>
-                <span className='text-3xl'>⛓️</span>
+              <div className='mt-4 flex items-center gap-3 border-2 border-[#ffcc00] bg-black p-3'>
+                <span className='text-3xl'>&#x26D3;&#xFE0F;</span>
                 <div>
-                  <span className='reward-coins-big'>+{MINIGAME_REWARD_COINS} coins</span>
-                  <p className='text-xs text-cyan-300 mt-0.5'>Mini-game complete!</p>
+                  <span className='font-mono font-bold text-[#ffcc00]'>+{MINIGAME_REWARD_COINS} coins</span>
+                  <p className='text-xs text-neutral-500 font-mono mt-0.5'>Mini-game complete!</p>
                 </div>
               </div>
             )}
@@ -236,25 +238,37 @@ export default function BlockchainFlow() {
         </div>
       )}
 
-      {/* ── Player row (hidden during mini-game) ── */}
+      {/* -- Player row (hidden during mini-game) -- */}
       {stage !== 'minigame' && (
-        <div className='blockchain-player-row'>
-          <div className='blockchain-player-dialogue'>
-            <p className='blockchain-player-tag'>{playerName}</p>
+        <div className='flex gap-4 items-start flex-row-reverse'>
+          <img
+            src={playerAvatar}
+            alt={playerName}
+            className='w-16 h-16 object-cover border-2 border-neutral-700 rounded-none flex-shrink-0'
+          />
+
+          <div className='bg-[#111] border-2 border-neutral-700 p-4 flex-1'>
+            <span className='bg-neutral-700 text-white font-mono font-bold text-xs uppercase px-2 py-1 inline-block'>{playerName}</span>
 
             {stage === 'intro' && (
-              <p className='text-sm text-slate-300 italic'>
+              <p className='text-sm text-neutral-400 italic mt-3 font-mono'>
                 Tell me more, Uncle Chunk! I want to understand.
               </p>
             )}
 
             {stage === 'quiz' && (
-              <div className='blockchain-options-wrap'>
+              <div className='mt-3 space-y-2'>
                 {BLOCKCHAIN_QUIZ.options.map((option) => {
-                  let cls = 'blockchain-option-btn'
+                  let borderColor = 'border-neutral-700'
+                  let bgColor = 'bg-black'
                   if (selectedAnswer) {
-                    if (option.id === BLOCKCHAIN_QUIZ.correctId) cls += ' correct'
-                    else if (option.id === selectedAnswer) cls += ' wrong'
+                    if (option.id === BLOCKCHAIN_QUIZ.correctId) {
+                      borderColor = 'border-[#00ff88]'
+                      bgColor = 'bg-[#00ff88]/10'
+                    } else if (option.id === selectedAnswer) {
+                      borderColor = 'border-[#ff3366]'
+                      bgColor = 'bg-[#ff3366]/10'
+                    }
                   }
                   return (
                     <button
@@ -262,7 +276,7 @@ export default function BlockchainFlow() {
                       type='button'
                       disabled={!!selectedAnswer}
                       onClick={() => handleAnswer(option.id)}
-                      className={cls}
+                      className={`w-full text-left border-2 ${borderColor} ${bgColor} p-3 font-mono text-sm text-white cursor-pointer hover:border-[#00ff88] transition-all`}
                     >
                       {option.label}
                     </button>
@@ -272,133 +286,127 @@ export default function BlockchainFlow() {
             )}
 
             {stage === 'quiz-feedback' && (
-              <p className='text-sm text-slate-300 italic'>
-                {isCorrect ? 'Oh that makes perfect sense! 🎉' : 'Ah, I understand now. Thank you!'}
+              <p className='text-sm text-neutral-400 italic mt-3 font-mono'>
+                {isCorrect ? 'Oh that makes perfect sense!' : 'Ah, I understand now. Thank you!'}
               </p>
             )}
 
             {stage === 'minigame-intro' && (
-              <p className='text-sm text-slate-300 italic'>
+              <p className='text-sm text-neutral-400 italic mt-3 font-mono'>
                 I want to try building a blockchain myself!
               </p>
             )}
 
             {stage === 'complete' && (
-              <p className='text-sm text-cyan-300 italic font-medium'>
-                I can see why tampering is impossible — the whole chain breaks! ⛓️
+              <p className='text-sm text-[#00ff88] italic font-mono font-medium mt-3'>
+                I can see why tampering is impossible -- the whole chain breaks!
               </p>
             )}
           </div>
-
-          <img
-            src={playerAvatar}
-            alt={playerName}
-            className='blockchain-user-portrait'
-          />
         </div>
       )}
 
-      {/* ════════════════════════════════════════════════════════════════════
+      {/* ================================================================
           MINI-GAME
-      ════════════════════════════════════════════════════════════════════ */}
+      ================================================================ */}
       {stage === 'minigame' && (
-        <div className='blockchain-minigame'>
-          <div className='minigame-header'>
-            <p className='text-xs uppercase tracking-widest text-cyan-400'>
-              Build the Blockchain — Mini Game
+        <div className='border-2 border-[#00ff88] bg-black p-4 space-y-4'>
+          <div className='border-b-2 border-neutral-700 pb-3'>
+            <p className='uppercase tracking-[0.2em] text-xs text-[#00ff88] font-mono'>
+              Build the Blockchain -- Mini Game
             </p>
-            <h4 className='mt-1 text-lg font-bold text-white'>
+            <h4 className='mt-1 text-lg font-black uppercase tracking-tight text-white'>
               {gameComplete
-                ? '✅ Chain Complete! All transactions validated.'
+                ? 'Chain Complete! All transactions validated.'
                 : `Validate and add Block #${pendingIndex + 1} of ${PENDING_TRANSACTIONS.length}`}
             </h4>
-            <p className='text-xs text-slate-400 mt-0.5'>
-              Click <span className='text-cyan-400 font-semibold'>Validate & Add</span> to extend
-              the chain · Click{' '}
-              <span className='text-red-400 font-semibold'>Tamper</span> on any block to see
+            <p className='text-xs text-neutral-500 font-mono mt-1'>
+              Click <span className='text-[#00ff88] font-bold'>Validate & Add</span> to extend
+              the chain // Click{' '}
+              <span className='text-[#ff3366] font-bold'>Tamper</span> on any block to see
               immutability in action
             </p>
           </div>
 
           {/* Tamper warning */}
           {showTamperWarning && (
-            <div className='tamper-warning'>
-              <FaExclamationTriangle className='text-red-400 text-xl flex-shrink-0' />
+            <div className='border-2 border-[#ff3366] bg-[#ff3366]/10 p-4 flex items-start gap-3'>
+              <FaExclamationTriangle className='text-[#ff3366] text-xl flex-shrink-0' />
               <div>
-                <p className='font-semibold text-red-300'>Chain Broken!</p>
-                <p className='text-xs text-red-200'>
+                <p className='font-bold text-[#ff3366] font-mono uppercase text-sm'>Chain Broken!</p>
+                <p className='text-xs text-neutral-300 font-mono mt-1'>
                   Modifying Block #{tamperedBlockNum} invalidated{' '}
                   {chain.filter((b) => b.tampered).length} block
                   {chain.filter((b) => b.tampered).length > 1 ? 's' : ''} after it. This is why
                   blockchain data is immutable!
                 </p>
               </div>
-              <button type='button' onClick={handleRepair} className='repair-btn'>
-                🔧 Repair Chain
+              <button type='button' onClick={handleRepair} className='bg-[#00ff88] text-black font-bold uppercase tracking-wider text-xs border-2 border-[#00ff88] px-3 py-1.5 rounded-none flex-shrink-0 hover:shadow-[2px_2px_0_white] transition-all'>
+                Repair Chain
               </button>
             </div>
           )}
 
           {/* Chain visualization */}
-          <div className='chain-scroll-wrap'>
-            <div className='chain-blocks'>
+          <div className='overflow-x-auto'>
+            <div className='flex gap-0 items-center min-w-max'>
               {chain.map((block, idx) => (
-                <div key={block.blockNum} className='chain-item'>
-                  <div className={`chain-block ${block.tampered ? 'invalid' : 'valid'}`}>
-                    <div className='block-top'>
-                      <span className='block-num'>Block #{block.blockNum}</span>
+                <div key={block.blockNum} className='flex items-center'>
+                  <div className={`border-2 ${block.tampered ? 'border-[#ff3366]' : 'border-[#00ff88]'} bg-black p-3 w-56`}>
+                    <div className='flex items-center justify-between mb-2'>
+                      <span className='font-mono text-xs font-bold text-white'>Block #{block.blockNum}</span>
                       {block.blockNum === 0 && (
-                        <span className='genesis-badge'>Genesis</span>
+                        <span className='font-mono text-[10px] uppercase bg-[#00ff88] text-black px-1.5 py-0.5 font-bold'>Genesis</span>
                       )}
-                      {block.tampered && <span className='invalid-badge'>INVALID</span>}
+                      {block.tampered && <span className='font-mono text-[10px] uppercase bg-[#ff3366] text-white px-1.5 py-0.5 font-bold'>INVALID</span>}
                     </div>
 
-                    <div className='block-body'>
-                      <p className='block-tx'>{block.transaction}</p>
-                      <div className='block-hashes'>
-                        <p className='hash-line'>
-                          <span className='hash-label'>PREV</span>
-                          <span className='hash-val'>
+                    <div className='space-y-1.5'>
+                      <p className='font-mono text-xs text-neutral-300 leading-snug'>{block.transaction}</p>
+                      <div className='space-y-1'>
+                        <p className='flex items-center gap-1.5'>
+                          <span className='font-mono text-[10px] uppercase text-neutral-500 tracking-wider'>PREV</span>
+                          <span className='font-mono text-[#00ff88] text-xs bg-black border border-neutral-800 px-2 py-0.5'>
                             {block.prevHash === '—'
                               ? '—'
-                              : `${block.prevHash.slice(0, 8)}…`}
+                              : `${block.prevHash.slice(0, 8)}...`}
                           </span>
                         </p>
-                        <p className='hash-line'>
-                          <span className='hash-label'>HASH</span>
+                        <p className='flex items-center gap-1.5'>
+                          <span className='font-mono text-[10px] uppercase text-neutral-500 tracking-wider'>HASH</span>
                           <span
-                            className={`hash-val ${block.tampered ? 'text-red-400' : ''}`}
+                            className={`font-mono text-xs bg-black border border-neutral-800 px-2 py-0.5 ${block.tampered ? 'text-[#ff3366]' : 'text-[#00ff88]'}`}
                           >
-                            {block.tampered ? '????????…' : `${block.hash.slice(0, 8)}…`}
+                            {block.tampered ? '????????...' : `${block.hash.slice(0, 8)}...`}
                           </span>
                         </p>
                       </div>
                     </div>
 
-                    {/* Tamper button — only on non-genesis, non-tampered blocks when chain is healthy */}
+                    {/* Tamper button */}
                     {block.blockNum > 0 && !block.tampered && !tamperedBlockNum && !gameComplete && (
                       <button
                         type='button'
                         onClick={() => handleTamper(block.blockNum)}
-                        className='tamper-btn'
+                        className='mt-2 w-full bg-[#ff3366] text-white font-mono font-bold uppercase text-[10px] border-2 border-[#ff3366] px-2 py-1 tracking-wider hover:shadow-[2px_2px_0_white] transition-all'
                       >
-                        Tamper ⚠
+                        Tamper
                       </button>
                     )}
 
                     {/* Lock/alert icon */}
-                    <div className='lock-icon'>
+                    <div className='mt-2 flex justify-center'>
                       {block.tampered ? (
-                        <FaExclamationTriangle className='text-red-500' />
+                        <FaExclamationTriangle className='text-[#ff3366]' />
                       ) : (
-                        <FaLock className='text-cyan-500' />
+                        <FaLock className='text-[#00ff88]' />
                       )}
                     </div>
                   </div>
 
                   {/* Chain link connector */}
                   {idx < chain.length - 1 && (
-                    <div className={`chain-link ${chain[idx + 1].tampered ? 'broken' : ''}`}>
+                    <div className={`px-1 ${chain[idx + 1].tampered ? 'text-[#ff3366]' : 'text-[#00ff88]'}`}>
                       <FaLink />
                     </div>
                   )}
@@ -409,29 +417,29 @@ export default function BlockchainFlow() {
               {!gameComplete &&
                 pendingIndex < PENDING_TRANSACTIONS.length &&
                 !showTamperWarning && (
-                  <div className='chain-item'>
-                    <div className='chain-link pending-link'>
+                  <div className='flex items-center'>
+                    <div className='px-1 text-neutral-600 animate-pulse'>
                       <FaLink />
                     </div>
-                    <div className='chain-block pending'>
-                      <div className='block-top'>
-                        <span className='block-num'>Block #{chain.length}</span>
-                        <span className='pending-badge'>Pending</span>
+                    <div className='border-2 border-dashed border-neutral-600 bg-black p-3 w-56'>
+                      <div className='flex items-center justify-between mb-2'>
+                        <span className='font-mono text-xs font-bold text-neutral-500'>Block #{chain.length}</span>
+                        <span className='font-mono text-[10px] uppercase bg-neutral-700 text-neutral-300 px-1.5 py-0.5 font-bold'>Pending</span>
                       </div>
-                      <div className='block-body'>
-                        <p className='block-tx'>
+                      <div>
+                        <p className='font-mono text-xs text-neutral-400 leading-snug'>
                           {PENDING_TRANSACTIONS[pendingIndex].transaction}
                         </p>
-                        <p className='text-xs text-slate-400 mt-1'>
+                        <p className='text-xs text-neutral-600 font-mono mt-1'>
                           Awaiting your validation...
                         </p>
                       </div>
                       <button
                         type='button'
                         onClick={handleValidateBlock}
-                        className='validate-btn'
+                        className='mt-2 w-full bg-[#00ff88] text-black font-mono font-bold uppercase text-xs border-2 border-[#00ff88] px-2 py-1.5 tracking-wider hover:shadow-[2px_2px_0_white] transition-all'
                       >
-                        ✓ Validate & Add
+                        Validate & Add
                       </button>
                     </div>
                   </div>
@@ -441,20 +449,20 @@ export default function BlockchainFlow() {
 
           {/* Game complete bar */}
           {gameComplete && (
-            <div className='game-complete-bar'>
-              <span className='text-3xl'>🏆</span>
-              <div>
-                <p className='font-bold text-white'>Blockchain successfully built!</p>
-                <p className='text-sm text-cyan-300'>
+            <div className='border-2 border-[#ffcc00] bg-black p-4 flex items-center gap-4'>
+              <span className='text-3xl'>&#x1F3C6;</span>
+              <div className='flex-1'>
+                <p className='font-bold text-white font-mono uppercase'>Blockchain successfully built!</p>
+                <p className='text-sm text-[#ffcc00] font-mono'>
                   +{MINIGAME_REWARD_COINS} coins earned for completing the mini-game
                 </p>
               </div>
               <button
                 type='button'
                 onClick={() => setStage('complete')}
-                className='blockchain-continue-btn'
+                className='bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
-                Finish →
+                Finish
               </button>
             </div>
           )}

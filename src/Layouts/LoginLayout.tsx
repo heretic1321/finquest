@@ -12,22 +12,29 @@ const LoginLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
         backgroundRepeat: 'no-repeat, no-repeat',
       }}
     >
-      <div className='mx-auto flex min-h-full w-full max-w-md flex-col justify-start px-6 py-8 md:justify-center'>
+      {/* Dark overlay */}
+      <div className='absolute inset-0 bg-black/90' />
+
+      <div className='relative mx-auto flex min-h-full w-full max-w-md flex-col justify-start px-6 py-8 md:justify-center'>
         <div className='mb-8 text-center'>
-          <h1 className='text-5xl font-bold tracking-tight'>
-            <span className='text-emerald-400'>Fin</span>
-            <span className='text-white'>Quest</span>
+          <h1 className='text-5xl font-black uppercase tracking-tighter'>
+            <span className='text-[#00ff88]'>FIN</span>
+            <span className='text-white'>QUEST</span>
           </h1>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className='mt-3 font-mono text-xs uppercase tracking-[0.3em] text-neutral-500'>
             Learn money. Live smart. Play your way.
           </p>
         </div>
 
-        <div className='rounded-2xl border border-white/15 bg-[#0b162bbb]/80 p-8 backdrop-blur-md'>
+        <div className='relative border-2 border-[#00ff88] bg-[#0a0a0a] p-8 shadow-[8px_8px_0_#00ff88]'>
+          {/* Corner accent top-left */}
+          <div className='absolute -left-1.5 -top-1.5 h-3 w-3 bg-[#00ff88]' />
+          {/* Corner accent bottom-right */}
+          <div className='absolute -bottom-1.5 -right-1.5 h-3 w-3 bg-[#00ff88]' />
           {children}
         </div>
 
-        <p className="mt-6 text-center text-[11px] text-slate-400">
+        <p className='mt-6 text-center font-mono text-xs uppercase tracking-wider text-neutral-600'>
           A financial literacy experience for young India
         </p>
       </div>

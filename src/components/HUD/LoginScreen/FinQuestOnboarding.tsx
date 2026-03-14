@@ -44,16 +44,16 @@ const FinQuestOnboarding: React.FC = () => {
 
   return (
     <>
-      <h2 className='mb-6 text-center text-2xl font-semibold'>
-        Tell us about yourself
+      <h2 className='mb-6 text-center text-xl font-black uppercase tracking-tight text-white'>
+        Enter Your Details
       </h2>
 
       <div className='flex flex-col gap-4'>
         {/* Name */}
         <div className='flex flex-col gap-1.5'>
-          <label className='text-sm text-slate-300'>Your Name</label>
+          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Your Name</label>
           <input
-            className='rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/30'
+            className='rounded-none border-2 border-neutral-700 bg-black px-4 py-3 font-mono text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
             type='text'
             placeholder='What should we call you?'
             value={name}
@@ -64,9 +64,9 @@ const FinQuestOnboarding: React.FC = () => {
 
         {/* Age */}
         <div className='flex flex-col gap-1.5'>
-          <label className='text-sm text-slate-300'>Your Age</label>
+          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Your Age</label>
           <input
-            className='rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/30'
+            className='rounded-none border-2 border-neutral-700 bg-black px-4 py-3 font-mono text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
             type='number'
             placeholder='e.g. 21'
             value={age}
@@ -78,9 +78,9 @@ const FinQuestOnboarding: React.FC = () => {
 
         {/* Mobile Number */}
         <div className='flex flex-col gap-1.5'>
-          <label className='text-sm text-slate-300'>Mobile Number</label>
+          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Mobile Number</label>
           <input
-            className='rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/30'
+            className='rounded-none border-2 border-neutral-700 bg-black px-4 py-3 font-mono text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
             type='tel'
             placeholder='e.g. 9876543210'
             value={mobileNumber}
@@ -95,13 +95,13 @@ const FinQuestOnboarding: React.FC = () => {
 
         {/* Gender */}
         <div className='flex flex-col gap-1.5'>
-          <label className='text-sm text-slate-300'>Gender</label>
+          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Gender</label>
           <div className='flex gap-3'>
             <button
-              className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition ${
+              className={`flex-1 rounded-none border-2 px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${
                 gender === 'male'
-                  ? 'border-emerald-400 bg-emerald-400/20 text-emerald-300'
-                  : 'border-white/10 bg-white/5 text-slate-300 hover:border-white/20'
+                  ? 'border-[#00ff88] bg-[#00ff88] text-black shadow-[3px_3px_0_white]'
+                  : 'border-neutral-700 bg-black text-neutral-400 hover:border-neutral-500'
               }`}
               onClick={() => {
                 setGender('male')
@@ -111,10 +111,10 @@ const FinQuestOnboarding: React.FC = () => {
               Male
             </button>
             <button
-              className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition ${
+              className={`flex-1 rounded-none border-2 px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${
                 gender === 'female'
-                  ? 'border-emerald-400 bg-emerald-400/20 text-emerald-300'
-                  : 'border-white/10 bg-white/5 text-slate-300 hover:border-white/20'
+                  ? 'border-[#00ff88] bg-[#00ff88] text-black shadow-[3px_3px_0_white]'
+                  : 'border-neutral-700 bg-black text-neutral-400 hover:border-neutral-500'
               }`}
               onClick={() => {
                 setGender('female')
@@ -128,7 +128,7 @@ const FinQuestOnboarding: React.FC = () => {
 
         {/* Avatar selector */}
         <div className='flex flex-col gap-1.5'>
-          <label className='text-sm text-slate-300'>Choose your avatar</label>
+          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Choose your avatar</label>
           <div className='grid grid-cols-2 gap-3'>
             <button
               type='button'
@@ -136,18 +136,18 @@ const FinQuestOnboarding: React.FC = () => {
                 setGender('male')
                 setAvatarPath(MALE_AVATAR)
               }}
-              className={`rounded-lg border p-2 transition ${
+              className={`rounded-none border-2 bg-black p-2 transition ${
                 avatarPath === MALE_AVATAR
-                  ? 'border-emerald-400 bg-emerald-400/10'
-                  : 'border-white/10 bg-white/5 hover:border-white/20'
+                  ? 'border-[#00ff88] shadow-[4px_4px_0_#00ff88]'
+                  : 'border-neutral-700 hover:border-neutral-500'
               }`}
             >
               <img
                 src={MALE_AVATAR}
                 alt='Male Avatar'
-                className='mx-auto h-24 w-full rounded-md object-cover object-top'
+                className='mx-auto h-24 w-full rounded-none object-cover object-top'
               />
-              <p className='mt-2 text-center text-xs text-slate-300'>Male Avatar</p>
+              <p className='mt-2 text-center font-mono text-xs uppercase tracking-wider text-neutral-500'>Male Avatar</p>
             </button>
 
             <button
@@ -156,41 +156,41 @@ const FinQuestOnboarding: React.FC = () => {
                 setGender('female')
                 setAvatarPath(FEMALE_AVATAR)
               }}
-              className={`rounded-lg border p-2 transition ${
+              className={`rounded-none border-2 bg-black p-2 transition ${
                 avatarPath === FEMALE_AVATAR
-                  ? 'border-emerald-400 bg-emerald-400/10'
-                  : 'border-white/10 bg-white/5 hover:border-white/20'
+                  ? 'border-[#00ff88] shadow-[4px_4px_0_#00ff88]'
+                  : 'border-neutral-700 hover:border-neutral-500'
               }`}
             >
               <img
                 src={FEMALE_AVATAR}
                 alt='Female Avatar'
-                className='mx-auto h-24 w-full rounded-md object-cover object-top'
+                className='mx-auto h-24 w-full rounded-none object-cover object-top'
               />
-              <p className='mt-2 text-center text-xs text-slate-300'>Female Avatar</p>
+              <p className='mt-2 text-center font-mono text-xs uppercase tracking-wider text-neutral-500'>Female Avatar</p>
             </button>
           </div>
         </div>
 
         {/* Student or Working */}
         <div className='flex flex-col gap-1.5'>
-          <label className='text-sm text-slate-300'>I am a...</label>
+          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>I am a...</label>
           <div className='flex gap-3'>
             <button
-              className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition ${
+              className={`flex-1 rounded-none border-2 px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${
                 userType === 'student'
-                  ? 'border-emerald-400 bg-emerald-400/20 text-emerald-300'
-                  : 'border-white/10 bg-white/5 text-slate-300 hover:border-white/20'
+                  ? 'border-[#00ff88] bg-[#00ff88] text-black shadow-[3px_3px_0_white]'
+                  : 'border-neutral-700 bg-black text-neutral-400 hover:border-neutral-500'
               }`}
               onClick={() => setUserType('student')}
             >
               Student
             </button>
             <button
-              className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition ${
+              className={`flex-1 rounded-none border-2 px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${
                 userType === 'working'
-                  ? 'border-emerald-400 bg-emerald-400/20 text-emerald-300'
-                  : 'border-white/10 bg-white/5 text-slate-300 hover:border-white/20'
+                  ? 'border-[#00ff88] bg-[#00ff88] text-black shadow-[3px_3px_0_white]'
+                  : 'border-neutral-700 bg-black text-neutral-400 hover:border-neutral-500'
               }`}
               onClick={() => setUserType('working')}
             >
@@ -201,10 +201,10 @@ const FinQuestOnboarding: React.FC = () => {
 
         {/* Submit */}
         <button
-          className={`mt-4 w-full rounded-lg py-3.5 text-base font-semibold transition ${
+          className={`mt-4 w-full rounded-none py-4 text-base font-bold uppercase tracking-wider transition-all ${
             isValid
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400'
-              : 'cursor-not-allowed bg-white/10 text-slate-500'
+              ? 'border-2 border-[#00ff88] bg-[#00ff88] text-black shadow-[4px_4px_0_white] hover:translate-x-1 hover:translate-y-1 hover:shadow-none'
+              : 'cursor-not-allowed border-2 border-neutral-800 bg-neutral-900 text-neutral-700 shadow-none'
           }`}
           disabled={!isValid}
           onClick={handleSubmit}
@@ -214,7 +214,7 @@ const FinQuestOnboarding: React.FC = () => {
 
         {/* Dev skip */}
         <button
-          className='mt-2 w-full rounded-lg border border-white/5 py-2.5 text-sm text-slate-500 transition hover:border-white/10 hover:text-slate-300'
+          className='mt-2 w-full rounded-none border-2 border-neutral-800 py-2.5 text-xs uppercase tracking-wider text-neutral-600 transition hover:border-neutral-600 hover:text-neutral-400'
           onClick={() => {
             localStorage.setItem('finquest_player', JSON.stringify({
               name: 'Dev',
@@ -234,7 +234,7 @@ const FinQuestOnboarding: React.FC = () => {
         </button>
 
         <button
-          className='mt-1 w-full rounded-lg border border-indigo-400/30 bg-indigo-500/10 py-2.5 text-sm font-medium text-indigo-200 transition hover:bg-indigo-500/20'
+          className='mt-1 w-full rounded-none border-2 border-[#ffcc00] py-2.5 text-xs font-medium uppercase tracking-wider text-[#ffcc00] transition hover:bg-[#ffcc00] hover:text-black'
           onClick={() =>
             openUIFlow('login-flow-gallery', { source: 'login' })
           }

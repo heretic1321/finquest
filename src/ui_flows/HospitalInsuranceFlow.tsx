@@ -9,7 +9,6 @@ import {
 } from './insuranceStoryEngine'
 import { formatRupees } from '@client/stores/gameStore'
 import { GLOBAL_COMPANION } from '@client/config/CompanionConfig'
-import './hospitalInsurance.css'
 
 type Stage = 'intro' | 'question-1' | 'feedback-1' | 'question-2' | 'simulating' | 'result' | 'summary'
 
@@ -156,38 +155,38 @@ export default function HospitalInsuranceFlow() {
   }
 
   return (
-    <div className='insurance-convo-screen'>
-      <div className='insurance-convo-wrap'>
-        <div className='conversation-header'>
+    <div className='bg-[#0a0a0a] min-h-[80vh] p-4'>
+      <div className='space-y-4'>
+        <div className='flex items-center justify-between border-b-2 border-neutral-700 pb-4'>
           <div>
-            <p className='text-xs uppercase tracking-[0.2em] text-rose-200'>Hospital Insurance Domain</p>
-            <h3 className='mt-2 text-2xl font-semibold text-white'>Reena’s Story</h3>
+            <p className='uppercase tracking-[0.2em] text-xs text-[#ff3366] font-mono'>Hospital Insurance Domain</p>
+            <h3 className='mt-1 text-2xl font-black uppercase tracking-tight text-white'>Reena's Story</h3>
           </div>
-          <div className='rounded-xl border border-yellow-300/30 bg-yellow-400/10 px-4 py-2 text-right'>
-            <p className='text-xs text-yellow-200'>Reward points</p>
-            <p className='text-xl font-bold text-yellow-100'>+{rewardPoints}</p>
+          <div className='border-2 border-[#ffcc00] bg-black px-4 py-2 text-right'>
+            <p className='text-xs text-neutral-500 uppercase tracking-wider font-mono'>Reward points</p>
+            <p className='text-xl font-bold text-[#ffcc00] font-mono'>+{rewardPoints}</p>
           </div>
         </div>
 
-        <div className='reena-row'>
+        <div className='flex gap-4 items-start'>
           <img
             src={topSpeakerImage}
             alt={topSpeakerName}
-            className={isReenaSpeaking ? 'reena-portrait' : 'companion-portrait'}
+            className='w-20 h-20 object-cover border-2 border-[#00ff88] rounded-none flex-shrink-0'
           />
 
-          <div className='reena-dialogue-box'>
-            <p className='speaker-tag'>{topSpeakerName}</p>
-            <p className='reena-text'>
+          <div className='bg-black border-2 border-neutral-700 p-4 flex-1'>
+            <span className='bg-[#ff3366] text-white font-mono font-bold text-xs uppercase px-2 py-1 inline-block'>{topSpeakerName}</span>
+            <p className='font-mono text-sm text-neutral-300 mt-3 leading-relaxed'>
               {typedText}
-              <span className='type-cursor'>|</span>
+              <span className='inline-block w-0.5 h-4 bg-[#00ff88] ml-0.5 animate-pulse' />
             </p>
 
             {stage === 'intro' && (
               <button
                 type='button'
                 onClick={goNextDialogue}
-                className='mt-4 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400'
+                className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
                 Continue
               </button>
@@ -197,7 +196,7 @@ export default function HospitalInsuranceFlow() {
               <button
                 type='button'
                 onClick={() => setStage('question-2')}
-                className='mt-4 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400'
+                className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
                 Continue
               </button>
@@ -207,45 +206,44 @@ export default function HospitalInsuranceFlow() {
               <button
                 type='button'
                 onClick={() => setStage('summary')}
-                className='mt-4 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400'
+                className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
                 Continue
               </button>
             )}
 
             {stage === 'summary' && (
-              <div className='summary-money-pill'>
-                <span className='inline-flex items-center gap-2'>
-                  <span className='coin-dot'>🪙</span> Money left: {formatRupees(playerMoney)}
-                </span>
+              <div className='mt-4 border-2 border-[#ffcc00] bg-black p-3 flex items-center gap-2'>
+                <span className='text-lg'>&#x1FA99;</span>
+                <span className='font-mono font-bold text-[#ffcc00]'>Money left: {formatRupees(playerMoney)}</span>
               </div>
             )}
           </div>
         </div>
 
-        <div className='user-row'>
+        <div className='flex gap-4 items-start flex-row-reverse'>
           <img
             src={playerAvatar}
             alt={playerName}
-            className='user-portrait'
+            className='w-16 h-16 object-cover border-2 border-neutral-700 rounded-none flex-shrink-0'
           />
 
-          <div className='user-dialogue-box'>
-            <p className='speaker-tag'>{playerName}</p>
+          <div className='bg-[#111] border-2 border-neutral-700 p-4 flex-1'>
+            <span className='bg-neutral-700 text-white font-mono font-bold text-xs uppercase px-2 py-1 inline-block'>{playerName}</span>
 
             {stage === 'intro' && (
-              <p className='empty-user-line'>...</p>
+              <p className='text-sm text-neutral-500 font-mono mt-3'>...</p>
             )}
 
             {stage === 'question-1' && (
-              <div className='options-wrap'>
-                <p className='user-question'>{MISTAKE_QUESTION.text}</p>
+              <div className='mt-3 space-y-2'>
+                <p className='font-mono text-sm text-neutral-300'>{MISTAKE_QUESTION.text}</p>
                 {MISTAKE_QUESTION.options.map((option) => (
                   <button
                     key={option.id}
                     type='button'
                     onClick={() => handleFirstQuestionAnswer(option.id)}
-                    className='option-btn'
+                    className='w-full text-left border-2 border-neutral-700 bg-black p-3 font-mono text-sm text-white cursor-pointer hover:border-[#00ff88] hover:shadow-[3px_3px_0_#00ff88] transition-all'
                   >
                     {option.label}
                   </button>
@@ -254,23 +252,23 @@ export default function HospitalInsuranceFlow() {
             )}
 
             {stage === 'feedback-1' && (
-              <p className='empty-user-line'>...</p>
+              <p className='text-sm text-neutral-500 font-mono mt-3'>...</p>
             )}
 
             {stage === 'question-2' && (
-              <div className='options-wrap'>
-                <p className='user-question'>What will you choose?</p>
+              <div className='mt-3 space-y-2'>
+                <p className='font-mono text-sm text-neutral-300'>What will you choose?</p>
                 <button
                   type='button'
                   onClick={() => handleScenarioDecision('buy-insurance')}
-                  className='option-btn success'
+                  className='w-full text-left border-2 border-neutral-700 bg-black p-4 font-mono text-sm text-white cursor-pointer hover:border-[#00ff88] hover:shadow-[3px_3px_0_#00ff88] transition-all'
                 >
-                  Buy health insurance (₹500 per month)
+                  Buy health insurance (&#x20B9;500 per month)
                 </button>
                 <button
                   type='button'
                   onClick={() => handleScenarioDecision('skip-insurance')}
-                  className='option-btn danger'
+                  className='w-full text-left border-2 border-neutral-700 bg-black p-4 font-mono text-sm text-white cursor-pointer hover:border-[#ff3366] hover:shadow-[3px_3px_0_#ff3366] transition-all'
                 >
                   Skip insurance and save money
                 </button>
@@ -278,21 +276,27 @@ export default function HospitalInsuranceFlow() {
             )}
 
             {stage === 'simulating' && (
-              <div className='sim-wait'>
-                <div className='spinner' />
-                <p>Thinking through outcomes...</p>
+              <div className='mt-3 flex items-center gap-3'>
+                <div className='w-4 h-4 border-2 border-[#00ff88] border-t-transparent animate-spin' />
+                <p className='font-mono text-sm text-neutral-400'>Thinking through outcomes...</p>
               </div>
             )}
 
             {stage === 'result' && scenarioResult && (
-              <div className='result-chips'>
-                <div className='chip'>Money impact: -{formatRupees(scenarioResult.moneyDeducted)}</div>
-                <div className='chip'>Insurance covered: {formatRupees(scenarioResult.insuranceCover)}</div>
+              <div className='mt-3 flex gap-3'>
+                <div className='border-2 border-[#ff3366] bg-black p-3 flex-1'>
+                  <p className='font-mono text-xs text-neutral-500 uppercase tracking-wider'>Money impact</p>
+                  <p className='font-mono text-[#ff3366] font-bold'>-{formatRupees(scenarioResult.moneyDeducted)}</p>
+                </div>
+                <div className='border-2 border-[#00ff88] bg-black p-3 flex-1'>
+                  <p className='font-mono text-xs text-neutral-500 uppercase tracking-wider'>Insurance covered</p>
+                  <p className='font-mono text-[#00ff88] font-bold'>{formatRupees(scenarioResult.insuranceCover)}</p>
+                </div>
               </div>
             )}
 
             {stage === 'summary' && (
-              <p className='empty-user-line'>I understand. I will plan for health insurance.</p>
+              <p className='text-sm text-neutral-400 font-mono mt-3'>I understand. I will plan for health insurance.</p>
             )}
           </div>
         </div>

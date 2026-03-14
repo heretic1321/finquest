@@ -151,7 +151,7 @@ const STOCK_PATTERNS: Record<string, OutcomePattern[]> = {
       kind: 'gain',
       multiplier: 2.2,
       title: 'Momentum jackpot',
-      advice: 'High upside came with high risk. Don’t assume this happens every time.',
+      advice: 'High upside came with high risk. Don\'t assume this happens every time.',
       healthDelta: 8,
     },
     {
@@ -480,57 +480,44 @@ export default function InvestmentCenterFlow() {
   }
 
   return (
-    <div
-      className='space-y-4 rounded-xl p-3'
-      style={{
-        background:
-          'linear-gradient(150deg, #070c1a 0%, #090f22 50%, #060b18 100%)',
-        boxShadow: 'inset 0 0 80px rgba(251, 191, 36, 0.04)',
-      }}
-    >
-      <div className='rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4'>
-        <p className='text-xs uppercase tracking-[0.2em] text-emerald-300'>Investment Center</p>
-        <h3 className='mt-2 text-2xl font-semibold'>Choose a stock and invest thoughtfully</h3>
-        <p className='mt-2 text-sm leading-6 text-slate-300'>
+    <div className='space-y-4 bg-[#0a0a0a] p-3'>
+      <div className='border-2 border-[#00ff88] bg-black p-4'>
+        <p className='uppercase tracking-[0.2em] text-xs text-[#00ff88] font-mono'>Investment Center</p>
+        <h3 className='mt-2 text-2xl font-black uppercase tracking-tight text-white'>Choose a stock and invest thoughtfully</h3>
+        <p className='mt-2 text-sm leading-6 text-neutral-400 font-mono'>
           Compare historical trends, risk, and valuation metrics before taking action.
           Strong outcomes are possible, but disciplined decision-making matters most.
         </p>
-        <p className='mt-2 text-xs text-slate-400'>🪙 Current bank balance: {formatRupees(balance)}</p>
+        <p className='mt-2 font-mono text-xs text-neutral-500'>Current bank balance: {formatRupees(balance)}</p>
       </div>
 
       <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
         {STOCKS.map((stock) => (
           <article
             key={stock.id}
-            className='rounded-2xl border border-white/10 bg-white/5 p-4'
+            className='bg-[#111] border-2 border-neutral-700 p-4'
           >
             <div className='flex items-start justify-between gap-3'>
               <div>
-                <p className='text-sm font-semibold text-white'>{stock.name}</p>
-                <p className='mt-1 text-xs text-slate-400'>{stock.sector}</p>
+                <p className='text-sm font-bold text-white font-mono'>{stock.name}</p>
+                <p className='mt-1 text-xs text-neutral-500 font-mono uppercase tracking-wider'>{stock.sector}</p>
               </div>
-              <span className={`rounded-full px-2 py-1 text-[11px] ${
+              <span className={`px-2 py-1 text-[11px] font-mono font-bold uppercase border-2 ${
                 stock.risk === 'Low'
-                  ? 'bg-emerald-500/15 text-emerald-300'
+                  ? 'border-[#00ff88] text-[#00ff88]'
                   : stock.risk === 'Medium'
-                    ? 'bg-amber-500/15 text-amber-300'
-                    : 'bg-rose-500/15 text-rose-300'
+                    ? 'border-[#ffcc00] text-[#ffcc00]'
+                    : 'border-[#ff3366] text-[#ff3366]'
               }`}>
                 {stock.risk} risk
               </span>
             </div>
 
             <svg viewBox='0 0 240 90' className='mt-4 h-24 w-full overflow-visible'>
-              <defs>
-                <linearGradient id={`gradient-${stock.id}`} x1='0%' y1='0%' x2='100%' y2='0%'>
-                  <stop offset='0%' stopColor='#34d399' />
-                  <stop offset='100%' stopColor='#60a5fa' />
-                </linearGradient>
-              </defs>
               <polyline
                 fill='none'
-                stroke={`url(#gradient-${stock.id})`}
-                strokeWidth='4'
+                stroke='#00ff88'
+                strokeWidth='3'
                 strokeLinecap='round'
                 strokeLinejoin='round'
                 points={buildChartPoints(stock.trend)}
@@ -538,45 +525,45 @@ export default function InvestmentCenterFlow() {
             </svg>
 
             <div className='mt-3 grid grid-cols-2 gap-2 text-xs'>
-              <div className='rounded-lg bg-slate-900/50 p-2'>
-                <p className='text-slate-400'>1Y return</p>
-                <p className={stock.oneYearReturn >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+              <div className='bg-black border border-neutral-800 p-2'>
+                <p className='text-neutral-500 font-mono uppercase tracking-wider text-[10px]'>1Y return</p>
+                <p className={`font-mono font-bold ${stock.oneYearReturn >= 0 ? 'text-[#00ff88]' : 'text-[#ff3366]'}`}>
                   {stock.oneYearReturn >= 0 ? '+' : ''}{stock.oneYearReturn}%
                 </p>
               </div>
-              <div className='rounded-lg bg-slate-900/50 p-2'>
-                <p className='text-slate-400'>P/E ratio</p>
-                <p className='text-white'>{stock.peRatio}</p>
+              <div className='bg-black border border-neutral-800 p-2'>
+                <p className='text-neutral-500 font-mono uppercase tracking-wider text-[10px]'>P/E ratio</p>
+                <p className='text-white font-mono font-bold'>{stock.peRatio}</p>
               </div>
-              <div className='rounded-lg bg-slate-900/50 p-2'>
-                <p className='text-slate-400'>Volatility</p>
-                <p className='text-white'>{stock.volatility}</p>
+              <div className='bg-black border border-neutral-800 p-2'>
+                <p className='text-neutral-500 font-mono uppercase tracking-wider text-[10px]'>Volatility</p>
+                <p className='text-white font-mono font-bold'>{stock.volatility}</p>
               </div>
-              <div className='rounded-lg bg-slate-900/50 p-2'>
-                <p className='text-slate-400'>Stake</p>
-                <p className='text-white'>🪙 {formatRupees(stock.suggestedStake)}</p>
+              <div className='bg-black border border-neutral-800 p-2'>
+                <p className='text-neutral-500 font-mono uppercase tracking-wider text-[10px]'>Stake</p>
+                <p className='text-white font-mono font-bold'>{formatRupees(stock.suggestedStake)}</p>
               </div>
             </div>
 
-            <p className='mt-3 text-xs leading-5 text-slate-300'>{stock.summary}</p>
+            <p className='mt-3 text-xs leading-5 text-neutral-400 font-mono'>{stock.summary}</p>
 
             {simulationByStock[stock.id]?.status === 'idle' && (
               <button
                 type='button'
                 onClick={() => handleInvestNow(stock)}
-                className='mt-4 w-full rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400'
+                className='mt-4 w-full bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2.5 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
                 Invest now
               </button>
             )}
 
             {simulationByStock[stock.id]?.status === 'running' && (
-              <div className='mt-4 rounded-xl border border-indigo-400/30 bg-indigo-500/10 p-3'>
-                <div className='flex items-center gap-2 text-sm text-indigo-100'>
-                  <span className='inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-indigo-300' />
-                  Let’s wait for the results...
+              <div className='mt-4 border-2 border-[#ffcc00] bg-black p-3'>
+                <div className='flex items-center gap-2 text-sm text-[#ffcc00] font-mono'>
+                  <span className='inline-block h-2.5 w-2.5 animate-pulse bg-[#ffcc00]' />
+                  Let's wait for the results...
                 </div>
-                <p className='mt-2 text-xs text-indigo-200'>
+                <p className='mt-2 text-xs text-neutral-500 font-mono'>
                   Time left:{' '}
                   {Math.max(
                     0,
@@ -590,7 +577,7 @@ export default function InvestmentCenterFlow() {
                 <button
                   type='button'
                   onClick={() => handleSellStock(stock)}
-                  className='mt-3 w-full rounded-lg border border-amber-300/40 bg-amber-400/20 px-3 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/30'
+                  className='mt-3 w-full bg-[#ff3366] text-white font-bold uppercase tracking-wider text-sm border-2 border-[#ff3366] px-3 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
                 >
                   Sell stock
                 </button>
@@ -598,12 +585,12 @@ export default function InvestmentCenterFlow() {
             )}
 
             {simulationByStock[stock.id]?.status === 'ready' && (
-              <div className='mt-4 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3'>
-                <p className='text-sm font-semibold text-emerald-200'>Analysis completed</p>
+              <div className='mt-4 border-2 border-[#00ff88] bg-black p-3'>
+                <p className='text-sm font-bold text-[#00ff88] font-mono uppercase'>Analysis completed</p>
                 <button
                   type='button'
                   onClick={() => handleCheckResults(stock)}
-                  className='mt-3 w-full rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-400'
+                  className='mt-3 w-full bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-3 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
                 >
                   Check results
                 </button>
@@ -613,39 +600,39 @@ export default function InvestmentCenterFlow() {
         ))}
       </div>
 
-      <p className='text-xs text-slate-500'>
-        🪙 Total investment simulations: {totalSimulations}
+      <p className='text-xs text-neutral-600 font-mono uppercase tracking-wider'>
+        Total investment simulations: {totalSimulations}
       </p>
 
       {modal.open && (
-        <div className='fixed inset-0 z-[140] flex items-center justify-center bg-black/55 px-4'>
-          <div className={`w-full max-w-lg rounded-2xl border p-5 shadow-2xl ${
+        <div className='fixed inset-0 z-[140] flex items-center justify-center bg-black/80 px-4'>
+          <div className={`w-full max-w-lg border-2 p-5 ${
             modal.tone === 'success'
-              ? 'border-emerald-400/30 bg-[#0d1e1a]'
+              ? 'border-[#00ff88] bg-black shadow-[6px_6px_0_#00ff88]'
               : modal.tone === 'danger'
-                ? 'border-rose-400/30 bg-[#230f14]'
-                : 'border-white/15 bg-[#111a2b]'
+                ? 'border-[#ff3366] bg-black shadow-[6px_6px_0_#ff3366]'
+                : 'border-neutral-700 bg-black shadow-[6px_6px_0_white]'
           }`}>
             <div>
               <div className='flex items-center gap-3'>
-                <div className='rounded-full bg-yellow-400/20 p-2.5 text-yellow-300'>
+                <div className='border-2 border-[#ffcc00] p-2.5 text-[#ffcc00]'>
                   <FaCoins className='h-7 w-7' />
                 </div>
-                <h4 className='text-2xl font-bold text-white'>{modal.title}</h4>
+                <h4 className='text-2xl font-black uppercase tracking-tight text-white'>{modal.title}</h4>
               </div>
 
-              <p className='mt-5 text-2xl font-semibold leading-9 text-white'>{modal.primaryStatement}</p>
-              <p className='mt-2 text-lg font-medium text-slate-200'>{modal.totalStatement}</p>
+              <p className='mt-5 text-2xl font-bold leading-9 text-white font-mono'>{modal.primaryStatement}</p>
+              <p className='mt-2 text-lg font-medium text-neutral-300 font-mono'>{modal.totalStatement}</p>
 
-              <div className='mt-5 rounded-xl border border-sky-400/30 bg-sky-500/10 p-4'>
-                <p className='text-sm font-semibold uppercase tracking-wide text-sky-200'>Advice</p>
-                <p className='mt-2 text-base leading-7 text-slate-100'>{modal.advice}</p>
+              <div className='mt-5 border-2 border-[#00ff88] bg-[#111] p-4'>
+                <p className='text-xs font-bold uppercase tracking-[0.2em] text-[#00ff88] font-mono'>Advice</p>
+                <p className='mt-2 text-base leading-7 text-neutral-300 font-mono'>{modal.advice}</p>
               </div>
 
               <button
                 type='button'
                 onClick={() => setModal((prev) => ({ ...prev, open: false }))}
-                className='mt-5 w-full rounded-xl bg-indigo-500 px-4 py-3 text-base font-semibold text-white transition hover:bg-indigo-400'
+                className='mt-5 w-full bg-[#00ff88] text-black font-bold uppercase tracking-wider text-base border-2 border-[#00ff88] px-4 py-3 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
                 Continue
               </button>

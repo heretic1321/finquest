@@ -43,47 +43,47 @@ function PlayerHUD() {
   const { level, title, progress } = getPlayerLevel(points)
 
   return (
-    <div className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-2">
+    <div className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between bg-black border-b-2 border-[#00ff88] px-4 py-2">
       {/* Left: Player info */}
-      <div className="flex items-center gap-4 rounded-2xl bg-black/60 backdrop-blur-md px-5 py-3 border border-white/[0.08] shadow-lg">
+      <div className="flex items-center gap-4">
         {/* Avatar */}
         <div className="relative">
-          <div className="w-11 h-11 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center text-emerald-400 text-base font-bold">
+          <div className="w-10 h-10 border-2 border-[#00ff88] bg-black flex items-center justify-center text-[#00ff88] font-mono font-bold">
             {initials}
           </div>
           {/* Level badge */}
-          <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-[10px] font-bold text-white rounded-full w-5 h-5 flex items-center justify-center border-2 border-black/40">
+          <div className="absolute -bottom-1 -right-1 bg-[#00ff88] text-[10px] font-mono font-bold text-black w-5 h-5 flex items-center justify-center border-2 border-black">
             {level}
           </div>
         </div>
 
         {/* Name + title */}
         <div className="leading-tight">
-          <div className="text-white text-base font-semibold">{playerName}</div>
-          <div className="text-emerald-400/80 text-xs font-medium">{title}</div>
+          <div className="font-bold uppercase tracking-wider text-white text-sm">{playerName}</div>
+          <div className="text-[#00ff88] text-xs uppercase tracking-widest font-mono">{title}</div>
         </div>
 
         {/* Divider */}
-        <div className="w-px h-9 bg-white/10" />
+        <div className="w-px h-8 bg-neutral-700" />
 
         {/* Balance */}
         <div className="leading-tight">
-          <div className="text-xs text-slate-400 font-medium">Balance</div>
-          <div className="text-white text-lg font-bold tabular-nums">{formatRupees(balance)}</div>
+          <div className="text-xs uppercase tracking-wider text-neutral-500">Balance</div>
+          <div className="font-mono text-[#00ff88] text-lg tabular-nums">{formatRupees(balance)}</div>
         </div>
 
         {/* Divider */}
-        <div className="w-px h-9 bg-white/10" />
+        <div className="w-px h-8 bg-neutral-700" />
 
         {/* Points + Level bar */}
         <div className="leading-tight min-w-[90px]">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">XP</span>
-            <span className="text-xs text-amber-400 font-bold tabular-nums">{points}</span>
+            <span className="text-xs uppercase tracking-wider text-neutral-500">XP</span>
+            <span className="text-xs text-[#ffcc00] font-mono font-bold tabular-nums">{points}</span>
           </div>
-          <div className="w-full h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden">
+          <div className="w-full h-1 bg-neutral-800 mt-1 overflow-hidden">
             <div
-              className="h-full bg-amber-400 rounded-full transition-all duration-500"
+              className="h-full bg-[#ffcc00] transition-all duration-500"
               style={{ width: `${progress * 100}%` }}
             />
           </div>
@@ -95,7 +95,7 @@ function PlayerHUD() {
         {/* Unity game */}
         <button
           onClick={() => launchUnityGame()}
-          className="rounded-lg bg-black/50 backdrop-blur-md p-2 border border-white/5 hover:bg-white/10 transition"
+          className="border-2 border-neutral-600 bg-black p-2 hover:border-[#00ff88] hover:text-[#00ff88] transition-colors"
           title="Launch Dungeon Game"
         >
           <GiCrossedSwords className="h-4 w-4 fill-purple-400" />
@@ -104,7 +104,7 @@ function PlayerHUD() {
         {/* Mute */}
         <button
           onClick={() => SoundsStore.getState().toggleMuted()}
-          className="rounded-lg bg-black/50 backdrop-blur-md p-2 border border-white/5 hover:bg-white/10 transition"
+          className="border-2 border-neutral-600 bg-black p-2 hover:border-[#00ff88] hover:text-[#00ff88] transition-colors"
         >
           {isMuted
             ? <GoMute className="h-4 w-4 fill-white" />
@@ -116,7 +116,7 @@ function PlayerHUD() {
         {!isTouchDevice && (
           <button
             onClick={() => GesturesAndDeviceStore.getState().toggleFullscreen?.()}
-            className="rounded-lg bg-black/50 backdrop-blur-md p-2 border border-white/5 hover:bg-white/10 transition"
+            className="border-2 border-neutral-600 bg-black p-2 hover:border-[#00ff88] hover:text-[#00ff88] transition-colors"
           >
             {document.fullscreenElement
               ? <BsFullscreenExit className="h-4 w-4 fill-white" />
@@ -226,12 +226,12 @@ export default function HUD() {
         if (!zone) return null
         return (
           <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 text-center">
-            <div className="bg-black/70 backdrop-blur-md rounded-2xl px-10 py-5 border border-emerald-500/30 shadow-2xl shadow-emerald-500/10">
-              <p className="text-white text-lg font-bold mb-1">{zone.name}</p>
-              <p className="text-slate-400 text-sm mb-3">{zone.description}</p>
-              <div className="flex items-center justify-center gap-2 text-emerald-400">
-                <kbd className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-3 py-1 text-sm font-mono font-bold">E</kbd>
-                <span className="text-sm font-medium">to enter</span>
+            <div className="bg-black border-2 border-[#00ff88] shadow-[4px_4px_0_#00ff88] px-10 py-5">
+              <p className="font-black uppercase tracking-tight text-white text-lg mb-1">{zone.name}</p>
+              <p className="text-neutral-400 text-sm font-mono mb-3">{zone.description}</p>
+              <div className="flex items-center justify-center gap-2 text-[#00ff88]">
+                <kbd className="border-2 border-[#00ff88] bg-[#00ff88] text-black font-mono font-bold px-3 py-1">E</kbd>
+                <span className="text-sm font-mono uppercase tracking-wider">to enter</span>
               </div>
             </div>
           </div>
@@ -241,12 +241,12 @@ export default function HUD() {
       {/* Old man proximity prompt */}
       {hasStartButtonBeenPressed && !loading_initialSpawn && oldManNearby && !oldManUIOpen && !isEnterStorePromptShown && (
         <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 text-center">
-          <div className="bg-black/70 backdrop-blur-md rounded-2xl px-10 py-5 border border-amber-500/30 shadow-2xl shadow-amber-500/10">
-            <p className="text-white text-lg font-bold mb-1">🧘 The Wise Elder</p>
-            <p className="text-slate-400 text-sm mb-3">He seems to have something to say...</p>
-            <div className="flex items-center justify-center gap-2 text-amber-400">
-              <kbd className="bg-amber-500/20 border border-amber-500/40 rounded-lg px-3 py-1 text-sm font-mono font-bold">E</kbd>
-              <span className="text-sm font-medium">to talk</span>
+          <div className="bg-black border-2 border-[#ffcc00] shadow-[4px_4px_0_#ffcc00] px-10 py-5">
+            <p className="font-black uppercase tracking-tight text-white text-lg mb-1">The Wise Elder</p>
+            <p className="text-neutral-400 text-sm font-mono mb-3">He seems to have something to say...</p>
+            <div className="flex items-center justify-center gap-2 text-[#ffcc00]">
+              <kbd className="border-2 border-[#ffcc00] bg-[#ffcc00] text-black font-mono font-bold px-3 py-1">E</kbd>
+              <span className="text-sm font-mono uppercase tracking-wider">to talk</span>
             </div>
           </div>
         </div>
@@ -255,9 +255,9 @@ export default function HUD() {
       {/* Zone exit prompt */}
       {hasStartButtonBeenPressed && isExitStorePromptShown && (
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 text-center">
-          <div className="bg-black/70 backdrop-blur-sm rounded-xl px-8 py-4 border border-red-500/30">
-            <p className="text-red-400 text-lg font-semibold">
-              Press E to exit {getZoneByStoreKey(exitStorePromptStoreName)?.name || exitStorePromptStoreName}
+          <div className="bg-black border-2 border-[#ff3366] shadow-[4px_4px_0_#ff3366] px-8 py-4">
+            <p className="text-[#ff3366] text-lg font-mono font-bold uppercase tracking-wider">
+              Press <kbd className="border-2 border-[#ff3366] bg-[#ff3366] text-black font-mono font-bold px-2 py-0.5 mx-1">E</kbd> to exit {getZoneByStoreKey(exitStorePromptStoreName)?.name || exitStorePromptStoreName}
             </p>
           </div>
         </div>
