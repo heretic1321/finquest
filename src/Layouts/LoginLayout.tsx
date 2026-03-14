@@ -6,19 +6,28 @@ interface LoginLayoutProps {
 
 const LoginLayout: React.FC<LoginLayoutProps> = ({ children }) => {
   return (
-    <section className='flex h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#0a1628] text-white'>
-      <div className='w-full max-w-md px-6'>
+    <section
+      className='fixed inset-0 z-50 w-full overflow-y-auto touch-pan-y text-white'
+      style={{
+        backgroundImage:
+          "url('/assets/ui/login/login_bg.png'), url('/assets/ui/login/login_bg.jpg')",
+        backgroundSize: 'cover, cover',
+        backgroundPosition: 'center, center',
+        backgroundRepeat: 'no-repeat, no-repeat',
+      }}
+    >
+      <div className='mx-auto flex min-h-full w-full max-w-md flex-col justify-start px-6 py-8 md:justify-center'>
         <div className='mb-8 text-center'>
           <h1 className='text-5xl font-bold tracking-tight'>
             <span className='text-emerald-400'>Fin</span>
-            <span className='text-white'>Quest</span>
+            <span className='text-[#122744]'>Quest</span>
           </h1>
           <p className='mt-2 text-sm text-slate-400'>
             Learn money. Live smart. Play your way.
           </p>
         </div>
 
-        <div className='rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md'>
+        <div className='rounded-2xl border border-white/15 bg-[#0b162bbb]/80 p-8 backdrop-blur-md'>
           {children}
         </div>
 

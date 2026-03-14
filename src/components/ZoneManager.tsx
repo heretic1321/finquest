@@ -9,6 +9,7 @@ import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { MapStore } from '@client/contexts/MapContext'
 import { PlayerConfigStore } from '@client/components/Character'
+import { getUIFlowForStore, UIFlowStore } from '@client/ui_flows'
 
 type ZoneManagerProps = {
   characterRef: React.MutableRefObject<CharacterRef | null>
@@ -45,6 +46,18 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
   // Handle entry: teleport player into the zone
   useEffect(() => {
     if (!storeRequestedToEnter) return
+
+    const uiFlowId = getUIFlowForStore(storeRequestedToEnter)
+    if (uiFlowId) {
+      UIFlowStore.getState().openUIFlow(uiFlowId, {
+        source: 'zone',
+        storeKey: storeRequestedToEnter,
+      })
+      setStoreRequestedToEnter('')
+      setIsEnterStorePromptShown(false)
+      return
+    }
+
     const config = StoreConfigs[storeRequestedToEnter]
     if (!config) return
 

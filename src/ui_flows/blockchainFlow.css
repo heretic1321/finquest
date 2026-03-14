@@ -1,0 +1,603 @@
+/* ─── Blockchain Flow Screen ─────────────────────────────────────────────── */
+
+.blockchain-screen {
+  min-height: 88vh;
+  background:
+    radial-gradient(ellipse at 12% 12%, rgba(34, 211, 238, 0.2) 0%, transparent 42%),
+    radial-gradient(ellipse at 88% 18%, rgba(168, 85, 247, 0.2) 0%, transparent 44%),
+    radial-gradient(ellipse at 50% 100%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+    linear-gradient(160deg, #0a0f2b 0%, #12173f 45%, #0a1230 100%);
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Digital grid lines */
+.blockchain-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 72px,
+      rgba(34, 211, 238, 0.03) 72px,
+      rgba(34, 211, 238, 0.03) 73px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 72px,
+      rgba(34, 211, 238, 0.03) 72px,
+      rgba(34, 211, 238, 0.03) 73px
+    );
+  pointer-events: none;
+}
+
+/* ─── Header ────────────────────────────────────────────────────────────── */
+
+.blockchain-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  z-index: 1;
+}
+
+.blockchain-coin-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  background: rgba(234, 179, 8, 0.07);
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.9rem;
+}
+
+/* ─── NPC / Companion row ───────────────────────────────────────────────── */
+
+.blockchain-npc-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 1.5rem;
+  align-items: flex-start;
+  z-index: 1;
+}
+
+.blockchain-npc-portrait {
+  width: 165px;
+  height: 230px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 1rem;
+  border: 2px solid rgba(6, 182, 212, 0.45);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.18), 0 8px 24px rgba(0, 0, 0, 0.55);
+  flex-shrink: 0;
+  animation: bcPortraitIn 0.5s ease forwards;
+}
+
+.blockchain-companion-portrait {
+  width: 165px;
+  height: 230px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 1rem;
+  border: 2px solid rgba(139, 92, 246, 0.42);
+  box-shadow: 0 0 28px rgba(139, 92, 246, 0.18), 0 8px 24px rgba(0, 0, 0, 0.55);
+  flex-shrink: 0;
+  animation: bcPortraitIn 0.5s ease forwards;
+}
+
+@keyframes bcPortraitIn {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.blockchain-dialogue-box {
+  background: rgba(4, 15, 30, 0.88);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  backdrop-filter: blur(14px);
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  animation: bcDialogueIn 0.4s ease forwards;
+}
+
+.blockchain-dialogue-box::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 26px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid rgba(6, 182, 212, 0.2);
+}
+
+@keyframes bcDialogueIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Player row ────────────────────────────────────────────────────────── */
+
+.blockchain-player-row {
+  display: grid;
+  grid-template-columns: 1fr 165px;
+  gap: 1.5rem;
+  align-items: flex-start;
+  z-index: 1;
+}
+
+.blockchain-player-dialogue {
+  background: rgba(4, 10, 28, 0.82);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  backdrop-filter: blur(14px);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.blockchain-player-dialogue::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 26px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid rgba(139, 92, 246, 0.2);
+}
+
+.blockchain-user-portrait {
+  width: 165px;
+  height: 165px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 1rem;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.12), 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── Speaker tags ──────────────────────────────────────────────────────── */
+
+.blockchain-speaker-tag {
+  display: inline-block;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #67e8f9;
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.22);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.blockchain-player-tag {
+  display: inline-block;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+/* ─── Dialogue text + cursor ────────────────────────────────────────────── */
+
+.blockchain-dialogue-text {
+  font-size: 0.925rem;
+  line-height: 1.75;
+  color: #e2e8f0;
+}
+
+.blockchain-type-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #22d3ee;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: bcBlink 1s step-end infinite;
+}
+
+@keyframes bcBlink {
+  50% { opacity: 0; }
+}
+
+/* ─── Continue button ───────────────────────────────────────────────────── */
+
+.blockchain-continue-btn {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 0.45rem 1.15rem;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  border-radius: 0.625rem;
+  color: #67e8f9;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.blockchain-continue-btn:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.65);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+}
+
+/* ─── Quiz options ──────────────────────────────────────────────────────── */
+
+.blockchain-options-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.blockchain-option-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 1rem;
+  background: rgba(4, 10, 28, 0.75);
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  border-radius: 0.6rem;
+  color: #c4b5fd;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.blockchain-option-btn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.45);
+}
+
+.blockchain-option-btn.correct {
+  border-color: #22d3ee;
+  background: rgba(6, 182, 212, 0.1);
+  color: #67e8f9;
+  cursor: default;
+}
+
+.blockchain-option-btn.wrong {
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.09);
+  color: #fca5a5;
+  cursor: default;
+}
+
+/* ─── Reward popup (inside dialogue box) ───────────────────────────────── */
+
+.blockchain-reward-popup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.22);
+  border-radius: 0.75rem;
+}
+
+.reward-coins-big {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fde68a;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MINI-GAME
+═══════════════════════════════════════════════════════════════════════════ */
+
+.blockchain-minigame {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 1;
+}
+
+.minigame-header {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.12);
+}
+
+/* ─── Tamper warning banner ─────────────────────────────────────────────── */
+
+.tamper-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 0.75rem;
+  animation: bcDialogueIn 0.3s ease forwards;
+}
+
+.repair-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0.4rem 0.9rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 0.55rem;
+  color: #fca5a5;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.repair-btn:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
+
+/* ─── Horizontal scroll chain ───────────────────────────────────────────── */
+
+.chain-scroll-wrap {
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.chain-blocks {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: max-content;
+  padding: 0.5rem 0.25rem;
+}
+
+.chain-item {
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Individual block ──────────────────────────────────────────────────── */
+
+.chain-block {
+  width: 190px;
+  min-height: 160px;
+  border-radius: 0.75rem;
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.chain-block.valid {
+  background: rgba(4, 18, 30, 0.9);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.08), inset 0 0 20px rgba(6, 182, 212, 0.03);
+}
+
+.chain-block.invalid {
+  background: rgba(30, 5, 10, 0.9);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.12);
+  animation: blockShake 0.4s ease;
+}
+
+.chain-block.pending {
+  background: rgba(6, 18, 38, 0.7);
+  border: 1px dashed rgba(6, 182, 212, 0.3);
+  box-shadow: none;
+}
+
+@keyframes blockShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-4px); }
+  40%       { transform: translateX(4px); }
+  60%       { transform: translateX(-3px); }
+  80%       { transform: translateX(3px); }
+}
+
+/* ─── Block internals ───────────────────────────────────────────────────── */
+
+.block-top {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.block-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #22d3ee;
+  text-transform: uppercase;
+}
+
+.genesis-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 999px;
+  color: #67e8f9;
+  padding: 1px 7px;
+}
+
+.invalid-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 999px;
+  color: #fca5a5;
+  padding: 1px 7px;
+}
+
+.pending-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: 999px;
+  color: #fde68a;
+  padding: 1px 7px;
+  animation: pendingPulse 2s ease-in-out infinite;
+}
+
+@keyframes pendingPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.block-body {
+  flex: 1;
+}
+
+.block-tx {
+  font-size: 0.78rem;
+  color: #e2e8f0;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.block-hashes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.4rem;
+}
+
+.hash-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+}
+
+.hash-label {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #475569;
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.hash-val {
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  color: #22d3ee;
+  word-break: break-all;
+}
+
+.lock-icon {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* ─── Tamper button ─────────────────────────────────────────────────────── */
+
+.tamper-btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.3rem 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(239, 68, 68, 0.07);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 0.4rem;
+  color: #fca5a5;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.tamper-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* ─── Validate button ───────────────────────────────────────────────────── */
+
+.validate-btn {
+  width: 100%;
+  padding: 0.4rem 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  border-radius: 0.4rem;
+  color: #67e8f9;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-top: auto;
+}
+
+.validate-btn:hover {
+  background: rgba(6, 182, 212, 0.22);
+  border-color: rgba(6, 182, 212, 0.65);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+}
+
+/* ─── Chain link connector ──────────────────────────────────────────────── */
+
+.chain-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  flex-shrink: 0;
+  color: #22d3ee;
+  font-size: 1rem;
+  opacity: 0.7;
+  transition: all 0.3s;
+}
+
+.chain-link.broken {
+  color: #f87171;
+  opacity: 1;
+  animation: linkFlicker 0.8s ease-in-out infinite;
+}
+
+.chain-link.pending-link {
+  color: #fde68a;
+  opacity: 0.5;
+  animation: pendingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes linkFlicker {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ─── Game complete bar ─────────────────────────────────────────────────── */
+
+.game-complete-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1.1rem;
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 0.875rem;
+  animation: bcDialogueIn 0.4s ease forwards;
+}

@@ -14,6 +14,7 @@ import { GesturesAndDeviceStore } from '@client/contexts/GesturesAndDeviceContex
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { getZoneByStoreKey } from '@client/config/ZoneConfig'
+import { UIFlowStore, UIFlowsOverlay } from '@client/ui_flows'
 import { useShallow } from 'zustand/react/shallow'
 
 export default function HUD() {
@@ -51,6 +52,7 @@ export default function HUD() {
     (state) => state.loading_initialSpawn,
   )
   const isMuted = SoundsStore((state) => state.isMuted)
+  const isUIFlowOpen = UIFlowStore((state) => state.isOpen)
 
   // Login screen
   const showLogin = useMemo(() => {
@@ -179,6 +181,9 @@ export default function HUD() {
           </div>
         </div>
       )}
+
+      {/* UI Flows pipeline overlay */}
+      {isUIFlowOpen && <UIFlowsOverlay />}
     </>
   )
 }
