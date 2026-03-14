@@ -1,5 +1,5 @@
-import { useRef, useEffect, useMemo } from 'react'
-import { useAnimations } from '@react-three/drei'
+import { useRef, useEffect, useState } from 'react'
+import { TransformControls } from '@react-three/drei'
 import { useFrame, useLoader } from '@react-three/fiber'
 import * as THREE from 'three'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
@@ -32,44 +32,51 @@ type OldManNPCProps = {
 export default function OldManNPC({ characterRef }: OldManNPCProps) {
   const groupRef = useRef<THREE.Group>(null!)
   const modelGroupRef = useRef<THREE.Group>(null!)
+  const isDebugMode = genericStore((s) => s.isDebugMode)
+  const [transformMode, setTransformMode] = useState<'translate' | 'rotate' | 'scale'>('translate')
 
   const { npcPos, npcRot, npcScale } = useControls('Old Man NPC', {
-    npcPos: { value: [4, 5.8, -150], label: 'Position', step: 0.5 },
+    npcPos: { value: [3.5, 1.8, -130], label: 'Position', step: 0.5 },
     npcRot: { value: [0, 0, 0], label: 'Rotation', step: 0.1 },
-    npcScale: { value: 0.06, min: 0.01, max: 0.5, step: 0.005, label: 'Scale' },
+    npcScale: { value: 0.95, min: 0.01, max: 5, step: 0.01, label: 'Scale' },
   })
 
   // Load FBX model
   const fbx = useLoader(FBXLoader, './assets/avatars/oldman.fbx')
+  const mixerRef = useRef<THREE.AnimationMixer | null>(null)
 
-  // Clone so we don't mutate the cached original
-  const clonedScene = useMemo(() => {
-    const clone = fbx.clone()
-    clone.traverse((child) => {
+  // Set up shadow casting on meshes
+  useEffect(() => {
+    fbx.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         child.castShadow = true
         child.receiveShadow = true
       }
     })
-    return clone
   }, [fbx])
 
-  // Set up animations from the FBX (mixamo embeds them in the file)
-  const { actions } = useAnimations(fbx.animations, modelGroupRef)
-
-  // Play the first animation (the dance from mixamo) on loop
+  // Set up animation mixer directly on the FBX scene (no clone needed for single instance)
   useEffect(() => {
-    const animNames = Object.keys(actions)
-    if (animNames.length > 0) {
-      const firstAnim = actions[animNames[0]]
-      if (firstAnim) {
-        firstAnim.setLoop(THREE.LoopRepeat, Infinity)
-        firstAnim.play()
-      }
-    }
-  }, [actions])
+    if (!fbx || fbx.animations.length === 0) return
 
-  useFrame(() => {
+    const mixer = new THREE.AnimationMixer(fbx)
+    const clip = fbx.animations[0]
+    const action = mixer.clipAction(clip)
+    action.setLoop(THREE.LoopRepeat, Infinity)
+    action.play()
+    mixerRef.current = mixer
+
+    return () => {
+      mixer.stopAllAction()
+      mixer.uncacheRoot(fbx)
+      mixerRef.current = null
+    }
+  }, [fbx])
+
+  useFrame((_, delta) => {
+    // Tick the animation mixer every frame
+    if (mixerRef.current) mixerRef.current.update(delta)
+
     if (!genericStore.getState().isTabFocused) return
     if (!characterRef.current?.playerRef?.current || !groupRef.current) return
 
@@ -84,8 +91,8 @@ export default function OldManNPC({ characterRef }: OldManNPCProps) {
       useOldManStore.getState().setNearby(false)
     }
 
-    // Rotate to face player when nearby
-    if (dist < TRIGGER_RADIUS && modelGroupRef.current) {
+    // Rotate to face player when nearby (only when not in debug transform mode)
+    if (dist < TRIGGER_RADIUS && modelGroupRef.current && !isDebugMode) {
       const dir = new THREE.Vector3().subVectors(playerPos, npcPosition).normalize()
       const angle = Math.atan2(dir.x, dir.z)
       modelGroupRef.current.rotation.y = THREE.MathUtils.lerp(
@@ -110,15 +117,48 @@ export default function OldManNPC({ characterRef }: OldManNPCProps) {
     return () => document.removeEventListener('keydown', handleKey)
   }, [])
 
+  // Debug: cycle transform mode with T key
+  useEffect(() => {
+    if (!isDebugMode) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.code !== 'KeyT') return
+      setTransformMode((prev) =>
+        prev === 'translate' ? 'rotate' : prev === 'rotate' ? 'scale' : 'translate',
+      )
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [isDebugMode])
+
+  // Log position when transform changes (debug mode)
+  const handleTransformChange = () => {
+    if (!groupRef.current) return
+    const p = groupRef.current.position
+    const r = groupRef.current.rotation
+    const s = groupRef.current.scale
+    console.log(
+      `Old Man NPC → pos: [${p.x.toFixed(2)}, ${p.y.toFixed(2)}, ${p.z.toFixed(2)}], rot: [${r.x.toFixed(2)}, ${r.y.toFixed(2)}, ${r.z.toFixed(2)}], scale: ${s.x.toFixed(4)}`,
+    )
+  }
+
   return (
-    <group ref={groupRef} position={npcPos as unknown as [number, number, number]}>
-      <group
-        ref={modelGroupRef}
-        rotation={npcRot as unknown as [number, number, number]}
-        scale={npcScale}
-      >
-        <primitive object={clonedScene} />
+    <>
+      <group ref={groupRef} position={npcPos as unknown as [number, number, number]}>
+        <group
+          ref={modelGroupRef}
+          rotation={npcRot as unknown as [number, number, number]}
+          scale={npcScale}
+        >
+          <primitive object={fbx} />
+        </group>
       </group>
-    </group>
+      {isDebugMode && (
+        <TransformControls
+          object={groupRef}
+          mode={transformMode}
+          onObjectChange={handleTransformChange}
+        />
+      )}
+    </>
   )
 }

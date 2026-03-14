@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { GoMute, GoUnmute } from 'react-icons/go'
 import { BsFullscreen, BsFullscreenExit } from 'react-icons/bs'
 import { GiCrossedSwords } from 'react-icons/gi'
@@ -158,6 +158,20 @@ export default function HUD() {
   const oldManNearby = useOldManStore((s) => s.isNearby)
   const oldManUIOpen = useOldManStore((s) => s.isUIOpen)
 
+  // Loader with smooth fade-out: stays mounted while fading, then unmounts
+  const [loaderMounted, setLoaderMounted] = useState(false)
+  const [loaderFading, setLoaderFading] = useState(false)
+
+  useEffect(() => {
+    if (hasStartButtonBeenPressed && loading_initialSpawn) {
+      setLoaderMounted(true)
+      setLoaderFading(false)
+    } else if (loaderMounted && !loading_initialSpawn) {
+      // Stabilization done → start fade-out
+      setLoaderFading(true)
+    }
+  }, [hasStartButtonBeenPressed, loading_initialSpawn, loaderMounted])
+
   // Login screen
   const showLogin = useMemo(() => {
     if (!isLoggedIn && !isGuest) return <LoginScreen />
@@ -186,8 +200,11 @@ export default function HUD() {
         <div className="absolute inset-0 z-50">{showStartBtn}</div>
       )}
 
-      {hasStartButtonBeenPressed && loading_initialSpawn && (
-        <CustomLoader containerStyles={{}} innerStyles={{}} />
+      {loaderMounted && (
+        <CustomLoader
+          fadingOut={loaderFading}
+          onFadeComplete={() => setLoaderMounted(false)}
+        />
       )}
 
       {/* In-game HUD */}

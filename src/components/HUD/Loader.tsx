@@ -1,56 +1,41 @@
 import * as React from 'react'
 import { useProgress } from '@react-three/drei'
 
-interface LoaderOptions {
-  containerStyles: React.CSSProperties
-  innerStyles: React.CSSProperties
-  barStyles: React.CSSProperties
-  dataStyles: React.CSSProperties
-  dataInterpolation: (p: number) => string
-  initialState: (active: boolean) => boolean
+interface LoaderProps {
+  /** When true, loader fades out and unmounts after transition */
+  fadingOut?: boolean
+  onFadeComplete?: () => void
 }
 
-const defaultDataInterpolation = (p: number) => `Loading ${p.toFixed(0)}%`
-
-export function CustomLoader({
-  containerStyles,
-  innerStyles,
-  dataInterpolation = defaultDataInterpolation,
-  initialState = (active: boolean) => active,
-}: Partial<LoaderOptions>) {
-  const { active, progress } = useProgress()
+export function CustomLoader({ fadingOut = false, onFadeComplete }: LoaderProps) {
+  const { progress } = useProgress()
   const progressRef = React.useRef(0)
   const rafRef = React.useRef(0)
   const progressSpanRef = React.useRef<HTMLSpanElement>(null)
-  const [shown, setShown] = React.useState(initialState(active))
-
-  React.useEffect(() => {
-    let t: NodeJS.Timeout
-    if (active !== shown) t = setTimeout(() => setShown(active), 1000)
-    return () => clearTimeout(t)
-  }, [shown, active])
 
   const updateProgress = React.useCallback(() => {
     if (!progressSpanRef.current) return
     progressRef.current += (progress - progressRef.current) / 2
     if (progressRef.current > 0.95 * progress || progress === 100)
       progressRef.current = progress
-    progressSpanRef.current.innerText = dataInterpolation(progressRef.current)
+    progressSpanRef.current.innerText = `Loading ${progressRef.current.toFixed(0)}%`
     if (progressRef.current < progress)
       rafRef.current = requestAnimationFrame(updateProgress)
-  }, [dataInterpolation, progress])
+  }, [progress])
 
   React.useEffect(() => {
     updateProgress()
     return () => cancelAnimationFrame(rafRef.current)
   }, [updateProgress])
 
-  return shown ? (
+  return (
     <div
       style={{
-        opacity: active ? 1 : 0,
+        opacity: fadingOut ? 0 : 1,
         transition: 'opacity 0.8s ease-out',
-        ...containerStyles,
+      }}
+      onTransitionEnd={() => {
+        if (fadingOut && onFadeComplete) onFadeComplete()
       }}
       className='absolute inset-0 z-[1000] flex flex-col items-center justify-center bg-[#0a0f1a]'
     >
@@ -76,5 +61,5 @@ export function CustomLoader({
         />
       </div>
     </div>
-  ) : null
+  )
 }
