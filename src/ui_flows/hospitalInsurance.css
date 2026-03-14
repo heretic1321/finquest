@@ -1,0 +1,216 @@
+.insurance-convo-screen {
+  min-height: calc(100vh - 180px);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 70, 110, 0.22), transparent 38%),
+    radial-gradient(circle at 88% 18%, rgba(100, 130, 255, 0.2), transparent 44%),
+    radial-gradient(circle at 50% 95%, rgba(180, 30, 70, 0.1), transparent 50%),
+    linear-gradient(140deg, #060c18 0%, #0b1526 45%, #080f1e 100%);
+  border: 1px solid rgba(255, 80, 120, 0.15);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.insurance-convo-wrap {
+  display: grid;
+  gap: 14px;
+}
+
+.conversation-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.reena-row,
+.user-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.reena-portrait,
+.user-portrait {
+  width: 180px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.reena-portrait {
+  box-shadow: 0 18px 35px rgba(255, 64, 129, 0.18);
+}
+
+.companion-portrait {
+  width: 180px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.5);
+  box-shadow: 0 18px 35px rgba(90, 140, 255, 0.22);
+}
+
+.user-portrait {
+  box-shadow: 0 18px 35px rgba(56, 189, 248, 0.16);
+}
+
+.reena-dialogue-box,
+.user-dialogue-box {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(10, 18, 32, 0.6);
+  padding: 14px;
+  backdrop-filter: blur(4px);
+}
+
+.speaker-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c7d2fe;
+  border: 1px solid rgba(199, 210, 254, 0.35);
+  border-radius: 999px;
+  padding: 3px 9px;
+  margin-bottom: 8px;
+}
+
+.reena-text {
+  min-height: 88px;
+  color: #e2e8f0;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.empty-user-line {
+  color: #cbd5e1;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+
+.options-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.user-question {
+  color: #e2e8f0;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.option-btn {
+  text-align: left;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: rgba(30, 41, 59, 0.65);
+  color: #e2e8f0;
+  font-size: 0.92rem;
+  transition: border-color 170ms ease, transform 170ms ease, background 170ms ease;
+}
+
+.option-btn:hover {
+  border-color: rgba(165, 180, 252, 0.7);
+  background: rgba(67, 56, 202, 0.22);
+  transform: translateY(-1px);
+}
+
+.option-btn.success:hover {
+  border-color: rgba(74, 222, 128, 0.7);
+  background: rgba(22, 163, 74, 0.2);
+}
+
+.option-btn.danger:hover {
+  border-color: rgba(251, 113, 133, 0.7);
+  background: rgba(225, 29, 72, 0.2);
+}
+
+.sim-wait {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(148, 163, 184, 0.45);
+  border-top-color: #93c5fd;
+  border-radius: 999px;
+  animation: spinLinear 0.8s linear infinite;
+}
+
+.result-chips {
+  display: grid;
+  gap: 8px;
+}
+
+.chip {
+  border-radius: 999px;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  background: rgba(250, 204, 21, 0.12);
+  color: #fef08a;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+.summary-money-pill {
+  margin-top: 10px;
+  border: 1px solid rgba(74, 222, 128, 0.45);
+  background: rgba(22, 163, 74, 0.16);
+  color: #bbf7d0;
+  border-radius: 999px;
+  padding: 7px 12px;
+  width: max-content;
+}
+
+.coin-dot {
+  font-size: 1rem;
+}
+
+.type-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: cursorBlink 1s step-end infinite;
+  color: #c7d2fe;
+}
+
+@keyframes spinLinear {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cursorBlink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .reena-row,
+  .user-row {
+    grid-template-columns: 1fr;
+  }
+
+  .reena-portrait,
+  .user-portrait {
+    width: 100%;
+    max-width: 220px;
+    height: 240px;
+  }
+}

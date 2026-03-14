@@ -9,8 +9,11 @@ import StoreEntryExitTriggerArea from '@client/components/StoreEntryExitTriggerA
 import { CharacterRef } from '@client/components/Character'
 import { StoreConfigs } from '@client/config/MapConfig'
 import { ZONE_CONFIGS, getZoneByStoreKey, STORE_TO_ZONE, IGNORED_STORES } from '@client/config/ZoneConfig'
+import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { MapStore } from '@client/contexts/MapContext'
+import { PlayerConfigStore } from '@client/components/Character'
+import { getUIFlowForStore, UIFlowStore } from '@client/ui_flows'
 
 const getMapScale = () => MapStore.getState().mapScale || 2
 
@@ -154,10 +157,22 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
   const {
     setIsEnterStorePromptShown,
     setEnterStorePromptStoreName,
+    storeRequestedToEnter,
+    setStoreRequestedToEnter,
+    setIsExitStorePromptShown,
+    setExitStorePromptStoreName,
+    storeRequestedToExit,
+    setStoreRequestedToExit,
   } = HUDStore(
     useShallow((state) => ({
       setIsEnterStorePromptShown: state.setIsEnterStorePromptShown,
       setEnterStorePromptStoreName: state.setEnterStorePromptStoreName,
+      storeRequestedToEnter: state.storeRequestedToEnter,
+      setStoreRequestedToEnter: state.setStoreRequestedToEnter,
+      setIsExitStorePromptShown: state.setIsExitStorePromptShown,
+      setExitStorePromptStoreName: state.setExitStorePromptStoreName,
+      storeRequestedToExit: state.storeRequestedToExit,
+      setStoreRequestedToExit: state.setStoreRequestedToExit,
     })),
   )
 
@@ -213,6 +228,45 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
     [ZONE_CONFIGS.stockexchange.storeKey]: labelPos.stockLabelOffset as [number, number, number],
   }
 
+  // Handle entry
+  useEffect(() => {
+    if (!storeRequestedToEnter) return
+
+    const uiFlowId = getUIFlowForStore(storeRequestedToEnter)
+    if (uiFlowId) {
+      UIFlowStore.getState().openUIFlow(uiFlowId, {
+        source: 'zone',
+        storeKey: storeRequestedToEnter,
+      })
+      setStoreRequestedToEnter('')
+      setIsEnterStorePromptShown(false)
+      return
+    }
+
+    const config = StoreConfigs[storeRequestedToEnter]
+    if (!config) return
+    const zone = getZoneByStoreKey(storeRequestedToEnter)
+    console.log(`[ZoneManager] Entering zone: ${zone?.name || storeRequestedToEnter}`)
+    if (characterRef.current?.teleportPlayer) characterRef.current.teleportPlayer(config.entrySpawnPosition)
+    genericStore.setState({ insideStore: storeRequestedToEnter })
+    setStoreRequestedToEnter('')
+    setIsEnterStorePromptShown(false)
+  }, [storeRequestedToEnter])
+
+  // Handle exit
+  useEffect(() => {
+    if (!storeRequestedToExit) return
+    const exitStoreName = typeof storeRequestedToExit === 'string' ? storeRequestedToExit : storeRequestedToExit.nameOfStoreToExit
+    const config = StoreConfigs[exitStoreName]
+    if (!config) return
+    const zone = getZoneByStoreKey(exitStoreName)
+    console.log(`[ZoneManager] Exiting zone: ${zone?.name || exitStoreName}`)
+    if (characterRef.current?.teleportPlayer) characterRef.current.teleportPlayer(config.exitSpawnPosition)
+    genericStore.setState({ insideStore: null })
+    setStoreRequestedToExit(null)
+    setIsExitStorePromptShown(false)
+  }, [storeRequestedToExit])
+
   // Initial recolor when stores load
   useEffect(() => {
     const storeKeys = Object.keys(allStoresInfo)
@@ -243,15 +297,18 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
     zoneColors.stockColor, zoneColors.stockMetal, zoneColors.stockRough,
   ])
 
-  // E key to open zone UI
+  // Key listener for E (handles both entry and exit)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code !== 'KeyE') return
-      if (HUDStore.getState().isEnterStorePromptShown) {
+      const enterPromptShown = HUDStore.getState().isEnterStorePromptShown
+      const exitPromptShown = HUDStore.getState().isExitStorePromptShown
+      if (enterPromptShown) {
         const storeName = HUDStore.getState().enterStorePromptStoreName
-        if (storeName) {
-          HUDStore.getState().setStoreRequestedToEnter(storeName)
-        }
+        if (storeName) HUDStore.getState().setStoreRequestedToEnter(storeName)
+      } else if (exitPromptShown) {
+        const storeName = HUDStore.getState().exitStorePromptStoreName
+        if (storeName) HUDStore.getState().setStoreRequestedToExit({ nameOfStoreToExit: storeName, exitingVia: 'gate' })
       }
     }
     document.addEventListener('keydown', handleKeyDown)
@@ -267,7 +324,7 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
         const storeInfo = allStoresInfo[storeName]
         if (!storeInfo) return null
 
-        const { lods, entryTriggerAreaGeometry, entryTriggerAreaTransform } = storeInfo
+        const { lods, entryTriggerAreaGeometry, entryTriggerAreaTransform, exitTriggerAreaGeometry, exitTriggerAreaTransform } = storeInfo
         const hasLods = lods.objects[0] || lods.objects[1] || lods.objects[2]
         const zone = getZoneByStoreKey(storeName)
         const labelOffset = labelOffsetMap[storeName] ?? [0, 20, 0]
@@ -329,6 +386,25 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
                 onOutside={() => {
                   if (HUDStore.getState().enterStorePromptStoreName === storeName) {
                     setIsEnterStorePromptShown(false)
+                  }
+                }}
+              />
+            )}
+
+            {/* Exit trigger */}
+            {exitTriggerAreaGeometry && (
+              <StoreEntryExitTriggerArea
+                characterRef={characterRef}
+                geometry={exitTriggerAreaGeometry}
+                transform={exitTriggerAreaTransform}
+                keyId={`${storeName}-exit`}
+                onInside={() => {
+                  setExitStorePromptStoreName(storeName)
+                  setIsExitStorePromptShown(true)
+                }}
+                onOutside={() => {
+                  if (HUDStore.getState().exitStorePromptStoreName === storeName) {
+                    setIsExitStorePromptShown(false)
                   }
                 }}
               />

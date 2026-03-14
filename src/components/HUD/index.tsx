@@ -7,7 +7,6 @@ import JumpButton from '@client/components/HUD/JumpButton'
 import LoginScreen from '@client/components/HUD/LoginScreen'
 import StartButton from '@client/components/HUD/StartButton'
 import ZoneUI from '@client/components/HUD/ZoneUI'
-import OldManUI from '@client/components/HUD/OldManUI'
 import { useOldManStore } from '@client/components/OldManNPC'
 import { CustomLoader } from '@client/components/HUD/Loader'
 import { SoundsStore } from '@client/components/Sounds'
@@ -19,6 +18,7 @@ import { HUDStore } from '@client/contexts/HUDContext'
 import { getZoneByStoreKey } from '@client/config/ZoneConfig'
 import { useGameStore, getPlayerLevel } from '@client/stores/gameStore'
 import { launchUnityGame } from '@client/utils/unityLauncher'
+import { UIFlowStore, UIFlowsOverlay } from '@client/ui_flows'
 import { useShallow } from 'zustand/react/shallow'
 
 function formatRupees(amount: number): string {
@@ -145,18 +145,23 @@ export default function HUD() {
     showDialogScreen,
     isEnterStorePromptShown,
     enterStorePromptStoreName,
+    isExitStorePromptShown,
+    exitStorePromptStoreName,
   } = HUDStore(
     useShallow((state) => ({
       hasStartButtonBeenPressed: state.hasStartButtonBeenPressed,
       showDialogScreen: state.showDialogScreen,
       isEnterStorePromptShown: state.isEnterStorePromptShown,
       enterStorePromptStoreName: state.enterStorePromptStoreName,
+      isExitStorePromptShown: state.isExitStorePromptShown,
+      exitStorePromptStoreName: state.exitStorePromptStoreName,
     })),
   )
 
   const loading_initialSpawn = genericStore((s) => s.loading_initialSpawn)
   const oldManNearby = useOldManStore((s) => s.isNearby)
   const oldManUIOpen = useOldManStore((s) => s.isUIOpen)
+  const isUIFlowOpen = UIFlowStore((state) => state.isOpen)
 
   // Loader with smooth fade-out: stays mounted while fading, then unmounts
   const [loaderMounted, setLoaderMounted] = useState(false)
@@ -247,9 +252,22 @@ export default function HUD() {
         </div>
       )}
 
+      {/* Zone exit prompt */}
+      {hasStartButtonBeenPressed && isExitStorePromptShown && (
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 text-center">
+          <div className="bg-black/70 backdrop-blur-sm rounded-xl px-8 py-4 border border-red-500/30">
+            <p className="text-red-400 text-lg font-semibold">
+              Press E to exit {getZoneByStoreKey(exitStorePromptStoreName)?.name || exitStorePromptStoreName}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Zone full-page UI */}
       <ZoneUI />
-      <OldManUI />
+
+      {/* UI Flows pipeline overlay */}
+      {isUIFlowOpen && <UIFlowsOverlay />}
     </>
   )
 }
