@@ -9,6 +9,7 @@ import { create } from 'zustand'
 import { CharacterRef } from '@client/components/Character'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { genericStore } from '@client/contexts/GlobalStateContext'
+import { UIFlowStore } from '@client/ui_flows'
 
 // Store for old man interaction
 export const useOldManStore = create<{
@@ -103,14 +104,14 @@ export default function OldManNPC({ characterRef }: OldManNPCProps) {
     }
   })
 
-  // E key to open interaction UI
+  // E key to open blockchain flow
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.code !== 'KeyE') return
       const nearby = useOldManStore.getState().isNearby
       const enterPrompt = HUDStore.getState().isEnterStorePromptShown
       if (nearby && !enterPrompt) {
-        useOldManStore.getState().setUIOpen(true)
+        UIFlowStore.getState().openUIFlow('blockchain-flow', { source: 'zone' })
       }
     }
     document.addEventListener('keydown', handleKey)

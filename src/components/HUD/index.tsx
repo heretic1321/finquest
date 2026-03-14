@@ -94,7 +94,7 @@ function PlayerHUD() {
       <div className="flex items-center gap-1.5">
         {/* Unity game */}
         <button
-          onClick={() => launchUnityGame()}
+          onClick={() => { SoundsStore.getState().playUIClick(); launchUnityGame() }}
           className="border-2 border-neutral-600 bg-black p-2 hover:border-[#00ff88] hover:text-[#00ff88] transition-colors"
           title="Launch Dungeon Game"
         >
@@ -103,7 +103,7 @@ function PlayerHUD() {
 
         {/* Mute */}
         <button
-          onClick={() => SoundsStore.getState().toggleMuted()}
+          onClick={() => { SoundsStore.getState().playUIClick(); SoundsStore.getState().toggleMuted() }}
           className="border-2 border-neutral-600 bg-black p-2 hover:border-[#00ff88] hover:text-[#00ff88] transition-colors"
         >
           {isMuted
@@ -115,7 +115,7 @@ function PlayerHUD() {
         {/* Fullscreen (desktop only) */}
         {!isTouchDevice && (
           <button
-            onClick={() => GesturesAndDeviceStore.getState().toggleFullscreen?.()}
+            onClick={() => { SoundsStore.getState().playUIClick(); GesturesAndDeviceStore.getState().toggleFullscreen?.() }}
             className="border-2 border-neutral-600 bg-black p-2 hover:border-[#00ff88] hover:text-[#00ff88] transition-colors"
           >
             {document.fullscreenElement
@@ -252,16 +252,7 @@ export default function HUD() {
         </div>
       )}
 
-      {/* Zone exit prompt */}
-      {hasStartButtonBeenPressed && isExitStorePromptShown && (
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 text-center">
-          <div className="bg-black border-2 border-[#ff3366] shadow-[4px_4px_0_#ff3366] px-8 py-4">
-            <p className="text-[#ff3366] text-lg font-mono font-bold uppercase tracking-wider">
-              Press <kbd className="border-2 border-[#ff3366] bg-[#ff3366] text-black font-mono font-bold px-2 py-0.5 mx-1">E</kbd> to exit {getZoneByStoreKey(exitStorePromptStoreName)?.name || exitStorePromptStoreName}
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Exit triggers disabled — players no longer enter buildings */}
 
       {/* Zone full-page UI */}
       <ZoneUI />

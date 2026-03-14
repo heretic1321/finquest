@@ -1,8 +1,11 @@
-import backgroundSoundSource from "@client/assets/sounds/ambient.mp3";
 import jumpSoundSource from "@client/assets/sounds/jump.mp3";
-import clickSoundSource from "@client/assets/sounds/menuClick.mp3";
 import shineSoundSource from "@client/assets/sounds/shine.mp3";
 import walkingSoundSource from "@client/assets/sounds/walk.mp3";
+
+// Use new ambient + SFX from public/assets
+const backgroundSoundSource = '/assets/music/normalGameAmbient.mp3';
+const clickSoundSource = '/assets/soundEffect/clickSound2.mp3';
+const uiClickSoundSource = '/assets/soundEffect/mouseclick.mp3';
 import { genericStore } from "@client/contexts/GlobalStateContext";
 import { HUDStore } from '@client/contexts/HUDContext';
 import { Howl } from 'howler';
@@ -32,6 +35,10 @@ interface SoundsZustandState {
   jumpSoundRef: MutableRefObject<Howl | null>
   jumpTimeout: NodeJS.Timeout | null
   playJumpSoundOnce: () => void
+
+  uiClickSoundRef: MutableRefObject<Howl | null>
+  playUIClick: () => void
+
   mainScreenDetailedRef: MutableRefObject<LOD | null>
   mainScreenVideoRef: MutableRefObject<HTMLVideoElement | null>
   mainScreenAudioRef: MutableRefObject<PositionalAudioImpl | null>
@@ -51,6 +58,9 @@ clickSoundRef.current = null
 
 const jumpSoundRef = createRef<Howl | null>() as MutableRefObject<Howl | null>
 jumpSoundRef.current = null
+
+const uiClickSoundRef = createRef<Howl | null>() as MutableRefObject<Howl | null>
+uiClickSoundRef.current = null
 
 const mainScreenDetailedRef = createRef<LOD | null>() as MutableRefObject<LOD | null>
 mainScreenDetailedRef.current = null
@@ -103,6 +113,7 @@ export const SoundsStore = create<SoundsZustandState>((set, get) => ({
         get().shineSoundRef.current?.stop()
         get().clickSoundRef.current?.stop()
         get().jumpSoundRef.current?.stop()
+        get().uiClickSoundRef.current?.stop()
     } else {
         // Only resume background music when unmuting
         const isInsideStore = genericStore.getState().insideStore !== null
@@ -153,6 +164,13 @@ export const SoundsStore = create<SoundsZustandState>((set, get) => ({
   playClickSoundOnce: () => {
     if (!get().isMuted) {
         get().clickSoundRef.current?.play()
+    }
+  },
+
+  uiClickSoundRef,
+  playUIClick: () => {
+    if (!get().isMuted) {
+      get().uiClickSoundRef.current?.play()
     }
   },
 
@@ -292,6 +310,13 @@ const Sounds = () => {
       SoundsStore.getState().jumpSoundRef.current = new Howl({
         src: jumpSoundSource,
         volume: 0.5
+      })
+    }
+
+    if (SoundsStore.getState().uiClickSoundRef.current == null) {
+      SoundsStore.getState().uiClickSoundRef.current = new Howl({
+        src: uiClickSoundSource,
+        volume: 0.4
       })
     }
   }, [])

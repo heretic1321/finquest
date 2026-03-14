@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { FaCoins } from 'react-icons/fa'
+import { useGameStore } from '@client/stores/gameStore'
 import { GLOBAL_COMPANION } from '@client/config/CompanionConfig'
 import {
   BANK_TOPICS,
@@ -126,9 +127,10 @@ export default function BankFlow() {
   const handleTopicComplete = () => {
     if (!activeTopic || !currentTopic) return
 
-    // Award coins
+    // Award coins + XP
     if (quizResult?.isCorrect) {
       setTotalCoins((prev) => prev + currentTopic.rewardCoins)
+      useGameStore.getState().addPoints(currentTopic.rewardCoins)
     }
 
     // Mark topic done

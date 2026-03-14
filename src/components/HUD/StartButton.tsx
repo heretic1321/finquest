@@ -15,11 +15,12 @@ const StartButton = () => {
   const playerName = playerData.name || 'Explorer'
 
   const handleClick = () => {
+    SoundsStore.getState().playUIClick()
     // Set loading BEFORE triggering canvas render to avoid uncovered frames
     genericStore.setState({ loading_initialSpawn: true })
     setHasStartButtonBeenPressed(true)
     if (toggleFullscreen && !isDebugMode) toggleFullscreen()
-    setTimeout(() => SoundsStore.getState().setupAndPlayBackgroundMusic(true), 2000)
+    setTimeout(() => SoundsStore.getState().setupAndPlayBackgroundMusic(), 2000)
   }
 
   return (

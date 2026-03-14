@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { AuthAPIStore } from '@client/contexts/AuthContext'
 import { UIFlowStore } from '@client/ui_flows'
+import { SoundsStore } from '@client/components/Sounds'
 
 type UserType = 'student' | 'working' | null
 type GenderType = 'male' | 'female' | null
@@ -27,7 +28,7 @@ const FinQuestOnboarding: React.FC = () => {
 
   const handleSubmit = () => {
     if (!isValid) return
-    // Store user profile in localStorage for game use
+    SoundsStore.getState().playUIClick()
     localStorage.setItem('finquest_player', JSON.stringify({
       name: name.trim(),
       age: parseInt(age),
@@ -44,45 +45,45 @@ const FinQuestOnboarding: React.FC = () => {
 
   return (
     <>
-      <h2 className='mb-6 text-center text-xl font-black uppercase tracking-tight text-white'>
+      <h2 className='mb-3 text-center text-sm font-black uppercase tracking-wider text-white'>
         Enter Your Details
       </h2>
 
-      <div className='flex flex-col gap-4'>
-        {/* Name */}
-        <div className='flex flex-col gap-1.5'>
-          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Your Name</label>
-          <input
-            className='rounded-none border-2 border-neutral-700 bg-black px-4 py-3 font-mono text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
-            type='text'
-            placeholder='What should we call you?'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={20}
-          />
+      <div className='flex flex-col gap-2.5'>
+        {/* Name + Age row */}
+        <div className='flex gap-2.5'>
+          <div className='flex flex-1 flex-col gap-1'>
+            <label className='font-mono text-[10px] uppercase tracking-wider text-neutral-500'>Name</label>
+            <input
+              className='w-full border-2 border-neutral-700 bg-black px-3 py-2 font-mono text-sm text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
+              type='text'
+              placeholder='Your name'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={20}
+            />
+          </div>
+          <div className='flex w-20 flex-col gap-1'>
+            <label className='font-mono text-[10px] uppercase tracking-wider text-neutral-500'>Age</label>
+            <input
+              className='w-full border-2 border-neutral-700 bg-black px-3 py-2 font-mono text-sm text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
+              type='number'
+              placeholder='21'
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              min={14}
+              max={60}
+            />
+          </div>
         </div>
 
-        {/* Age */}
-        <div className='flex flex-col gap-1.5'>
-          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Your Age</label>
+        {/* Mobile */}
+        <div className='flex flex-col gap-1'>
+          <label className='font-mono text-[10px] uppercase tracking-wider text-neutral-500'>Mobile</label>
           <input
-            className='rounded-none border-2 border-neutral-700 bg-black px-4 py-3 font-mono text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
-            type='number'
-            placeholder='e.g. 21'
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            min={14}
-            max={60}
-          />
-        </div>
-
-        {/* Mobile Number */}
-        <div className='flex flex-col gap-1.5'>
-          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Mobile Number</label>
-          <input
-            className='rounded-none border-2 border-neutral-700 bg-black px-4 py-3 font-mono text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
+            className='w-full border-2 border-neutral-700 bg-black px-3 py-2 font-mono text-sm text-white placeholder:text-neutral-600 outline-none focus:border-[#00ff88]'
             type='tel'
-            placeholder='e.g. 9876543210'
+            placeholder='9876543210'
             value={mobileNumber}
             onChange={(e) => {
               const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10)
@@ -93,91 +94,44 @@ const FinQuestOnboarding: React.FC = () => {
           />
         </div>
 
-        {/* Gender */}
-        <div className='flex flex-col gap-1.5'>
-          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Gender</label>
-          <div className='flex gap-3'>
+        {/* Avatar + Gender combined */}
+        <div className='flex flex-col gap-1'>
+          <label className='font-mono text-[10px] uppercase tracking-wider text-neutral-500'>Choose Avatar</label>
+          <div className='grid grid-cols-2 gap-2.5'>
             <button
-              className={`flex-1 rounded-none border-2 px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${
+              type='button'
+              onClick={() => { setGender('male'); setAvatarPath(MALE_AVATAR) }}
+              className={`flex items-center gap-2.5 border-2 bg-black p-2 transition ${
                 gender === 'male'
-                  ? 'border-[#00ff88] bg-[#00ff88] text-black shadow-[3px_3px_0_white]'
-                  : 'border-neutral-700 bg-black text-neutral-400 hover:border-neutral-500'
+                  ? 'border-[#00ff88] shadow-[3px_3px_0_#00ff88]'
+                  : 'border-neutral-700 hover:border-neutral-500'
               }`}
-              onClick={() => {
-                setGender('male')
-                setAvatarPath(MALE_AVATAR)
-              }}
             >
-              Male
+              <img src={MALE_AVATAR} alt='Male' className='h-14 w-14 object-contain' />
+              <span className='font-mono text-xs font-bold uppercase tracking-wider text-neutral-400'>Male</span>
             </button>
+
             <button
-              className={`flex-1 rounded-none border-2 px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${
+              type='button'
+              onClick={() => { setGender('female'); setAvatarPath(FEMALE_AVATAR) }}
+              className={`flex items-center gap-2.5 border-2 bg-black p-2 transition ${
                 gender === 'female'
-                  ? 'border-[#00ff88] bg-[#00ff88] text-black shadow-[3px_3px_0_white]'
-                  : 'border-neutral-700 bg-black text-neutral-400 hover:border-neutral-500'
-              }`}
-              onClick={() => {
-                setGender('female')
-                setAvatarPath(FEMALE_AVATAR)
-              }}
-            >
-              Female
-            </button>
-          </div>
-        </div>
-
-        {/* Avatar selector */}
-        <div className='flex flex-col gap-1.5'>
-          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>Choose your avatar</label>
-          <div className='grid grid-cols-2 gap-3'>
-            <button
-              type='button'
-              onClick={() => {
-                setGender('male')
-                setAvatarPath(MALE_AVATAR)
-              }}
-              className={`rounded-none border-2 bg-black p-2 transition ${
-                avatarPath === MALE_AVATAR
-                  ? 'border-[#00ff88] shadow-[4px_4px_0_#00ff88]'
+                  ? 'border-[#00ff88] shadow-[3px_3px_0_#00ff88]'
                   : 'border-neutral-700 hover:border-neutral-500'
               }`}
             >
-              <img
-                src={MALE_AVATAR}
-                alt='Male Avatar'
-                className='mx-auto h-24 w-full rounded-none object-cover object-top'
-              />
-              <p className='mt-2 text-center font-mono text-xs uppercase tracking-wider text-neutral-500'>Male Avatar</p>
-            </button>
-
-            <button
-              type='button'
-              onClick={() => {
-                setGender('female')
-                setAvatarPath(FEMALE_AVATAR)
-              }}
-              className={`rounded-none border-2 bg-black p-2 transition ${
-                avatarPath === FEMALE_AVATAR
-                  ? 'border-[#00ff88] shadow-[4px_4px_0_#00ff88]'
-                  : 'border-neutral-700 hover:border-neutral-500'
-              }`}
-            >
-              <img
-                src={FEMALE_AVATAR}
-                alt='Female Avatar'
-                className='mx-auto h-24 w-full rounded-none object-cover object-top'
-              />
-              <p className='mt-2 text-center font-mono text-xs uppercase tracking-wider text-neutral-500'>Female Avatar</p>
+              <img src={FEMALE_AVATAR} alt='Female' className='h-14 w-14 object-contain' />
+              <span className='font-mono text-xs font-bold uppercase tracking-wider text-neutral-400'>Female</span>
             </button>
           </div>
         </div>
 
         {/* Student or Working */}
-        <div className='flex flex-col gap-1.5'>
-          <label className='font-mono text-xs uppercase tracking-wider text-neutral-500'>I am a...</label>
-          <div className='flex gap-3'>
+        <div className='flex flex-col gap-1'>
+          <label className='font-mono text-[10px] uppercase tracking-wider text-neutral-500'>I am a...</label>
+          <div className='flex gap-2.5'>
             <button
-              className={`flex-1 rounded-none border-2 px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${
+              className={`flex-1 border-2 px-3 py-2 text-xs font-bold uppercase tracking-wider transition ${
                 userType === 'student'
                   ? 'border-[#00ff88] bg-[#00ff88] text-black shadow-[3px_3px_0_white]'
                   : 'border-neutral-700 bg-black text-neutral-400 hover:border-neutral-500'
@@ -187,21 +141,21 @@ const FinQuestOnboarding: React.FC = () => {
               Student
             </button>
             <button
-              className={`flex-1 rounded-none border-2 px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${
+              className={`flex-1 border-2 px-3 py-2 text-xs font-bold uppercase tracking-wider transition ${
                 userType === 'working'
                   ? 'border-[#00ff88] bg-[#00ff88] text-black shadow-[3px_3px_0_white]'
                   : 'border-neutral-700 bg-black text-neutral-400 hover:border-neutral-500'
               }`}
               onClick={() => setUserType('working')}
             >
-              Working Professional
+              Working
             </button>
           </div>
         </div>
 
         {/* Submit */}
         <button
-          className={`mt-4 w-full rounded-none py-4 text-base font-bold uppercase tracking-wider transition-all ${
+          className={`mt-1 w-full py-3 text-sm font-bold uppercase tracking-wider transition-all ${
             isValid
               ? 'border-2 border-[#00ff88] bg-[#00ff88] text-black shadow-[4px_4px_0_white] hover:translate-x-1 hover:translate-y-1 hover:shadow-none'
               : 'cursor-not-allowed border-2 border-neutral-800 bg-neutral-900 text-neutral-700 shadow-none'
@@ -212,35 +166,34 @@ const FinQuestOnboarding: React.FC = () => {
           Start My Journey
         </button>
 
-        {/* Dev skip */}
-        <button
-          className='mt-2 w-full rounded-none border-2 border-neutral-800 py-2.5 text-xs uppercase tracking-wider text-neutral-600 transition hover:border-neutral-600 hover:text-neutral-400'
-          onClick={() => {
-            localStorage.setItem('finquest_player', JSON.stringify({
-              name: 'Dev',
-              age: 21,
-              mobileNumber: '9999999999',
-              gender: 'male',
-              avatarPath: MALE_AVATAR,
-              type: 'student',
-            }))
-            continueAsGuest('Dev')
-            window.setTimeout(() => {
-              openUIFlow('laxmi-intro', { source: 'login' })
-            }, 80)
-          }}
-        >
-          Skip (Dev Mode)
-        </button>
-
-        <button
-          className='mt-1 w-full rounded-none border-2 border-[#ffcc00] py-2.5 text-xs font-medium uppercase tracking-wider text-[#ffcc00] transition hover:bg-[#ffcc00] hover:text-black'
-          onClick={() =>
-            openUIFlow('login-flow-gallery', { source: 'login' })
-          }
-        >
-          UI Flows (Test)
-        </button>
+        {/* Dev buttons */}
+        <div className='flex gap-2'>
+          <button
+            className='flex-1 border-2 border-neutral-800 py-1.5 text-[10px] uppercase tracking-wider text-neutral-600 transition hover:border-neutral-600 hover:text-neutral-400'
+            onClick={() => {
+              localStorage.setItem('finquest_player', JSON.stringify({
+                name: 'Dev',
+                age: 21,
+                mobileNumber: '9999999999',
+                gender: 'male',
+                avatarPath: MALE_AVATAR,
+                type: 'student',
+              }))
+              continueAsGuest('Dev')
+              window.setTimeout(() => {
+                openUIFlow('laxmi-intro', { source: 'login' })
+              }, 80)
+            }}
+          >
+            Skip (Dev)
+          </button>
+          <button
+            className='flex-1 border-2 border-[#ffcc00] py-1.5 text-[10px] font-medium uppercase tracking-wider text-[#ffcc00] transition hover:bg-[#ffcc00] hover:text-black'
+            onClick={() => openUIFlow('login-flow-gallery', { source: 'login' })}
+          >
+            UI Flows
+          </button>
+        </div>
       </div>
     </>
   )

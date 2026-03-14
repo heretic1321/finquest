@@ -7,7 +7,7 @@ import {
   evaluateMistakeAnswer,
   simulateInsuranceDecision,
 } from './insuranceStoryEngine'
-import { formatRupees } from '@client/stores/gameStore'
+import { formatRupees, useGameStore } from '@client/stores/gameStore'
 import { GLOBAL_COMPANION } from '@client/config/CompanionConfig'
 
 type Stage = 'intro' | 'question-1' | 'feedback-1' | 'question-2' | 'simulating' | 'result' | 'summary'
@@ -129,6 +129,7 @@ export default function HospitalInsuranceFlow() {
     setSelectedMistakeOption(optionId)
     setMistakeFeedback(evaluation.explanation)
     setRewardPoints((prev) => prev + evaluation.rewardPoints)
+    useGameStore.getState().addPoints(evaluation.rewardPoints)
 
     setStage('feedback-1')
   }

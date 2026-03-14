@@ -391,24 +391,7 @@ const ZoneManager = memo(({ characterRef }: ZoneManagerProps) => {
               />
             )}
 
-            {/* Exit trigger */}
-            {exitTriggerAreaGeometry && (
-              <StoreEntryExitTriggerArea
-                characterRef={characterRef}
-                geometry={exitTriggerAreaGeometry}
-                transform={exitTriggerAreaTransform}
-                keyId={`${storeName}-exit`}
-                onInside={() => {
-                  setExitStorePromptStoreName(storeName)
-                  setIsExitStorePromptShown(true)
-                }}
-                onOutside={() => {
-                  if (HUDStore.getState().exitStorePromptStoreName === storeName) {
-                    setIsExitStorePromptShown(false)
-                  }
-                }}
-              />
-            )}
+            {/* Exit triggers disabled — players no longer enter buildings */}
           </group>
         )
       })}

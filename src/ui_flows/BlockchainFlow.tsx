@@ -10,6 +10,8 @@ import {
   UNCLE_CHUNK_DIALOGUES,
   makeVisualHash,
 } from './blockchainStoryEngine'
+import { launchUnityGame } from '@client/utils/unityLauncher'
+import { useGameStore } from '@client/stores/gameStore'
 
 type Stage = 'intro' | 'quiz' | 'quiz-feedback' | 'minigame-intro' | 'minigame' | 'complete'
 
@@ -78,7 +80,7 @@ export default function BlockchainFlow() {
   const topSpeakerName = isLaxmiSpeaking ? GLOBAL_COMPANION.name : 'Uncle Chunk'
   const topSpeakerImage = isLaxmiSpeaking
     ? GLOBAL_COMPANION.imagePath
-    : '/assets/ui/blockchain/uncle_chunk.png'
+    : '/assets/ui/blockchain/sharma_ji.png'
 
   // Compute what the top speaker says for typewriter
   const speakerLine = useMemo(() => {
@@ -124,7 +126,10 @@ export default function BlockchainFlow() {
     const correct = optionId === BLOCKCHAIN_QUIZ.correctId
     setSelectedAnswer(optionId)
     setIsCorrect(correct)
-    if (correct) setTotalCoins((prev) => prev + BLOCKCHAIN_QUIZ.rewardCoins)
+    if (correct) {
+      setTotalCoins((prev) => prev + BLOCKCHAIN_QUIZ.rewardCoins)
+      useGameStore.getState().addPoints(BLOCKCHAIN_QUIZ.rewardCoins)
+    }
     setStage('quiz-feedback')
   }
 
@@ -208,20 +213,13 @@ export default function BlockchainFlow() {
             {stage === 'quiz-feedback' && (
               <button
                 type='button'
-                onClick={() => setStage('minigame-intro')}
+                onClick={() => {
+                  launchUnityGame()
+                  setStage('complete')
+                }}
                 className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
               >
-                Show me the mini-game
-              </button>
-            )}
-
-            {stage === 'minigame-intro' && (
-              <button
-                type='button'
-                onClick={() => setStage('minigame')}
-                className='mt-4 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
-              >
-                Build the Blockchain!
+                Play the Dungeon Game
               </button>
             )}
 
@@ -291,12 +289,6 @@ export default function BlockchainFlow() {
               </p>
             )}
 
-            {stage === 'minigame-intro' && (
-              <p className='text-sm text-neutral-400 italic mt-3 font-mono'>
-                I want to try building a blockchain myself!
-              </p>
-            )}
-
             {stage === 'complete' && (
               <p className='text-sm text-[#00ff88] italic font-mono font-medium mt-3'>
                 I can see why tampering is impossible -- the whole chain breaks!
@@ -306,168 +298,7 @@ export default function BlockchainFlow() {
         </div>
       )}
 
-      {/* ================================================================
-          MINI-GAME
-      ================================================================ */}
-      {stage === 'minigame' && (
-        <div className='border-2 border-[#00ff88] bg-black p-4 space-y-4'>
-          <div className='border-b-2 border-neutral-700 pb-3'>
-            <p className='uppercase tracking-[0.2em] text-xs text-[#00ff88] font-mono'>
-              Build the Blockchain -- Mini Game
-            </p>
-            <h4 className='mt-1 text-lg font-black uppercase tracking-tight text-white'>
-              {gameComplete
-                ? 'Chain Complete! All transactions validated.'
-                : `Validate and add Block #${pendingIndex + 1} of ${PENDING_TRANSACTIONS.length}`}
-            </h4>
-            <p className='text-xs text-neutral-500 font-mono mt-1'>
-              Click <span className='text-[#00ff88] font-bold'>Validate & Add</span> to extend
-              the chain // Click{' '}
-              <span className='text-[#ff3366] font-bold'>Tamper</span> on any block to see
-              immutability in action
-            </p>
-          </div>
-
-          {/* Tamper warning */}
-          {showTamperWarning && (
-            <div className='border-2 border-[#ff3366] bg-[#ff3366]/10 p-4 flex items-start gap-3'>
-              <FaExclamationTriangle className='text-[#ff3366] text-xl flex-shrink-0' />
-              <div>
-                <p className='font-bold text-[#ff3366] font-mono uppercase text-sm'>Chain Broken!</p>
-                <p className='text-xs text-neutral-300 font-mono mt-1'>
-                  Modifying Block #{tamperedBlockNum} invalidated{' '}
-                  {chain.filter((b) => b.tampered).length} block
-                  {chain.filter((b) => b.tampered).length > 1 ? 's' : ''} after it. This is why
-                  blockchain data is immutable!
-                </p>
-              </div>
-              <button type='button' onClick={handleRepair} className='bg-[#00ff88] text-black font-bold uppercase tracking-wider text-xs border-2 border-[#00ff88] px-3 py-1.5 rounded-none flex-shrink-0 hover:shadow-[2px_2px_0_white] transition-all'>
-                Repair Chain
-              </button>
-            </div>
-          )}
-
-          {/* Chain visualization */}
-          <div className='overflow-x-auto'>
-            <div className='flex gap-0 items-center min-w-max'>
-              {chain.map((block, idx) => (
-                <div key={block.blockNum} className='flex items-center'>
-                  <div className={`border-2 ${block.tampered ? 'border-[#ff3366]' : 'border-[#00ff88]'} bg-black p-3 w-56`}>
-                    <div className='flex items-center justify-between mb-2'>
-                      <span className='font-mono text-xs font-bold text-white'>Block #{block.blockNum}</span>
-                      {block.blockNum === 0 && (
-                        <span className='font-mono text-[10px] uppercase bg-[#00ff88] text-black px-1.5 py-0.5 font-bold'>Genesis</span>
-                      )}
-                      {block.tampered && <span className='font-mono text-[10px] uppercase bg-[#ff3366] text-white px-1.5 py-0.5 font-bold'>INVALID</span>}
-                    </div>
-
-                    <div className='space-y-1.5'>
-                      <p className='font-mono text-xs text-neutral-300 leading-snug'>{block.transaction}</p>
-                      <div className='space-y-1'>
-                        <p className='flex items-center gap-1.5'>
-                          <span className='font-mono text-[10px] uppercase text-neutral-500 tracking-wider'>PREV</span>
-                          <span className='font-mono text-[#00ff88] text-xs bg-black border border-neutral-800 px-2 py-0.5'>
-                            {block.prevHash === '—'
-                              ? '—'
-                              : `${block.prevHash.slice(0, 8)}...`}
-                          </span>
-                        </p>
-                        <p className='flex items-center gap-1.5'>
-                          <span className='font-mono text-[10px] uppercase text-neutral-500 tracking-wider'>HASH</span>
-                          <span
-                            className={`font-mono text-xs bg-black border border-neutral-800 px-2 py-0.5 ${block.tampered ? 'text-[#ff3366]' : 'text-[#00ff88]'}`}
-                          >
-                            {block.tampered ? '????????...' : `${block.hash.slice(0, 8)}...`}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Tamper button */}
-                    {block.blockNum > 0 && !block.tampered && !tamperedBlockNum && !gameComplete && (
-                      <button
-                        type='button'
-                        onClick={() => handleTamper(block.blockNum)}
-                        className='mt-2 w-full bg-[#ff3366] text-white font-mono font-bold uppercase text-[10px] border-2 border-[#ff3366] px-2 py-1 tracking-wider hover:shadow-[2px_2px_0_white] transition-all'
-                      >
-                        Tamper
-                      </button>
-                    )}
-
-                    {/* Lock/alert icon */}
-                    <div className='mt-2 flex justify-center'>
-                      {block.tampered ? (
-                        <FaExclamationTriangle className='text-[#ff3366]' />
-                      ) : (
-                        <FaLock className='text-[#00ff88]' />
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Chain link connector */}
-                  {idx < chain.length - 1 && (
-                    <div className={`px-1 ${chain[idx + 1].tampered ? 'text-[#ff3366]' : 'text-[#00ff88]'}`}>
-                      <FaLink />
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {/* Pending block preview */}
-              {!gameComplete &&
-                pendingIndex < PENDING_TRANSACTIONS.length &&
-                !showTamperWarning && (
-                  <div className='flex items-center'>
-                    <div className='px-1 text-neutral-600 animate-pulse'>
-                      <FaLink />
-                    </div>
-                    <div className='border-2 border-dashed border-neutral-600 bg-black p-3 w-56'>
-                      <div className='flex items-center justify-between mb-2'>
-                        <span className='font-mono text-xs font-bold text-neutral-500'>Block #{chain.length}</span>
-                        <span className='font-mono text-[10px] uppercase bg-neutral-700 text-neutral-300 px-1.5 py-0.5 font-bold'>Pending</span>
-                      </div>
-                      <div>
-                        <p className='font-mono text-xs text-neutral-400 leading-snug'>
-                          {PENDING_TRANSACTIONS[pendingIndex].transaction}
-                        </p>
-                        <p className='text-xs text-neutral-600 font-mono mt-1'>
-                          Awaiting your validation...
-                        </p>
-                      </div>
-                      <button
-                        type='button'
-                        onClick={handleValidateBlock}
-                        className='mt-2 w-full bg-[#00ff88] text-black font-mono font-bold uppercase text-xs border-2 border-[#00ff88] px-2 py-1.5 tracking-wider hover:shadow-[2px_2px_0_white] transition-all'
-                      >
-                        Validate & Add
-                      </button>
-                    </div>
-                  </div>
-                )}
-            </div>
-          </div>
-
-          {/* Game complete bar */}
-          {gameComplete && (
-            <div className='border-2 border-[#ffcc00] bg-black p-4 flex items-center gap-4'>
-              <span className='text-3xl'>&#x1F3C6;</span>
-              <div className='flex-1'>
-                <p className='font-bold text-white font-mono uppercase'>Blockchain successfully built!</p>
-                <p className='text-sm text-[#ffcc00] font-mono'>
-                  +{MINIGAME_REWARD_COINS} coins earned for completing the mini-game
-                </p>
-              </div>
-              <button
-                type='button'
-                onClick={() => setStage('complete')}
-                className='bg-[#00ff88] text-black font-bold uppercase tracking-wider text-sm border-2 border-[#00ff88] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
-              >
-                Finish
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Mini-game replaced by Unity dungeon game — launched via button above */}
     </div>
   )
 }

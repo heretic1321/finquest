@@ -81,7 +81,7 @@ const MainCanvas = () => {
 const Main = () => {
   return (
     <>
-      <Leva oneLineLabels collapsed />
+      <Leva oneLineLabels collapsed hidden={import.meta.env.PROD} />
       <GlobalStateContextProvider />
       <GesturesAndDeviceContextProvider />
       <AuthContextProvider />

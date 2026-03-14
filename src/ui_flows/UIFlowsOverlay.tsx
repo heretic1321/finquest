@@ -6,6 +6,7 @@ import InvestmentCenterFlow from './InvestmentCenterFlow'
 import LaxmiIntroFlow from './LaxmiIntroFlow'
 import LoginFlowGallery from './LoginFlowGallery'
 import { UIFlowStore } from './store'
+import { SoundsStore } from '@client/components/Sounds'
 
 const renderFlowContent = (activeFlowId: string | null) => {
   if (activeFlowId === 'investment-center') {
@@ -67,7 +68,7 @@ export default function UIFlowsOverlay() {
 
               <button
                 className='bg-[#ff3366] text-white font-bold uppercase tracking-wider text-sm border-2 border-[#ff3366] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
-                onClick={closeUIFlow}
+                onClick={() => { SoundsStore.getState().playUIClick(); closeUIFlow() }}
               >
                 Exit to World
               </button>
@@ -86,7 +87,7 @@ export default function UIFlowsOverlay() {
           <div className='mb-2 flex justify-end'>
             <button
               className='bg-[#ff3366] text-white font-bold uppercase tracking-wider text-sm border-2 border-[#ff3366] px-4 py-2 rounded-none shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all'
-              onClick={closeUIFlow}
+              onClick={() => { SoundsStore.getState().playUIClick(); closeUIFlow() }}
             >
               Exit to World
             </button>
