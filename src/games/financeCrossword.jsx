@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import './financeCrossword.css'
 
 const GRID_SIZE = 9
 const WORDS = [
@@ -215,19 +214,20 @@ export function FinanceCrossword({ onBack }) {
   }
 
   return (
-    <div className="finance-crossword-page">
-      <div className="finance-crossword-shell">
-        <div className="finance-crossword-header">
+    <div className="min-h-screen p-4 flex items-center justify-center bg-[#0a0a0a]">
+      <div className="w-full max-w-3xl flex flex-col gap-4">
+        <div className="flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <p className="finance-crossword-kicker">Mini-Game</p>
-            <h1>Finance Crossword</h1>
+            <p className="text-[#00ff88] uppercase tracking-[0.12em] font-mono text-xs mb-2">Mini-Game</p>
+            <h1 className="text-white font-black text-3xl md:text-4xl uppercase tracking-tighter font-mono">Finance Crossword</h1>
           </div>
-          <div className="finance-crossword-progress">{progressText}</div>
+          <div className="border-2 border-[#00ff88] bg-black px-4 py-2 text-[#00ff88] font-mono font-bold text-sm">{progressText}</div>
         </div>
 
-        <div className="finance-crossword-card">
+        <div className="bg-[#111] border-2 border-[#00ff88] shadow-[4px_4px_0_#00ff88] p-4">
           <div
-            className={`finance-crossword-grid${flashWrong ? ' wrong' : ''}`}
+            className="grid grid-cols-9 gap-1"
+            style={flashWrong ? { animation: 'shake 0.2s ease-in-out' } : undefined}
             onContextMenu={(event) => event.preventDefault()}
           >
             {puzzle.grid.map((row, rowIndex) =>
@@ -242,9 +242,14 @@ export function FinanceCrossword({ onBack }) {
                   <button
                     key={cellKey}
                     type="button"
-                    className={`finance-crossword-cell${
-                      isSelected ? ' selected' : ''
-                    }${isSolved ? ' solved' : ''}`}
+                    className={[
+                      'aspect-square border-2 font-bold font-mono text-base uppercase cursor-pointer transition-colors flex items-center justify-center select-none',
+                      isSolved
+                        ? 'bg-[#00ff88] border-[#00ff88] text-black'
+                        : isSelected
+                          ? 'bg-[#00ff88]/20 border-[#00ff88] text-white'
+                          : 'border-neutral-700 bg-black text-white hover:border-[#00ff88]',
+                    ].join(' ')}
                     onPointerDown={() => handlePointerDown(rowIndex, colIndex)}
                     onPointerEnter={() => handlePointerEnter(rowIndex, colIndex)}
                     onPointerUp={finalizeSelection}
@@ -256,25 +261,36 @@ export function FinanceCrossword({ onBack }) {
             )}
           </div>
 
-          <div className="finance-crossword-footer">
-            <div className="finance-crossword-wordlist">
+          <div className="mt-4">
+            <div className="flex gap-2.5 flex-wrap mb-4">
               {puzzle.placements.map((placement) => (
                 <span
                   key={placement.word}
-                  className={`finance-crossword-word${
-                    solvedSet.has(placement.word) ? ' solved' : ''
-                  }`}
+                  className={[
+                    'px-3 py-2 border-2 font-mono font-bold text-sm uppercase',
+                    solvedSet.has(placement.word)
+                      ? 'text-[#00ff88] line-through border-[#00ff88] bg-black'
+                      : 'border-neutral-700 bg-black text-white',
+                  ].join(' ')}
                 >
                   {placement.word}
                 </span>
               ))}
             </div>
 
-            <div className="finance-crossword-actions">
-              <button type="button" onClick={onBack}>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                className="bg-[#00ff88] text-black font-bold uppercase tracking-wider border-2 border-[#00ff88] px-6 py-2 font-mono cursor-pointer"
+                onClick={onBack}
+              >
                 Back
               </button>
-              <button type="button" onClick={resetGame}>
+              <button
+                type="button"
+                className="bg-[#00ff88] text-black font-bold uppercase tracking-wider border-2 border-[#00ff88] px-6 py-2 font-mono cursor-pointer"
+                onClick={resetGame}
+              >
                 New Game
               </button>
             </div>
@@ -282,14 +298,26 @@ export function FinanceCrossword({ onBack }) {
         </div>
 
         {completed && (
-          <div className="finance-crossword-winbox">
-            <p>Brilliant! You found every finance word.</p>
-            <button type="button" onClick={resetGame}>
+          <div className="border-2 border-[#ffcc00] bg-black p-6 text-center shadow-[4px_4px_0_#ffcc00]">
+            <p className="text-[#ffcc00] font-black uppercase text-2xl font-mono mb-3">Brilliant! You found every finance word.</p>
+            <button
+              type="button"
+              className="bg-[#00ff88] text-black font-bold uppercase tracking-wider border-2 border-[#00ff88] px-6 py-2 font-mono cursor-pointer"
+              onClick={resetGame}
+            >
               Play Again
             </button>
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-4px); }
+          75% { transform: translateX(4px); }
+        }
+      `}</style>
     </div>
   )
 }

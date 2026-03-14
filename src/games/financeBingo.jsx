@@ -149,21 +149,22 @@ export function FinanceBingo({ onBack }) {
   }
 
   return (
-    <div className="finance-bingo-overlay">
-      <div className="finance-bingo-shell">
-        <div className="finance-bingo-timer">Time: {formattedTime}</div>
-        <h1 className="finance-bingo-title">FINANCE BINGO</h1>
+    <div className="fixed inset-0 bg-[#0a0a0a] flex items-center justify-center z-50">
+      <div className="w-full max-w-lg p-6 bg-[#111] border-2 border-[#00ff88] shadow-[6px_6px_0_#00ff88]">
+        <div className="text-[#00ff88] font-mono text-sm mb-2">Time: {formattedTime}</div>
+        <h1 className="text-white font-black text-2xl uppercase tracking-tighter mb-4 font-mono">FINANCE BINGO</h1>
 
-        <div className="finance-bingo-status">
-          <div className="finance-bingo-current-number">
+        <div className="border-2 border-neutral-700 bg-black p-4 mb-4">
+          <div className="text-[#00ff88] font-mono font-bold text-3xl mb-2">
             {currentPrompt ? currentPrompt.id : '--'}
           </div>
-          <p className="finance-bingo-question">
+          <p className="text-neutral-300 font-mono text-sm mb-3">
             {currentPrompt ? currentPrompt.question : 'All questions completed.'}
           </p>
-          <div className="finance-bingo-actions">
+          <div className="flex gap-3">
             <button
               type="button"
+              className="bg-[#00ff88] text-black font-bold uppercase tracking-wider border-2 border-[#00ff88] px-6 py-2 font-mono cursor-pointer disabled:opacity-50"
               onClick={() => handleAnswer(true)}
               disabled={!currentPrompt || isFinished}
             >
@@ -171,6 +172,7 @@ export function FinanceBingo({ onBack }) {
             </button>
             <button
               type="button"
+              className="bg-black text-white border-2 border-neutral-600 px-6 py-2 uppercase tracking-wider font-bold font-mono cursor-pointer hover:border-[#ff3366] disabled:opacity-50"
               onClick={() => handleAnswer(false)}
               disabled={!currentPrompt || isFinished}
             >
@@ -179,13 +181,19 @@ export function FinanceBingo({ onBack }) {
           </div>
         </div>
 
-        <div className="finance-bingo-grid">
+        <div className="grid grid-cols-5 gap-1.5 mb-4">
           {board.map((tile) => (
             <div
               key={tile.id}
-              className={`finance-bingo-tile${tile.marked ? ' marked' : ''}${
-                currentPrompt?.id === tile.id ? ' active' : ''
-              }`}
+              className={[
+                'aspect-square border-2 flex items-center justify-center font-mono font-bold text-sm',
+                tile.marked
+                  ? 'bg-[#00ff88] border-[#00ff88] text-black'
+                  : 'border-neutral-700 bg-black text-white',
+                currentPrompt?.id === tile.id
+                  ? 'border-[#ffcc00] shadow-[2px_2px_0_#ffcc00]'
+                  : '',
+              ].join(' ')}
             >
               <span>{tile.id}</span>
             </div>
@@ -193,32 +201,44 @@ export function FinanceBingo({ onBack }) {
         </div>
 
         <div
-          className="finance-bingo-word"
+          className="flex justify-center gap-2 mb-4 font-mono text-3xl font-black"
           aria-label={`Bingo progress: ${displayedWord || 'none'}`}
         >
           {BINGO_WORD.split('').map((letter, index) => (
             <span
               key={letter}
-              className={index < revealedLetters ? 'revealed' : ''}
+              className={index < revealedLetters ? 'text-[#00ff88]' : 'text-neutral-700'}
             >
-              {index < revealedLetters ? letter : ''}
+              {index < revealedLetters ? letter : '_'}
             </span>
           ))}
         </div>
 
-        <div className="finance-bingo-footer">
-          <button type="button" onClick={onBack}>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            className="bg-[#00ff88] text-black font-bold uppercase tracking-wider border-2 border-[#00ff88] px-6 py-2 font-mono cursor-pointer"
+            onClick={onBack}
+          >
             Back
           </button>
-          <button type="button" onClick={handleRestart}>
+          <button
+            type="button"
+            className="bg-[#00ff88] text-black font-bold uppercase tracking-wider border-2 border-[#00ff88] px-6 py-2 font-mono cursor-pointer"
+            onClick={handleRestart}
+          >
             Restart
           </button>
         </div>
 
         {isFinished && (
-          <div className="finance-bingo-winbox">
-            <p>Congrats! you won!</p>
-            <button type="button" onClick={onBack}>
+          <div className="border-2 border-[#ffcc00] bg-black p-6 text-center mt-4 shadow-[4px_4px_0_#ffcc00]">
+            <p className="text-[#ffcc00] font-black uppercase text-xl font-mono mb-3">Congrats! you won!</p>
+            <button
+              type="button"
+              className="bg-[#00ff88] text-black font-bold uppercase tracking-wider border-2 border-[#00ff88] px-6 py-2 font-mono cursor-pointer"
+              onClick={onBack}
+            >
               OK
             </button>
           </div>

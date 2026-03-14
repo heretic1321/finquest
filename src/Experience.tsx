@@ -11,6 +11,7 @@ import UnderfloorRespawnTrigger from '@client/components/UnderfloorRespawnTrigge
 import ZoneManager from '@client/components/ZoneManager'
 import ColliderDebug from '@client/components/ColliderDebug'
 import OldManNPC from '@client/components/OldManNPC'
+import { MinigameKiosks } from '@client/components/MinigameKiosk'
 import { genericStore } from '@client/contexts/GlobalStateContext'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { useGameStore } from '@client/stores/gameStore'
@@ -235,6 +236,7 @@ const CharacterDependentComponents = () => {
       <ZoneManager characterRef={characterRef} />
       <ColliderDebug />
       <OldManNPC characterRef={characterRef} />
+      <MinigameKiosks characterRef={characterRef} />
     </>
   )
 }

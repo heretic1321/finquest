@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import './Wordle.css'
 
 function getTodayIST() {
   const now = new Date()
@@ -92,6 +91,18 @@ function buildConfetti(count = 26) {
     duration: 1.8 + Math.random() * 1.4,
     rotation: Math.random() * 360,
   }))
+}
+
+const cellStatusClasses = {
+  correct: 'bg-[#00ff88] border-[#00ff88] text-black',
+  present: 'bg-[#ffcc00] border-[#ffcc00] text-black',
+  absent: 'bg-neutral-700 border-neutral-700',
+}
+
+const keyStatusClasses = {
+  correct: 'bg-[#00ff88] border-[#00ff88] text-black',
+  present: 'bg-[#ffcc00] border-[#ffcc00] text-black',
+  absent: 'bg-neutral-700 border-neutral-700',
 }
 
 const Wordle = ({
@@ -388,31 +399,68 @@ const Wordle = ({
   }
 
   return (
-    <div className="wordle-page">
-      <div className="wordle-topbar">
-        <div className="wordle-brand">Wordle Street</div>
+    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
+      {/* Keyframe animations */}
+      <style>{`
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes shake-row {
+          20% { transform: translateX(-8px); }
+          40% { transform: translateX(8px); }
+          60% { transform: translateX(-5px); }
+          80% { transform: translateX(5px); }
+          100% { transform: translateX(0); }
+        }
+        @keyframes dance-row {
+          0%, 100% { transform: translateY(0); }
+          25% { transform: translateY(-8px); }
+          50% { transform: translateY(0); }
+          75% { transform: translateY(-4px); }
+        }
+        @keyframes win-glow {
+          0% { filter: brightness(1); }
+          50% { filter: brightness(1.35); }
+          100% { filter: brightness(1); }
+        }
+        @keyframes coin-pop {
+          0% { transform: translateY(0) scale(0.7); opacity: 0; }
+          20% { opacity: 1; }
+          100% { transform: translateY(calc(-140px - (var(--stack) * 8px))) scale(1.05); opacity: 0; }
+        }
+        @keyframes confetti-fall {
+          100% { transform: translateY(110vh) rotate(540deg); opacity: 0.9; }
+        }
+        .wordle-shake { animation: shake-row 0.35s ease; }
+        .wordle-dance { animation: dance-row 0.55s ease; }
+        .wordle-win { animation: win-glow 0.8s ease; }
+        .wordle-flip { animation: none; }
+      `}</style>
+
+      <div className="absolute top-3 left-5 right-5 flex items-center justify-between z-10">
+        <div className="text-white font-black text-sm uppercase tracking-wider">Wordle Street</div>
       </div>
 
       <button
         type="button"
-        className="wordle-howto-button"
+        className="absolute left-5 bottom-5 z-10 border-2 border-neutral-600 bg-black px-5 py-3 text-white font-mono uppercase tracking-wider text-sm cursor-pointer hover:border-[#00ff88]"
         onClick={() => setShowHowToPlay(true)}
       >
         How to Play
       </button>
 
-      <div className="wordle-shell">
-        <h1 className="wordle-title">Guess the word</h1>
+      <div className="min-h-screen flex flex-col items-center justify-center pt-16 px-4 pb-4">
+        <h1 className="text-[#00ff88] text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4">
+          Guess the word
+        </h1>
 
         <div
-          className="wordle-container"
+          className="outline-none"
           role="application"
           aria-label="Wordle game"
           onClick={focusInput}
         >
           <input
             ref={inputRef}
-            className="wordle-hidden-input"
+            className="absolute opacity-0 pointer-events-none"
             onKeyDown={handleKeyDown}
             inputMode="none"
             readOnly
@@ -420,11 +468,19 @@ const Wordle = ({
             autoFocus
           />
 
-          <div className="wordle-panel">
-            <div className="wordle-grid">
+          <div className="w-full max-w-[640px] p-5 bg-[#111] border-2 border-[#00ff88] shadow-[4px_4px_0_#00ff88]">
+            <div className="grid gap-1.5 justify-center mb-4">
               {grid.map((row, rowIdx) => (
                 <div
-                  className={`wordle-row ${rowAnimation[rowIdx] || ''}`}
+                  className={`grid grid-cols-5 gap-1.5 ${
+                    rowAnimation[rowIdx] === 'shake'
+                      ? 'wordle-shake'
+                      : rowAnimation[rowIdx] === 'dance'
+                        ? 'wordle-dance'
+                        : rowAnimation[rowIdx] === 'win'
+                          ? 'wordle-win'
+                          : ''
+                  }`}
                   key={rowIdx}
                   onAnimationEnd={() =>
                     setRowAnimation((prev) => ({ ...prev, [rowIdx]: '' }))
@@ -432,9 +488,9 @@ const Wordle = ({
                 >
                   {row.map((cell, colIdx) => (
                     <div
-                      className={`wordle-cell ${
+                      className={`w-[52px] h-[52px] border-2 border-neutral-600 bg-black text-white grid place-items-center text-2xl font-bold font-mono relative uppercase ${
                         statusGrid[rowIdx][colIdx]
-                          ? `flip ${statusGrid[rowIdx][colIdx]}`
+                          ? cellStatusClasses[statusGrid[rowIdx][colIdx]] || ''
                           : ''
                       }`}
                       key={colIdx}
@@ -443,20 +499,31 @@ const Wordle = ({
                       {rowIdx === currentRow &&
                         colIdx === currentCol &&
                         currentCol < 5 &&
-                        !finished && <span className="typing-cursor" />}
+                        !finished && (
+                          <span
+                            className="bg-[#00ff88]"
+                            style={{
+                              position: 'absolute',
+                              bottom: 9,
+                              width: 18,
+                              height: 3,
+                              animation: 'blink 1s infinite',
+                            }}
+                          />
+                        )}
                     </div>
                   ))}
                 </div>
               ))}
             </div>
 
-            <div className="wordle-keyboard">
+            <div className="flex flex-col gap-2 items-center">
               {QWERTY_ROWS.map((row, rowIndex) => (
-                <div className="wordle-key-row" key={rowIndex}>
+                <div className="flex gap-2 justify-center" key={rowIndex}>
                   {rowIndex === 2 && (
                     <button
                       type="button"
-                      className="wordle-key special"
+                      className="min-w-[68px] h-[46px] border-2 border-neutral-700 bg-black text-white text-xs font-bold font-mono cursor-pointer hover:border-[#00ff88] px-1.5"
                       onMouseDown={(event) => event.preventDefault()}
                       onClick={() => handleKeyboardClick('ENTER')}
                     >
@@ -468,7 +535,11 @@ const Wordle = ({
                     <button
                       key={key}
                       type="button"
-                      className={`wordle-key ${keyboardStatus[key] || ''}`}
+                      className={`min-w-[44px] h-[46px] border-2 border-neutral-700 bg-black text-white text-sm font-bold font-mono cursor-pointer hover:border-[#00ff88] px-1.5 ${
+                        keyboardStatus[key]
+                          ? keyStatusClasses[keyboardStatus[key]] || ''
+                          : ''
+                      }`}
                       onMouseDown={(event) => event.preventDefault()}
                       onClick={() => handleKeyboardClick(key)}
                       disabled={finished}
@@ -480,7 +551,7 @@ const Wordle = ({
                   {rowIndex === 2 && (
                     <button
                       type="button"
-                      className="wordle-key special"
+                      className="min-w-[68px] h-[46px] border-2 border-neutral-700 bg-black text-white text-xs font-bold font-mono cursor-pointer hover:border-[#00ff88] px-1.5"
                       onMouseDown={(event) => event.preventDefault()}
                       onClick={() => handleKeyboardClick('BACKSPACE')}
                     >
@@ -491,7 +562,7 @@ const Wordle = ({
               ))}
             </div>
 
-            <div className="wordle-timer">
+            <div className="mt-4 flex justify-center gap-1 text-[#00ff88] text-xl font-mono tabular-nums">
               <span>{timerParts.m}</span>
               <span>:</span>
               <span>{timerParts.s}</span>
@@ -502,13 +573,19 @@ const Wordle = ({
         </div>
       </div>
 
-      {message && !finished && <div className="wordle-popup-message">{message}</div>}
+      {message && !finished && (
+        <div className="fixed left-1/2 bottom-28 -translate-x-1/2 px-5 py-3 border-2 border-neutral-600 bg-black text-white font-mono z-10">
+          {message}
+        </div>
+      )}
 
       {finished && (
-        <div className="wordle-result-overlay">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-20 p-6">
           <div
-            className={`wordle-result-card ${
-              message.startsWith('Congratulations!') ? 'success' : 'failure'
+            className={`max-w-lg w-full p-7 bg-[#0a0a0a] text-center text-white font-mono ${
+              message.startsWith('Congratulations!')
+                ? 'border-2 border-[#00ff88] shadow-[6px_6px_0_#00ff88]'
+                : 'border-2 border-[#ff3366] shadow-[6px_6px_0_#ff3366]'
             }`}
           >
             {message.split('\n').map((line) => (
@@ -516,9 +593,9 @@ const Wordle = ({
             ))}
             <button
               type="button"
-              className="wordle-titlepage-btn"
+              className="mt-6 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-base border-2 border-[#00ff88] px-5 py-3 cursor-pointer shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
               onClick={() => {
-                if (typeof onCloseGame === 'function') onCloseGame()
+                onCloseGame?.()
                 restartGame()
               }}
             >
@@ -529,19 +606,22 @@ const Wordle = ({
       )}
 
       {showHowToPlay && (
-        <div className="wordle-modal-overlay" onClick={() => setShowHowToPlay(false)}>
+        <div
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-20 p-6"
+          onClick={() => setShowHowToPlay(false)}
+        >
           <div
-            className="wordle-modal"
+            className="max-w-lg w-full bg-[#0a0a0a] border-2 border-[#00ff88] p-7 font-mono text-white"
             onClick={(event) => event.stopPropagation()}
           >
-            <h2>How to Play</h2>
-            <p>Guess the 5-letter finance-themed word in 6 tries.</p>
-            <p>Green means the letter is in the correct place.</p>
-            <p>Yellow means the letter is in the word but in a different spot.</p>
-            <p>Gray means the letter is not in the word.</p>
+            <h2 className="text-[#00ff88] text-2xl font-bold mb-4">How to Play</h2>
+            <p className="mb-2.5 leading-relaxed">Guess the 5-letter finance-themed word in 6 tries.</p>
+            <p className="mb-2.5 leading-relaxed">Green means the letter is in the correct place.</p>
+            <p className="mb-2.5 leading-relaxed">Yellow means the letter is in the word but in a different spot.</p>
+            <p className="mb-2.5 leading-relaxed">Gray means the letter is not in the word.</p>
             <button
               type="button"
-              className="wordle-titlepage-btn"
+              className="mt-6 bg-[#00ff88] text-black font-bold uppercase tracking-wider text-base border-2 border-[#00ff88] px-5 py-3 cursor-pointer shadow-[3px_3px_0_white] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
               onClick={() => setShowHowToPlay(false)}
             >
               Close
@@ -551,13 +631,16 @@ const Wordle = ({
       )}
 
       {coins.length > 0 && (
-        <div className="coin-layer">
+        <div className="fixed inset-0 pointer-events-none z-[25]">
           {coins.map((coin) => (
             <div
               key={coin.id}
-              className="coin"
+              className="absolute text-[22px]"
               style={{
-                '--delay': `${coin.delay}ms`,
+                left: `calc(50% + (${coin.stack} * 14px) - 42px)`,
+                bottom: 110,
+                animation: 'coin-pop 1.8s ease-out forwards',
+                animationDelay: `${coin.delay}ms`,
                 '--stack': coin.stack,
               }}
             >
@@ -568,16 +651,19 @@ const Wordle = ({
       )}
 
       {confetti.length > 0 && (
-        <div className="wordle-confetti-layer" aria-hidden="true">
+        <div className="fixed inset-0 pointer-events-none z-[25]" aria-hidden="true">
           {confetti.map((piece) => (
             <span
               key={piece.id}
-              className="wordle-confetti"
+              className={`absolute top-[-20px] w-2.5 h-[18px] ${
+                piece.left > 50 ? 'bg-[#00ff88]' : 'bg-[#ffcc00]'
+              }`}
               style={{
                 left: `${piece.left}%`,
                 animationDelay: `${piece.delay}s`,
                 animationDuration: `${piece.duration}s`,
                 transform: `rotate(${piece.rotation}deg)`,
+                animation: `confetti-fall ${piece.duration}s linear ${piece.delay}s forwards`,
               }}
             />
           ))}

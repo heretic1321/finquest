@@ -19,6 +19,8 @@ import { getZoneByStoreKey } from '@client/config/ZoneConfig'
 import { useGameStore, getPlayerLevel } from '@client/stores/gameStore'
 import { launchUnityGame } from '@client/utils/unityLauncher'
 import { UIFlowStore, UIFlowsOverlay } from '@client/ui_flows'
+import MinigameOverlay from '@client/components/HUD/MinigameOverlay'
+import { useMinigameStore } from '@client/components/MinigameKiosk'
 import { useShallow } from 'zustand/react/shallow'
 
 function formatRupees(amount: number): string {
@@ -162,6 +164,8 @@ export default function HUD() {
   const oldManNearby = useOldManStore((s) => s.isNearby)
   const oldManUIOpen = useOldManStore((s) => s.isUIOpen)
   const isUIFlowOpen = UIFlowStore((state) => state.isOpen)
+  const nearbyKiosk = useMinigameStore((s) => s.nearbyKiosk)
+  const activeMinigame = useMinigameStore((s) => s.activeGame)
 
   // Loader with smooth fade-out: stays mounted while fading, then unmounts
   const [loaderMounted, setLoaderMounted] = useState(false)
@@ -254,11 +258,29 @@ export default function HUD() {
 
       {/* Exit triggers disabled — players no longer enter buildings */}
 
+      {/* Minigame kiosk proximity prompt */}
+      {hasStartButtonBeenPressed && !loading_initialSpawn && nearbyKiosk && !activeMinigame && !isEnterStorePromptShown && (
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 text-center">
+          <div className="bg-black border-2 border-[#00ff88] shadow-[4px_4px_0_#00ff88] px-8 py-4">
+            <p className="text-white text-lg font-black uppercase tracking-tight mb-1">
+              {nearbyKiosk === 'wordle' ? 'WORDLE STREET' : nearbyKiosk === 'bingo' ? 'FINANCE BINGO' : 'FINANCE CROSSWORD'}
+            </p>
+            <div className="flex items-center justify-center gap-2 text-[#00ff88]">
+              <kbd className="border-2 border-[#00ff88] bg-[#00ff88] text-black font-mono font-bold px-3 py-1">E</kbd>
+              <span className="text-sm font-mono uppercase tracking-wider">to play</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Zone full-page UI */}
       <ZoneUI />
 
       {/* UI Flows pipeline overlay */}
       {isUIFlowOpen && <UIFlowsOverlay />}
+
+      {/* Minigame overlay */}
+      {activeMinigame && <MinigameOverlay />}
     </>
   )
 }
