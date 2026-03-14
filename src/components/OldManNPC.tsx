@@ -1,20 +1,15 @@
-import { useRef, useEffect, useState } from 'react'
-import { useGLTF, useAnimations } from '@react-three/drei'
+import { useRef, useEffect } from 'react'
+import { useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { SkeletonUtils } from 'three-stdlib'
-import { useControls, folder } from 'leva'
+import { useControls } from 'leva'
+import { create } from 'zustand'
 
 import { CharacterRef } from '@client/components/Character'
 import { HUDStore } from '@client/contexts/HUDContext'
 import { genericStore } from '@client/contexts/GlobalStateContext'
 
-type OldManNPCProps = {
-  characterRef: React.MutableRefObject<CharacterRef | null>
-}
-
 // Store for old man interaction
-import { create } from 'zustand'
 export const useOldManStore = create<{
   isNearby: boolean
   isUIOpen: boolean
@@ -27,41 +22,36 @@ export const useOldManStore = create<{
   setUIOpen: (v) => set({ isUIOpen: v }),
 }))
 
-const TRIGGER_RADIUS = 15 // units
+const TRIGGER_RADIUS = 15
+
+type OldManNPCProps = {
+  characterRef: React.MutableRefObject<CharacterRef | null>
+}
 
 export default function OldManNPC({ characterRef }: OldManNPCProps) {
   const groupRef = useRef<THREE.Group>(null!)
   const modelRef = useRef<THREE.Group>(null!)
 
-  // Leva controls for positioning
   const { npcPos, npcRot, npcScale } = useControls('Old Man NPC', {
     npcPos: { value: [4, 5.8, -150], label: 'Position', step: 0.5 },
     npcRot: { value: [0, 0, 0], label: 'Rotation', step: 0.1 },
-    npcScale: { value: 4, min: 0.5, max: 10, step: 0.1, label: 'Scale' },
+    npcScale: { value: 5, min: 0.5, max: 15, step: 0.1, label: 'Scale' },
   })
 
-  // Load model — using guide.gltf as the old man
-  const { scene: originalScene } = useGLTF('./assets/avatars/guide.gltf')
-  const { animations: idleAnim } = useGLTF('./assets/animations/Standing_Idle.glb')
+  // Load static model (no rig, no animations)
+  const { scene } = useGLTF('./assets/avatars/oldguy.glb')
 
-  const clonedScene = SkeletonUtils.clone(originalScene)
-
-  // Set up idle animation
-  idleAnim[0].name = 'idle'
-  const { actions } = useAnimations([idleAnim[0]], modelRef)
-
-  useEffect(() => {
-    if (actions['idle']) {
-      actions['idle'].play()
-    }
-  }, [actions])
-
-  // Proximity detection — check distance to player each frame
-  useFrame(() => {
+  // Gentle idle bobbing
+  useFrame(({ clock }) => {
     if (!genericStore.getState().isTabFocused) return
-    if (!characterRef.current?.playerRef?.current) return
-    if (!groupRef.current) return
+    if (!modelRef.current) return
 
+    // Subtle floating bob
+    const t = clock.getElapsedTime()
+    modelRef.current.position.y = Math.sin(t * 1.5) * 0.08
+
+    // Proximity detection
+    if (!characterRef.current?.playerRef?.current || !groupRef.current) return
     const playerPos = characterRef.current.playerRef.current.position
     const npcPosition = groupRef.current.position
     const dist = playerPos.distanceTo(npcPosition)
@@ -73,12 +63,15 @@ export default function OldManNPC({ characterRef }: OldManNPCProps) {
       useOldManStore.getState().setNearby(false)
     }
 
-    // Face the player when nearby
-    if (dist < TRIGGER_RADIUS && modelRef.current) {
-      const dir = new THREE.Vector3()
-      dir.subVectors(playerPos, npcPosition).normalize()
+    // Rotate to face player when nearby
+    if (dist < TRIGGER_RADIUS) {
+      const dir = new THREE.Vector3().subVectors(playerPos, npcPosition).normalize()
       const angle = Math.atan2(dir.x, dir.z)
-      modelRef.current.rotation.y = angle
+      modelRef.current.rotation.y = THREE.MathUtils.lerp(
+        modelRef.current.rotation.y,
+        angle,
+        0.05
+      )
     }
   })
 
@@ -88,7 +81,6 @@ export default function OldManNPC({ characterRef }: OldManNPCProps) {
       if (e.code !== 'KeyE') return
       const nearby = useOldManStore.getState().isNearby
       const enterPrompt = HUDStore.getState().isEnterStorePromptShown
-      // Only trigger if nearby and no zone prompt is showing
       if (nearby && !enterPrompt) {
         useOldManStore.getState().setUIOpen(true)
       }
@@ -104,7 +96,7 @@ export default function OldManNPC({ characterRef }: OldManNPCProps) {
         rotation={npcRot as unknown as [number, number, number]}
         scale={npcScale}
       >
-        <primitive object={clonedScene} />
+        <primitive object={scene} />
       </group>
     </group>
   )
