@@ -40,10 +40,12 @@ export const UI_FLOW_DEFINITIONS: UIFlowDefinition[] = [
   },
 ]
 
-// Future mapping for world -> UI route handoff.
-// Example when asset/store key exists:
-// investmentcenter: 'investment-center'
-export const STORE_TO_UI_FLOW: Partial<Record<string, UIFlowId>> = {}
+// Map world store keys → UI flow IDs
+export const STORE_TO_UI_FLOW: Partial<Record<string, UIFlowId>> = {
+  cylinderstore: 'bank-flow',
+  tallstore: 'hospital-insurance',
+  domestore: 'investment-center',
+}
 
 export const getUIFlowForStore = (storeKey: string): UIFlowId | undefined =>
   STORE_TO_UI_FLOW[storeKey]
